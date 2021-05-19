@@ -79,5 +79,5 @@ services:
             - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
             - NGINX_SYMFONY_SERVER_NAME=${NGINX_SYMFONY_SERVER_NAME}
         volumes:
-            - ./logs/nginx:/var/log/nginx:cached
-            - ./symfony:/var/www/symfony:cached
+            - ./logs/nginx:/var/log/nginx
+            - ./symfony:/var/www/symfony
