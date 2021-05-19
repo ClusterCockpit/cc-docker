@@ -1,0 +1,83 @@
+version: '3.9'
+services:
+    db:
+        container_name: db
+        image: mysql:8.0.22
+        command: ["--default-authentication-plugin=mysql_native_password"]
+        ports:
+            - "${MYSQL_PORT}:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ClusterCockpit
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        volumes:
+            - ./sql:/var/lib/mysql
+
+    influxdb:
+        container_name: influxdb
+        image: influxdb
+        command: ["--reporting-disabled"]
+        ports:
+            - "${INFLUXDB_PORT}:8086"
+        environment:
+            DOCKER_INFLUXDB_INIT_MODE: setup
+            DOCKER_INFLUXDB_INIT_USERNAME: symfony
+            DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
+            DOCKER_INFLUXDB_INIT_ORG: ClusterCockpit
+            DOCKER_INFLUXDB_INIT_BUCKET: ClusterCockpit
+            DOCKER_INFLUXDB_INIT_RETENTION: 2w
+            DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
+        volumes:
+            - ./influxdb/data:/var/lib/influxdb2
+            - ./influxdb/config:/etc/influxdb2
+
+    php:
+        container_name: php-fpm
+        build:
+            context: ./php-fpm
+            args:
+                PHP_XDEBUG_MODE: ${PHP_XDEBUG_MODE}
+                PHP_XDEBUG_CLIENT_PORT: ${PHP_XDEBUG_CLIENT_PORT}
+                PHP_XDEBUG_CLIENT_HOST: ${PHP_XDEBUG_CLIENT_HOST}
+                SYMFONY_CLI_VERSION: 4.23.2
+                MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+                INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
+        ports:
+            - "${PHP_PORT}:9001"
+        volumes:
+            - ./logs/symfony:/var/www/symfony/var/log
+            - ./symfony:/var/www/symfony
+        depends_on:
+            - db
+            - influxdb
+
+    phpmyadmin:
+        image: phpmyadmin
+        container_name: phpmyadmin
+        environment:
+            - PMA_HOST=db
+            - PMA_USER=root
+            - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        ports:
+            - "${PHPMYADMIN_PORT}:80"
+        restart: always
+
+    nginx:
+        container_name: nginx
+        build:
+            context: ./nginx
+            args:
+                NGINX_SYMFONY_SERVER_NAME: ${NGINX_SYMFONY_SERVER_NAME}
+        ports:
+            - "${NGINX_PORT}:80"
+        depends_on:
+            - php
+        environment:
+            - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+            - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
+            - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
+            - NGINX_SYMFONY_SERVER_NAME=${NGINX_SYMFONY_SERVER_NAME}
+        volumes:
+            - ./logs/nginx:/var/log/nginx:cached
+            - ./symfony:/var/www/symfony:cached
