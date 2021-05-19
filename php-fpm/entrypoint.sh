@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+rm -rf /var/www/symfony/* /var/www/symfony/.*
 git clone https://github.com/ClusterCockpit/ClusterCockpit.git /var/www/symfony/.
 cd /var/www/symfony
 git checkout  feature-47-introduce-graphql-api
