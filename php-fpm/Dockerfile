@@ -66,8 +66,8 @@ RUN wget https://github.com/symfony/cli/releases/download/v$SYMFONY_CLI_VERSION/
 RUN apk add --update nodejs npm \
     && npm install --global yarn
 
-RUN mkdir -p /var/www/symfony && mkdir -p /var/www/symfony/var/log
-VOLUME /var/www/symfony /var/www/symfony/var/log
+RUN mkdir -p /var/www/symfony
+VOLUME /var/www/symfony
 
 COPY symfony.ini /etc/php8/conf.d/
 COPY symfony.ini /etc/php8/cli/conf.d/

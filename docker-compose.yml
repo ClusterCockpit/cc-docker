@@ -46,7 +46,6 @@ services:
         ports:
             - "${PHP_PORT}:9001"
         volumes:
-            - ./logs/symfony:/var/www/symfony/var/log
             - ./symfony:/var/www/symfony
         depends_on:
             - db
