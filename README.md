@@ -27,12 +27,11 @@ docker compose up
 
 Desired modes for the future are:
 
-* Demo: Includes everything to try out ClusterCockpit including initial Database Fixtures. No SSL and no reverse Proxy.
-* Develop: Only includes all external components of ClusterCockpit. A functional PHP environment and the ClusterCockpit source must be maintained on host machine.
-* Production: Includes everything to run ClusterCockpit in a Production environment including SSL and traefic reverse proxy and container orchestration.
+* **Demo** Includes everything to try out ClusterCockpit including initial Database Fixtures. No SSL and no reverse Proxy.
+* **Develop** Only includes all external components of ClusterCockpit. A functional PHP environment and the ClusterCockpit source must be maintained on host machine.
+* **Production** Includes everything to run ClusterCockpit in a Production environment including SSL and traefic reverse proxy and container orchestration.
 
 TODOS (There are probably a lot more!):
-* Some of the Volume directories need to be created first, others (influxdb) not
-* The main problem is currently the checkout of the ClusterCockpit tree to the existing directory `/var/www/symfony`, the directory is non-empty. Maybe because of caching
+* Some of the Volume directories need to be created first.
 * ClusterCockpit is at the moment still using the influxDB V1 API, the InfluxDB container is already V2
 * For a running demo database fixtures for MySQL and InfluxDB are missing
