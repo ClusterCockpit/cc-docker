@@ -10,7 +10,7 @@ git checkout feature-47-introduce-graphql-api
 composer install --no-dev --no-progress --optimize-autoloader
 yarn install
 yarn encore production
-# php bin/console doctrine:schema:create  --no-interaction
+php bin/console doctrine:schema:create  --no-interaction
 #php bin/console doctrine:migrations:migrate --no-interaction
 #php bin/console doc:fix:load --no-interaction
 
