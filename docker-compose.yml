@@ -68,6 +68,8 @@ services:
             context: ./nginx
             args:
                 NGINX_SYMFONY_SERVER_NAME: ${NGINX_SYMFONY_SERVER_NAME}
+                MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+                INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
         ports:
             - "${NGINX_PORT}:80"
         depends_on:

@@ -77,13 +77,15 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENV APP_ENV=prod
-ENV APP_DEBUG=0
+ENV APP_SECRET=67d829bf61dc5f87a73fd814e2c9f629
+ENV APP_DEBUG=1
 ARG INFLUXDB_PASSWORD
 ARG MYSQL_PASSWORD
 ENV INFLUXDB_URL=influxdb://symfony:${INFLUXDB_PASSWORD}@influxdb:8086/ClusterCockpit
 ENV DATABASE_URL=mysql://symfony:${MYSQL_PASSWORD}@db:3306/ClusterCockpit
 ENV CORS_ALLOW_ORIGIN=^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$
 
+WORKDIR /var/www/symfony
 EXPOSE 9001
 CMD ["php-fpm8", "-F"]
 ENTRYPOINT ["/entrypoint.sh"]
