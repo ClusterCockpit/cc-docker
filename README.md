@@ -35,3 +35,20 @@ TODOS (There are probably a lot more!):
 * Some of the Volume directories need to be created first.
 * ClusterCockpit is at the moment still using the influxDB V1 API, the InfluxDB container is already V2
 * For a running demo database fixtures for MySQL and InfluxDB are missing
+
+## Using for DEMO purpose
+
+Before starting the containers the fixture data needs to be prepared:
+* `$ cd data`
+* `$ ./init.sh`
+
+After that from the root of the repository you can start up the containers with:
+* `docker-compose up`
+* Wait... and wait a little longer
+
+You can access ClusterCockpit in your browser at http://localhost .
+Credentials for admin user are:
+* User: `admin`
+* Password: `AdminDev`
+
+Nothing is preserved! After shutting down the container everything is initialized from scratch.

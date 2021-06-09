@@ -1,18 +1,15 @@
-version: '1.0'
 services:
     db:
         container_name: db
         image: mysql:8.0.22
         command: ["--default-authentication-plugin=mysql_native_password"]
-        ports:
-            - "${MYSQL_PORT}:3306"
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ClusterCockpit
             MYSQL_USER: symfony
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
-            - ./sql:/var/lib/mysql
+            - ${DATADIR}/sql:/docker-entrypoint-initdb.d
 
     influxdb:
         container_name: influxdb
@@ -28,9 +25,6 @@ services:
             DOCKER_INFLUXDB_INIT_BUCKET: ClusterCockpit
             DOCKER_INFLUXDB_INIT_RETENTION: 2w
             DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
-        volumes:
-            - ./influxdb/data:/var/lib/influxdb2
-            - ./influxdb/config:/etc/influxdb2
 
     php:
         container_name: php-fpm
@@ -43,10 +37,11 @@ services:
                 SYMFONY_CLI_VERSION: 4.23.2
                 MYSQL_PASSWORD: ${MYSQL_PASSWORD}
                 INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
-        ports:
-            - "${PHP_PORT}:9001"
+        environment:
+          - DOCKER_CLUSTERCOCKPIT_INIT=true
         volumes:
-            - ./symfony:/var/www/symfony
+          - ${DATADIR}/symfony:/var/www/symfony:cached
+          - ${DATADIR}/job-archive:/var/lib/job-archive:cached
         depends_on:
             - db
             - influxdb
@@ -80,5 +75,4 @@ services:
             - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
             - NGINX_SYMFONY_SERVER_NAME=${NGINX_SYMFONY_SERVER_NAME}
         volumes:
-            - ./logs/nginx:/var/log/nginx
-            - ./symfony:/var/www/symfony
+          - ${DATADIR}/symfony:/var/www/symfony:cached
