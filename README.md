@@ -52,3 +52,5 @@ Credentials for admin user are:
 * Password: `AdminDev`
 
 Nothing is preserved! After shutting down the container everything is initialized from scratch.
+
+To reuse an existing Symfony tree at `./data/symfony` you may remove the environment variable `DOCKER_CLUSTERCOCKPIT_INIT` in the docker file.
