@@ -17,7 +17,7 @@ services:
         image: influxdb
         command: ["--reporting-disabled"]
         ports:
-            - "${INFLUXDB_PORT}:8086"
+            - "127.0.0.1:${INFLUXDB_PORT}:8086"
         environment:
             DOCKER_INFLUXDB_INIT_MODE: setup
             DOCKER_INFLUXDB_INIT_USERNAME: symfony
@@ -58,7 +58,7 @@ services:
             - PMA_USER=root
             - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
         ports:
-            - "${PHPMYADMIN_PORT}:80"
+            - "127.0.0.1:${PHPMYADMIN_PORT}:80"
         restart: always
 
     nginx:
@@ -70,7 +70,7 @@ services:
                 MYSQL_PASSWORD: ${MYSQL_PASSWORD}
                 INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
         ports:
-            - "${NGINX_PORT}:80"
+            - "127.0.0.1:${NGINX_PORT}:80"
         depends_on:
             - php
         environment:
