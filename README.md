@@ -55,4 +55,4 @@ Credentials for admin user are:
 You can shutdown the containers by pressing `CTR-C`.
 Nothing is preserved! After shutting down the container everything is initialized from scratch.
 
-To reuse an existing Symfony tree at `./data/symfony` you may remove the environment variable `DOCKER_CLUSTERCOCKPIT_INIT` in the docker file.
+To reuse an existing Symfony tree at `./data/symfony` you may remove the environment variable `DOCKER_CLUSTERCOCKPIT_INIT` in `docker-composer.yml` file.
