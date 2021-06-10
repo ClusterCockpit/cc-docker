@@ -9,6 +9,7 @@ services:
             MYSQL_USER: symfony
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
+            # - ${DATADIR}/sql:/var/lib/mysql
             - ${DATADIR}/sql:/docker-entrypoint-initdb.d
 
     influxdb:
@@ -25,6 +26,9 @@ services:
             DOCKER_INFLUXDB_INIT_BUCKET: ClusterCockpit
             DOCKER_INFLUXDB_INIT_RETENTION: 2w
             DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
+        # volumes:
+        #     - ${DATADIR}/influxdb/data:/var/lib/influxdb2
+        #     - ${DATADIR}/influxdb/config:/etc/influxdb2
 
     php:
         container_name: php-fpm
