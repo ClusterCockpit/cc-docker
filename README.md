@@ -42,6 +42,7 @@ Before starting the containers the fixture data needs to be prepared:
 * `$ cd data`
 * `$ ./init.sh`
 
+You need to ensure that no other web server is running on port 80. Also existing VPM connections sometimes cause problems with docker.
 After that from the root of the repository you can start up the containers with:
 * `docker-compose up`
 * Wait... and wait a little longer
