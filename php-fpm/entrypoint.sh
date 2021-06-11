@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ -n "${DOCKER_CLUSTERCOCKPIT_INIT}" ]; then
+if [ "$APP_CLUSTERCOCKPIT_INIT" = true ]; then
     rm -rf /var/www/symfony/* /var/www/symfony/.??*
     git clone https://github.com/ClusterCockpit/ClusterCockpit .
 
@@ -12,5 +12,7 @@ if [ -n "${DOCKER_CLUSTERCOCKPIT_INIT}" ]; then
     #php bin/console doctrine:fix:load --no-interaction
     ln -s /var/lib/job-archive var/job-archive
 fi
+
+php bin/console about
 
 exec "$@"

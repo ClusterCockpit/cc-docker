@@ -76,7 +76,8 @@ COPY symfony.ini /etc/php8/cli/conf.d/
 COPY symfony.pool.conf /etc/php8/php-fpm.d/
 COPY entrypoint.sh /entrypoint.sh
 
-ENV APP_ENV=prod
+ARG APP_ENVIRONMENT
+ENV APP_ENV=${APP_ENVIRONMENT}
 ENV APP_SECRET=67d829bf61dc5f87a73fd814e2c9f629
 ENV APP_DEBUG=1
 ARG INFLUXDB_PASSWORD

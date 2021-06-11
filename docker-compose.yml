@@ -41,8 +41,9 @@ services:
                 SYMFONY_CLI_VERSION: 4.23.2
                 MYSQL_PASSWORD: ${MYSQL_PASSWORD}
                 INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
+                APP_ENVIRONMENT: ${APP_ENVIRONMENT}
         environment:
-          - DOCKER_CLUSTERCOCKPIT_INIT=true
+          - APP_CLUSTERCOCKPIT_INIT=${APP_CLUSTERCOCKPIT_INIT}
         volumes:
           - ${DATADIR}/symfony:/var/www/symfony:cached
           - ${DATADIR}/job-archive:/var/lib/job-archive:cached
