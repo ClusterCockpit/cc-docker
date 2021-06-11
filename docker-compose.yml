@@ -1,6 +1,6 @@
 services:
     db:
-        container_name: db
+        container_name: cc-db
         image: mysql:8.0.22
         command: ["--default-authentication-plugin=mysql_native_password"]
         environment:
@@ -13,7 +13,7 @@ services:
             - ${DATADIR}/sql:/docker-entrypoint-initdb.d
 
     influxdb:
-        container_name: influxdb
+        container_name: cc-influxdb
         image: influxdb
         command: ["--reporting-disabled"]
         ports:
@@ -31,7 +31,7 @@ services:
         #     - ${DATADIR}/influxdb/config:/etc/influxdb2
 
     php:
-        container_name: php-fpm
+        container_name: cc-php
         build:
             context: ./php-fpm
             args:
@@ -52,7 +52,7 @@ services:
             - influxdb
 
     phpmyadmin:
-        image: phpmyadmin
+        image: cc-phpmyadmin
         container_name: phpmyadmin
         environment:
             - PMA_HOST=db
@@ -63,7 +63,7 @@ services:
         restart: always
 
     nginx:
-        container_name: nginx
+        container_name: cc-nginx
         build:
             context: ./nginx
             args:
