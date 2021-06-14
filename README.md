@@ -29,7 +29,7 @@ TODOS (There are probably a lot more!):
 * ClusterCockpit will be initialized from scratch on every start (Changes will not be preserved).
 
 ### Setup
-The fixture data needs to be prepared before the first start of the containers:
+The fixture data needs to be prepared once before the first start of the containers:
 * `$ cd data`
 * `$ ./init.sh`
 
