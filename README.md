@@ -1,6 +1,6 @@
 # cc-docker
 
-This is a setup for `docker compose` to try out a complete ClusterCockpit Application Stack including all external components. This docket setup is intended for demo purposes, but can be easily configured to be used as a development environement for ClusterCockpit.
+This is a setup for `docker compose` to try out a complete ClusterCockpit Application Stack including all external components. This docker setup is intended for demo purposes, but can be easily configured to be used as a development environement for ClusterCockpit.
 
 It creates containers for:
 * mysql
