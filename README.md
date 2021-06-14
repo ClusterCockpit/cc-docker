@@ -61,9 +61,9 @@ If not using an existing database, the fixture data needs to be prepared before 
 * `$ ./init.sh`
 
 If an existing database is to be used, do the following:
-* Change variables under `MySQL` and/or `INFLUXDB` in `.env` to match the credentials of your database(s).
-* Uncomment the mapping of default volume paths in `docker-compose.yml` for `cc-db` and/or `cc-influxdb` under `volumes`.
-* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db`.
+* It is recommended to use the included MySQL container.
+* Uncomment the mapping of default volume paths in `docker-compose.yml` for `cc-db` and/or `cc-influxdb` under `volumes` to persist the data across container restarts.
+* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db` to disable initialisation of the MySQL database. You may also place an own MysQL database dump in `./data/sql`.
 
 In `.env`, change the following variables under `APP`
 * `APP_CLUSTERCOCKPIT_INIT` to `false`
