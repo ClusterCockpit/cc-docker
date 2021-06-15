@@ -72,6 +72,7 @@ After that from the root of the repository you can start up the containers with:
 By default, you can access ClusterCockpit in your browser at `http://localhost`.
 If `NGINX_PORT` environment variable was changed, `use http://localhost:$PORT`.
 The InfluxDB Web interface can be accessed at `http://localhost:8086` using the credentials set in `.env`.
+PHPMyAdmin can be reached at `http://localhost:8080`.
 
 If default database fixture were used, the credentials for admin user are:
 * User: `admin`

@@ -1,7 +1,7 @@
 services:
     db:
         volumes:
-            - ${DATADIR}/sql:/var/lib/mysql
+            - ${DATADIR}/sqldata:/var/lib/mysql
 
     influxdb:
         ports:
