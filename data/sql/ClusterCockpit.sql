@@ -2125,12 +2125,17 @@ INSERT INTO `user` (`id`, `username`, `password`, `name`, `roles`, `email`, `is_
 (4, 'emmyUser3', NULL, 'Emmy User3', NULL, NULL, NULL, NULL),
 (5, 'emmyUser4', NULL, 'Emmy User4', NULL, NULL, NULL, NULL),
 (6, 'emmyUser5', NULL, 'Emmy User5', NULL, NULL, NULL, NULL),
-(7, 'woodyUser1', NULL, 'Woody User1', NULL, NULL, NULL, NULL),
-(8, 'woodyUser2', NULL, 'Woody User2', NULL, NULL, NULL, NULL),
-(9, 'woodyUser3', NULL, 'Woody User3', NULL, NULL, NULL, NULL),
-(10, 'woodyUser4', NULL, 'Woody User4', NULL, NULL, NULL, NULL),
-(11, 'woodyUser5', NULL, 'Woody User5', NULL, NULL, NULL, NULL),
-(12, 'demoUser', '$2y$10$A.Z9lQmDY/d0S1XhGMQWi..rtFWWdVi2A/9N96t6troj61iFi0rTS', 'Demo User', NULL, NULL, NULL, NULL);
+(7, 'emmyUser6', NULL, 'Emmy User6', NULL, NULL, NULL, NULL),
+(8, 'emmyUser7', NULL, 'Emmy User7', NULL, NULL, NULL, NULL),
+(9, 'emmyUser8', NULL, 'Emmy User8', NULL, NULL, NULL, NULL),
+(10, 'emmyUser9', NULL, 'Emmy User9', NULL, NULL, NULL, NULL),
+(11, 'emmyUser10', NULL, 'Emmy User10', NULL, NULL, NULL, NULL),
+(12, 'woodyUser1', NULL, 'Woody User1', NULL, NULL, NULL, NULL),
+(13, 'woodyUser2', NULL, 'Woody User2', NULL, NULL, NULL, NULL),
+(14, 'woodyUser3', NULL, 'Woody User3', NULL, NULL, NULL, NULL),
+(15, 'woodyUser4', NULL, 'Woody User4', NULL, NULL, NULL, NULL),
+(16, 'woodyUser5', NULL, 'Woody User5', NULL, NULL, NULL, NULL),
+(17, 'demoUser', '$2y$10$A.Z9lQmDY/d0S1XhGMQWi..rtFWWdVi2A/9N96t6troj61iFi0rTS', 'Demo User', NULL, NULL, NULL, NULL);
 
 --
 -- Indizes der exportierten Tabellen
@@ -2197,7 +2202,7 @@ ALTER TABLE `job_tag`
 -- AUTO_INCREMENT für Tabelle `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints der exportierten Tabellen

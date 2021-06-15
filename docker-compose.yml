@@ -9,8 +9,9 @@ services:
             MYSQL_USER: symfony
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
-            # - ${DATADIR}/sql:/var/lib/mysql
             - ${DATADIR}/sql:/docker-entrypoint-initdb.d
+        cap_add:
+            - SYS_NICE
 
     influxdb:
         container_name: cc-influxdb
@@ -26,9 +27,6 @@ services:
             DOCKER_INFLUXDB_INIT_BUCKET: ClusterCockpit
             DOCKER_INFLUXDB_INIT_RETENTION: 2w
             DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
-        # volumes:
-        #     - ${DATADIR}/influxdb/data:/var/lib/influxdb2
-        #     - ${DATADIR}/influxdb/config:/etc/influxdb2
 
     php:
         container_name: cc-php
@@ -50,17 +48,6 @@ services:
         depends_on:
             - db
             - influxdb
-
-    phpmyadmin:
-        image: cc-phpmyadmin
-        container_name: phpmyadmin
-        environment:
-            - PMA_HOST=db
-            - PMA_USER=root
-            - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        ports:
-            - "127.0.0.1:${PHPMYADMIN_PORT}:80"
-        restart: always
 
     nginx:
         container_name: cc-nginx

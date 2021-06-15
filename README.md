@@ -5,9 +5,9 @@ This is a setup for `docker compose` to try out a complete ClusterCockpit Applic
 It creates containers for:
 * mysql
 * influxdb
-* php-fpm (including the Symfony application)
-* phpmyadmin
+* php-fpm
 * nginx
+* phpmyadmin (only in dev mode)
 
 Ports and Passwords are configured in `.env`.
 
@@ -26,10 +26,10 @@ TODOS (There are probably a lot more!):
 ### Info
 * Demo starts in production environment.
 * Uses prepared fixture data for databases (Changes will not be preserved).
-* ClusterCockpit will be initialized from scratch on every start (Changes will not be preserved).
+* ClusterCockpit is initialized from scratch on every container start (Changes will not be preserved).
 
 ### Setup
-The fixture data needs to be prepared once before the first start of the containers:
+The fixture data needs to be prepared once before first start of containers:
 * `$ cd data`
 * `$ ./init.sh`
 
@@ -37,7 +37,7 @@ After that from the root of the repository you can start up the containers with:
 * `docker-compose up`
 * Wait... and wait a little longer
 
-By default, you can access ClusterCockpit in your browser at http://localhost . If NGINX_PORT environment variable was changed, use http://localhost:$PORT .
+By default, you can access ClusterCockpit in your browser at http://localhost . If the `NGINX_PORT` environment variable was changed, use `http://localhost:$PORT` .
 
 Credentials for admin user are:
 * User: `admin`
