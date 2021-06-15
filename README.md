@@ -49,31 +49,27 @@ To reuse an existing Symfony tree at `./data/symfony` you may change the environ
 
 ## Using for DEVELOP purpose
 ### Info
-* `APP_ENVIRONMENT` variable in `.env` used to switch `php-fpm` container to development environment.
+* `APP_ENVIRONMENT` variable in `.env` used to switch `php-fpm` container to development environement.
 * `APP_CLUSTERCOCKPIT_INIT` variable in `.env` used to prevent container from initializing a new ClusterCockpit instance on every start.
 * In this case, an existing Symfony tree at `./data/symfony` is required.
-* Due to additional dependencies of the development environment, the instance has to be prepared with `composer` and `yarn` devel-options.
-* By default, this also uses prepared fixture data for databases (Changes will not be preserved). In order to use an existing database, changes in `.env` and `docker-compose.yml` are required (see below).
+* By default, this also uses prepared fixture data for databases. In order to use an existing database, changes in `.env` and `docker-compose.yml` are required (see below).
 
 ### Setup
 If not using an existing database, the fixture data needs to be prepared before the first start of the containers:
 * `$ cd data`
 * `$ ./init.sh`
 
-If an existing database is to be used, do the following:
-* It is recommended to use the included MySQL container.
-* Uncomment the mapping of default volume paths in `docker-compose.yml` for `cc-db` and/or `cc-influxdb` under `volumes` to persist the data across container restarts.
-* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db` to disable initialisation of the MySQL database. You may also place an own MysQL database dump in `./data/sql`.
+* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db` to disable initialisation of the MySQL database. You may also place your own MysQL database dump in `./data/sql`.
 
 In `.env`, change the following variables under `APP`
 * `APP_CLUSTERCOCKPIT_INIT` to `false`
 * `APP_ENVIRONMENT` to `dev`
 
 After that from the root of the repository you can start up the containers with:
-* `docker-compose up`
+* `docker-compose -f docker-compose.yml -f docker-compose-dev.yml up`
 * Wait... and wait a little longer
 
-By default, you can access ClusterCockpit in your browser at http://localhost . If NGINX_PORT environment variable was changed, use http://localhost:$PORT .
+By default, you can access ClusterCockpit in your browser at http://localhost . If `NGINX_PORT` environment variable was changed, `use http://localhost:$PORT` .
 
 If default database fixture were used, the credentials for admin user are:
 * User: `admin`

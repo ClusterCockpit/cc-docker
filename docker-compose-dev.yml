@@ -4,6 +4,8 @@ services:
             - ${DATADIR}/sql:/var/lib/mysql
 
     influxdb:
+        ports:
+            - "127.0.0.1:${INFLUXDB_PORT}:8086"
         volumes:
             - ${DATADIR}/influxdb/data:/var/lib/influxdb2
             - ${DATADIR}/influxdb/config:/etc/influxdb2
