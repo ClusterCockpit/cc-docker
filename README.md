@@ -58,16 +58,18 @@ To reuse an existing Symfony tree at `./data/symfony` you may change the environ
 If not using an existing database, the fixture data needs to be prepared before the first start of the containers:
 * `$ cd data`
 * `$ ./init.sh`
-
-* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db` to disable initialisation of the MySQL database. You may also place your own MySQL database dump in `./data/sql`.
-
 In `.env`, change the following variables under `APP`
-* `APP_CLUSTERCOCKPIT_INIT` to `false`
 * `APP_ENVIRONMENT` to `dev`
 
 After that from the root of the repository you can start up the containers with:
 * `docker-compose -f docker-compose.yml -f docker-compose-dev.yml up`
 * Wait... and wait a little longer
+
+After the initial setup you have to:
+* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db` to disable initialisation of the MySQL database.
+* Set `APP_CLUSTERCOCKPIT_INIT` to `false` in the .env file
+
+On subsequent start of the containers you will then use the persisted volume data located in the `./data` directory.
 
 By default, you can access ClusterCockpit in your browser at `http://localhost`.
 If `NGINX_PORT` environment variable was changed, `use http://localhost:$PORT`.
