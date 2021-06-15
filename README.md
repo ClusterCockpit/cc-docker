@@ -59,7 +59,7 @@ If not using an existing database, the fixture data needs to be prepared before 
 * `$ cd data`
 * `$ ./init.sh`
 
-* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db` to disable initialisation of the MySQL database. You may also place your own MysQL database dump in `./data/sql`.
+* Comment or delete the line `- ${DATADIR}/sql:/docker-entrypoint-initdb.d` for `cc-db` to disable initialisation of the MySQL database. You may also place your own MySQL database dump in `./data/sql`.
 
 In `.env`, change the following variables under `APP`
 * `APP_CLUSTERCOCKPIT_INIT` to `false`
@@ -69,7 +69,9 @@ After that from the root of the repository you can start up the containers with:
 * `docker-compose -f docker-compose.yml -f docker-compose-dev.yml up`
 * Wait... and wait a little longer
 
-By default, you can access ClusterCockpit in your browser at http://localhost . If `NGINX_PORT` environment variable was changed, `use http://localhost:$PORT` .
+By default, you can access ClusterCockpit in your browser at `http://localhost`.
+If `NGINX_PORT` environment variable was changed, `use http://localhost:$PORT`.
+The InfluxDB Web interface can be accessed at `http://localhost:8086` using the credentials set in `.env`.
 
 If default database fixture were used, the credentials for admin user are:
 * User: `admin`
