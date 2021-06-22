@@ -4,9 +4,9 @@ This is a setup for `docker compose` to try out a complete ClusterCockpit Applic
 
 It creates containers for:
 * mysql
-* influxdb
 * php-fpm
 * nginx
+* influxdb (only in dev mode)
 * phpmyadmin (only in dev mode)
 
 Ports and Passwords are configured in `.env`.
