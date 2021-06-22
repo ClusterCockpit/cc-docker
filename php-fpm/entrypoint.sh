@@ -3,13 +3,15 @@
 if [ "$APP_CLUSTERCOCKPIT_INIT" = true ]; then
     rm -rf /var/www/symfony/* /var/www/symfony/.??*
     git clone https://github.com/ClusterCockpit/ClusterCockpit .
-    yarn install
 
     if [ "$APP_ENV" = dev ]; then
+        git checkout develop
         composer install --no-progress --optimize-autoloader
+        yarn install
         yarn encore dev
     else
         composer install --no-dev --no-progress --optimize-autoloader
+        yarn install
         yarn encore production
     fi
 

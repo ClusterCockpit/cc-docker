@@ -7,8 +7,9 @@ RUN mkdir -p /etc/nginx/templates
 COPY nginx.conf /etc/nginx/
 COPY templates/* /etc/nginx/templates/
 
+ARG APP_ENVIRONMENT
 ARG NGINX_SYMFONY_SERVER_NAME
-ENV APP_ENV=prod
+ENV APP_ENV=${APP_ENVIRONMENT}
 ENV APP_SECRET=67d829bf61dc5f87a73fd814e2c9f629
 ENV APP_DEBUG=1
 ARG INFLUXDB_PASSWORD

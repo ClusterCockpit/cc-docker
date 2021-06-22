@@ -4,6 +4,17 @@ services:
             - ${DATADIR}/sqldata:/var/lib/mysql
 
     influxdb:
+        container_name: cc-influxdb
+        image: influxdb
+        command: ["--reporting-disabled"]
+        environment:
+            DOCKER_INFLUXDB_INIT_MODE: setup
+            DOCKER_INFLUXDB_INIT_USERNAME: symfony
+            DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
+            DOCKER_INFLUXDB_INIT_ORG: ClusterCockpit
+            DOCKER_INFLUXDB_INIT_BUCKET: ClusterCockpit
+            DOCKER_INFLUXDB_INIT_RETENTION: 2w
+            DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
         ports:
             - "127.0.0.1:${INFLUXDB_PORT}:8086"
         volumes:
