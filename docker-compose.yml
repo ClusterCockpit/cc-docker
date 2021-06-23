@@ -32,7 +32,6 @@ services:
           - ${DATADIR}/job-archive:/var/lib/job-archive:cached
         depends_on:
             - db
-            - influxdb
 
     nginx:
         container_name: cc-nginx
