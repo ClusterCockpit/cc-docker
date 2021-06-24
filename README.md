@@ -7,7 +7,7 @@ It creates containers for:
 * php-fpm
 * nginx
 * influxdb (only in dev mode)
-* phpmyadmin (only in dev mode)
+* phpmyadmin (only in dev mode), this did not work with Chrome for me.
 
 Ports and Passwords are configured in `.env`.
 
