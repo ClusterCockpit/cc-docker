@@ -7,14 +7,9 @@ It creates containers for:
 * php-fpm
 * nginx
 * influxdb (only in dev mode)
-* phpmyadmin (only in dev mode)
+* phpmyadmin (only in dev mode), this did not work with Chrome for me.
 
 Ports and Passwords are configured in `.env`.
-
-TODOS (There are probably a lot more!):
-* Some of the Volume directories need to be created first.
-* ClusterCockpit is at the moment still using the influxDB V1 API, the InfluxDB container is already V2
-* For a complete demo database setup, InfluxDB data fixtures are missing (MySQL demo database is available)
 
 ## Known Issues
 
@@ -62,6 +57,17 @@ If not using an existing database, the fixture data needs to be prepared before 
 
 In `.env`, change the following variables under `APP`
 * `APP_ENVIRONMENT` to `dev`
+
+In case you want to switch from Demo to Develop you have to purge previous images. This command will purge **ALL** your docker images:
+```
+$ docker images -a -q | xargs docker rmi -f
+```
+
+Check with:
+```
+$ docker images
+```
+that all images are gone.
 
 After that from the root of the repository you can start up the containers with (use -d switch to startup in detached mode):
 * `docker-compose -f docker-compose.yml -f docker-compose-dev.yml up`
