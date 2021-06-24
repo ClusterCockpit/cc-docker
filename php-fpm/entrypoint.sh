@@ -18,6 +18,7 @@ if [ "$APP_CLUSTERCOCKPIT_INIT" = true ]; then
     ln -s /var/lib/job-archive var/job-archive
 fi
 
+# Reports php environment on container startup
 php bin/console about
 
 exec "$@"

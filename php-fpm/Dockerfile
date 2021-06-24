@@ -75,14 +75,18 @@ COPY symfony.ini /etc/php8/cli/conf.d/
 
 COPY symfony.pool.conf /etc/php8/php-fpm.d/
 COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ARG APP_ENVIRONMENT
 ENV APP_ENV=${APP_ENVIRONMENT}
 ENV APP_SECRET=67d829bf61dc5f87a73fd814e2c9f629
 ENV APP_DEBUG=1
 ARG INFLUXDB_PASSWORD
+ARG INFLUXDB_ADMIN_TOKEN
 ARG MYSQL_PASSWORD
-ENV INFLUXDB_URL=influxdb://symfony:${INFLUXDB_PASSWORD}@influxdb:8086/ClusterCockpit
+ENV INFLUXDB_URL=influxdb://symfony:${INFLUXDB_PASSWORD}@cc-influxdb:8086/ClusterCockpit
+ENV INFLUXDB_V2_URL=http://cc-influxdb:8086
+ENV INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
 ENV DATABASE_URL=mysql://symfony:${MYSQL_PASSWORD}@db:3306/ClusterCockpit
 ENV CORS_ALLOW_ORIGIN=^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$
 

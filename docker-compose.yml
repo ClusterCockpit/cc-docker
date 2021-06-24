@@ -24,6 +24,7 @@ services:
                 SYMFONY_CLI_VERSION: 4.23.2
                 MYSQL_PASSWORD: ${MYSQL_PASSWORD}
                 INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
+                INFLUXDB_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
                 APP_ENVIRONMENT: ${APP_ENVIRONMENT}
         environment:
           - APP_CLUSTERCOCKPIT_INIT=${APP_CLUSTERCOCKPIT_INIT}
