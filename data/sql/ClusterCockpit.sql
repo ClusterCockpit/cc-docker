@@ -109,7 +109,7 @@ CREATE TABLE `job_job_tag` (
 
 LOCK TABLES `job_job_tag` WRITE;
 /*!40000 ALTER TABLE `job_job_tag` DISABLE KEYS */;
-INSERT INTO `job_job_tag` VALUES (1269,3),(1269,4),(1270,4),(1327,3),(1351,1),(1351,2),(1355,1),(1355,2),(1357,1),(1366,1),(1460,1),(1462,1),(1463,1),(1464,1),(1464,2),(1465,1),(1467,1);
+INSERT INTO `job_job_tag` VALUES (1269,3),(1269,4),(1270,4),(1327,3),(1351,1),(1351,2),(1355,1),(1355,2),(1357,1),(1366,1),(1460,1),(1462,1),(1463,1),(1464,1),(1464,2),(1465,1),(1465,5),(1467,1);
 /*!40000 ALTER TABLE `job_job_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -134,7 +134,7 @@ CREATE TABLE `job_tag` (
 
 LOCK TABLES `job_tag` WRITE;
 /*!40000 ALTER TABLE `job_tag` DISABLE KEYS */;
-INSERT INTO `job_tag` VALUES (1,'throughput-limited','bottleneck'),(2,'bandwidth-limited','bottleneck'),(3,'low-utilisation','pathologic'),(4,'load-imbalance','pathologic');
+INSERT INTO `job_tag` VALUES (1,'throughput-limited','bottleneck'),(2,'bandwidth-limited','bottleneck'),(3,'low-utilisation','pathologic'),(4,'load-imbalance','pathologic'),(5,'network','bottleneck');
 /*!40000 ALTER TABLE `job_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -177,4 +177,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-07-08 09:02:47
+-- Dump completed on 2021-07-08  9:02:47
