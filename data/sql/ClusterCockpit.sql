@@ -32,7 +32,7 @@ CREATE TABLE `configuration` (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `feedback` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `configuration` (
 
 LOCK TABLES `configuration` WRITE;
 /*!40000 ALTER TABLE `configuration` DISABLE KEYS */;
-INSERT INTO `configuration` VALUES (1,'plot_view_showRoofline','true','default','Show roofline plot','true|false',NULL,'Enter true or false'),(2,'plot_view_showPolarplot','true','default','Show polar plot','true|false',NULL,'Enter true or false'),(3,'plot_view_showStatTable','true','default','Show stat table','true|false',NULL,'Enter true or false'),(4,'plot_view_plotsPerRow','3','default','Plots per row in job view','[0-9]+',NULL,'Enter a positive integer'),(5,'plot_list_samples','120','default','Sample points for downsampled plots','[0-9]+',NULL,'Enter a positive integer'),(6,'plot_list_sortColumn','1','default','Default sort column','[0-9]+',NULL,'Enter a positive integer'),(7,'plot_list_sortDirection','desc','default','Default sort direction','asc|desc',NULL,'Enter asc or desc'),(8,'plot_general_colorscheme','Accent','default','Plot color scheme','',NULL,''),(9,'plot_general_interactive','false','default','Interactive plots in job view','true|false',NULL,'Enter true or false'),(10,'plot_general_lineWidth','2','default','Line width for plots','[0-9]+',NULL,'Enter a positive integer'),(11,'plot_general_colorBackground','true','default','Color plot background','true|false',NULL,'Enter true or false'),(12,'data_time_digits','2','default','Timestamp rounding digits','[0-9]+',NULL,'Enter a positive integer'),(13,'data_metric_digits','1','default','Metric rounding digits','[0-9]+',NULL,'Enter a positive integer'),(14,'data_cache_period','40','default','Cache grace time','[0-9]+',NULL,'Enter a positive integer'),(15,'data_cache_numpoints','40','default','Cache build threshold','[0-9]+',NULL,'Enter a positive integer'),(16,'ldap_connection_url','','default','Connection URL','',NULL,''),(17,'ldap_user_base','','default','Base DN users','',NULL,''),(18,'ldap_user_key','','default','Key user id','',NULL,''),(19,'ldap_search_dn','','default','Search DN','',NULL,''),(20,'ldap_user_filter','','default','User query filter','',NULL,''),(21,'general_user_scramble','false','default','Anonymize user names','',NULL,''),(22,'general_user_emailbase','@mail.de','default','Email base adress used in user imports','',NULL,''),(23,'plot_list_selectedMetrics','cpu_load,flops_any,mem_bw','default','Metrics to show in job list','',NULL,''),(24,'plot_list_selectedMetrics','cpu_load,flops_any,mem_bw,mem_used','admin','Metrics to show in job list','',NULL,'');
+INSERT INTO `configuration` VALUES (1,'plot_view_showRoofline','true','default','Show roofline plot','true|false',NULL,'Enter true or false'),(2,'plot_view_showPolarplot','true','default','Show polar plot','true|false',NULL,'Enter true or false'),(3,'plot_view_showStatTable','true','default','Show stat table','true|false',NULL,'Enter true or false'),(4,'plot_view_plotsPerRow','3','default','Plots per row in job view','[0-9]+',NULL,'Enter a positive integer'),(5,'plot_list_samples','120','default','Sample points for downsampled plots','[0-9]+',NULL,'Enter a positive integer'),(6,'plot_list_sortColumn','1','default','Default sort column','[0-9]+',NULL,'Enter a positive integer'),(7,'plot_list_sortDirection','desc','default','Default sort direction','asc|desc',NULL,'Enter asc or desc'),(8,'plot_general_colorscheme','Accent','default','Plot color scheme','',NULL,''),(9,'plot_general_interactive','false','default','Interactive plots in job view','true|false',NULL,'Enter true or false'),(10,'plot_general_lineWidth','1','default','Line width for plots','[0-9]+',NULL,'Enter a positive integer'),(11,'plot_general_colorBackground','true','default','Color plot background','true|false',NULL,'Enter true or false'),(12,'data_time_digits','2','default','Timestamp rounding digits','[0-9]+',NULL,'Enter a positive integer'),(13,'data_metric_digits','1','default','Metric rounding digits','[0-9]+',NULL,'Enter a positive integer'),(14,'data_cache_period','40','default','Cache grace time','[0-9]+',NULL,'Enter a positive integer'),(15,'data_cache_numpoints','40','default','Cache build threshold','[0-9]+',NULL,'Enter a positive integer'),(16,'ldap_connection_url','','default','Connection URL','',NULL,''),(17,'ldap_user_base','','default','Base DN users','',NULL,''),(18,'ldap_user_key','','default','Key user id','',NULL,''),(19,'ldap_search_dn','','default','Search DN','',NULL,''),(20,'ldap_user_filter','','default','User query filter','',NULL,''),(21,'general_user_scramble','false','default','Anonymize user names','',NULL,''),(22,'general_user_emailbase','@mail.de','default','Email base adress used in user imports','',NULL,''),(23,'plot_list_selectedMetrics','[\"cpu_load\",\"flops_any\",\"mem_bw\",\"mem_used\"]','default','Metrics to show in job list','',NULL,'Enter a JSON list'),(24,'plot_list_selectedMetrics','[\"cpu_load\",\"flops_any\",\"mem_bw\",\"mem_used\"]','admin','Metrics to show in job list','',NULL,'Enter a JSON list'),(25,'analysis_view_histogramMetrics','[\"cpu_load\",\"mem_used\",\"flops_any\",\"mem_bw\",\"cpi\",\"clock\"]','admin','Metrics to show in histograms in analysis view','',NULL,'Enter a JSON list'),(30,'job_view_nodestats_selectedMetrics','[\"flops_any\",\"mem_bw\",\"mem_used\",\"cpu_load\",\"clock\"]','admin','Metrics to show in stats table in job view','',NULL,'Enter a JSON list'),(31,'job_view_selectedMetrics','[\"flops_any\",\"mem_bw\",\"mem_used\",\"cpu_load\",\"cpi\",\"clock\"]','admin','Metrics to show as plots in job view','',NULL,'Enter a JSON list'),(32,'analysis_view_scatterPlotMetrics','[[\"flops_any\",\"mem_bw\"],[\"flops_any\",\"cpu_load\"],[\"mem_bw\",\"cpu_load\"]]','admin','Metrics to show in scatter plots in analysis view','',NULL,'Enter a JSON list of metric pairs');
 /*!40000 ALTER TABLE `configuration` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -60,7 +60,7 @@ CREATE TABLE `job` (
   `num_nodes` int NOT NULL,
   `start_time` int NOT NULL,
   `duration` int NOT NULL,
-  `node_list` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `node_list` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_running` tinyint(1) NOT NULL,
   `job_script` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `project_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -125,7 +125,7 @@ CREATE TABLE `job_tag` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,7 +146,6 @@ DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user` (
-  `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -154,10 +153,9 @@ CREATE TABLE `user` (
   `email` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT NULL,
   `api_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQ_8D93D649F85E0677` (`username`),
+  PRIMARY KEY (`username`),
   UNIQUE KEY `UNIQ_8D93D6497BA2F5EB` (`api_token`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -166,7 +164,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin','$2y$13$bCJ.cWhE1MIaI.dg9jr/V.73inKd/U7ZBD0WpF5JMTomkfXuRkpRu','Local account','a:3:{i:0;s:9:\"ROLE_USER\";i:1;s:12:\"ROLE_ANALYST\";i:2;s:10:\"ROLE_ADMIN\";}','admin@ccdemo.de',1,NULL),(2,'emmyUser1',NULL,'Emmy User1',NULL,NULL,NULL,NULL),(3,'emmyUser2',NULL,'Emmy User2',NULL,NULL,NULL,NULL),(4,'emmyUser3',NULL,'Emmy User3',NULL,NULL,NULL,NULL),(5,'emmyUser4',NULL,'Emmy User4',NULL,NULL,NULL,NULL),(6,'emmyUser5',NULL,'Emmy User5',NULL,NULL,NULL,NULL),(7,'emmyUser6',NULL,'Emmy User6',NULL,NULL,NULL,NULL),(8,'emmyUser7',NULL,'Emmy User7',NULL,NULL,NULL,NULL),(9,'emmyUser8',NULL,'Emmy User8',NULL,NULL,NULL,NULL),(10,'emmyUser9',NULL,'Emmy User9',NULL,NULL,NULL,NULL),(11,'emmyUser10',NULL,'Emmy User10',NULL,NULL,NULL,NULL),(12,'woodyUser1',NULL,'Woody User1',NULL,NULL,NULL,NULL),(13,'woodyUser2',NULL,'Woody User2',NULL,NULL,NULL,NULL),(14,'woodyUser3',NULL,'Woody User3',NULL,NULL,NULL,NULL),(15,'woodyUser4',NULL,'Woody User4',NULL,NULL,NULL,NULL),(16,'woodyUser5',NULL,'Woody User5',NULL,NULL,NULL,NULL),(17,'demoUser','$2y$10$A.Z9lQmDY/d0S1XhGMQWi..rtFWWdVi2A/9N96t6troj61iFi0rTS','Demo User',NULL,NULL,NULL,NULL);
+INSERT INTO `user` VALUES ('admin','$2y$13$bCJ.cWhE1MIaI.dg9jr/V.73inKd/U7ZBD0WpF5JMTomkfXuRkpRu','Local account','a:3:{i:0;s:9:\"ROLE_USER\";i:1;s:12:\"ROLE_ANALYST\";i:2;s:10:\"ROLE_ADMIN\";}','admin@ccdemo.de',1,'9c6e3e647e84b87730815325aa8c7dff35deeada'),('demoUser','$2y$13$wZDSqfjEHOSBEW2cV7CsQuHZtd6qVKIfYxlZmGuQI7jPVqGOzYGuG','Demo User','a:2:{i:0;s:8:\"ROLE_API\";i:1;s:9:\"ROLE_USER\";}',NULL,0,'863ae06090602cbaef2d66b69d706953e50561b6'),('emmyUser1',NULL,'Emmy User1',NULL,NULL,NULL,NULL),('emmyUser10',NULL,'Emmy User10',NULL,NULL,NULL,NULL),('emmyUser2',NULL,'Emmy User2',NULL,NULL,NULL,NULL),('emmyUser3',NULL,'Emmy User3',NULL,NULL,NULL,NULL),('emmyUser4',NULL,'Emmy User4',NULL,NULL,NULL,NULL),('emmyUser5',NULL,'Emmy User5',NULL,NULL,NULL,NULL),('emmyUser6',NULL,'Emmy User6',NULL,NULL,NULL,NULL),('emmyUser7',NULL,'Emmy User7',NULL,NULL,NULL,NULL),('emmyUser8',NULL,'Emmy User8',NULL,NULL,NULL,NULL),('emmyUser9',NULL,'Emmy User9',NULL,NULL,NULL,NULL),('woodyUser1',NULL,'Woody User1',NULL,NULL,NULL,NULL),('woodyUser2',NULL,'Woody User2',NULL,NULL,NULL,NULL),('woodyUser3',NULL,'Woody User3',NULL,NULL,NULL,NULL),('woodyUser4',NULL,'Woody User4',NULL,NULL,NULL,NULL),('woodyUser5',NULL,'Woody User5',NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -179,4 +177,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-06-25 16:07:13
+-- Dump completed on 2021-07-08 09:02:47
