@@ -44,8 +44,8 @@ To reuse an existing Symfony tree at `./data/symfony` you may change the environ
 
 ## Using for DEVELOP purpose
 ### Info
-* `APP_ENVIRONMENT` variable in `.env` used to switch `php-fpm` container to development environement.
-* `APP_CLUSTERCOCKPIT_INIT` variable in `.env` used to prevent container from initializing a new ClusterCockpit instance on every start.
+* The `APP_ENVIRONMENT` variable in `.env` is used to switch the `php-fpm` container to development environment.
+* The `APP_CLUSTERCOCKPIT_INIT` variable in `.env` is used to prevent the container from initializing a new ClusterCockpit instance on every start.
 * In this case, an existing Symfony tree at `./data/symfony` is required.
 * By default, this also uses prepared fixture data for databases. In order to use an existing database, changes in `.env` and `docker-compose.yml` are required (see below).
 
