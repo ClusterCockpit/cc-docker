@@ -19,9 +19,9 @@ Ports and Passwords are configured in `.env`.
 
 ## Using for DEMO purpose
 ### Info
-* Demo starts in production environment.
-* Uses prepared fixture data for databases (Changes will not be preserved).
-* ClusterCockpit is initialized from scratch on every container start (Changes will not be preserved).
+* The demo starts in Symfony production environment.
+* It uses prepared fixture data for databases (Changes will not be preserved).
+* ClusterCockpit is checked out and initialized from scratch on every container start (Changes will not be preserved).
 
 ### Setup
 The fixture data needs to be prepared once before first start of containers:
