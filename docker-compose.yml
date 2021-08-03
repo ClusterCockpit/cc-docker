@@ -18,9 +18,6 @@ services:
         build:
             context: ./php-fpm
             args:
-                PHP_XDEBUG_MODE: ${PHP_XDEBUG_MODE}
-                PHP_XDEBUG_CLIENT_PORT: ${PHP_XDEBUG_CLIENT_PORT}
-                PHP_XDEBUG_CLIENT_HOST: ${PHP_XDEBUG_CLIENT_HOST}
                 SYMFONY_CLI_VERSION: 4.23.2
                 MYSQL_PASSWORD: ${MYSQL_PASSWORD}
                 INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
