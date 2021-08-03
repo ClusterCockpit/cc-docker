@@ -1,0 +1,43 @@
+# This is the workflow for testing cc-docker startup in demo mode
+# This will be automatic on specified event, but is set to manual while experimenting with workflows
+
+name: ccdocker-demo-startup
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+on:
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a single job
+  demo-startup:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Set timeout
+    timeout-minutes: 10
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    - name: Checkout latest cc-docker
+      uses: actions/checkout@v2
+
+    - name: Build containers
+      run: docker-compose -d -f "docker-compose.yml" build
+
+    - name: Run containers
+      run: docker-compose -d -f "docker-compose.yml" up
+
+    - name: Show containers
+      run: docker ps -a
+
+    - name: Ping ClusterCockpit
+      run: ping -c 3 localhost:80
+
+    - name: Ping phpMyAdmin
+      run: ping -c 3 localhost:8080
+
+    - name: Ping InfluxDB 2.0
+      run: ping -c 3 localhost:8086
+
+    - name: Stop containers
+      if: always()
+      run: docker-compose -f "docker-compose.yml" down
