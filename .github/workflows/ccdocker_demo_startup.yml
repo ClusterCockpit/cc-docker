@@ -24,7 +24,7 @@ jobs:
       run: docker-compose -f "docker-compose.yml" build
 
     - name: Run containers
-      run: docker-compose -f "docker-compose.yml" up
+      run: docker-compose -f "docker-compose.yml" up -d
 
     - name: Show containers
       run: docker ps -a
