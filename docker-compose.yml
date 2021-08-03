@@ -9,7 +9,7 @@ services:
             MYSQL_USER: symfony
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
-            - ${DATADIR}/sql:/docker-entrypoint-initdb.d
+            - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
         cap_add:
             - SYS_NICE
 
