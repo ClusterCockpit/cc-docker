@@ -26,17 +26,29 @@ jobs:
     - name: Run containers
       run: docker-compose -f "docker-compose.yml" up -d
 
+    - name: Giving containers 10s to load
+      run: sleep 10s
+
     - name: Show containers
       run: docker ps -a
 
-    - name: Ping ClusterCockpit
-      run: ping -c 3 localhost:80
+    - name: Get log from cc-nginx
+      run: docker logs cc-nginx
 
-    - name: Ping phpMyAdmin
-      run: ping -c 3 localhost:8080
+    - name: Get log from cc-php
+      run: docker logs cc-php
 
-    - name: Ping InfluxDB 2.0
-      run: ping -c 3 localhost:8086
+    - name: Get log from cc-influxdb
+      run: docker logs cc-influxdb | tail
+
+    - name: Get log from cc-db
+      run: docker logs cc-db
+
+    - name: Get log from cc-redis
+      run: docker logs cc-redis
+
+     -name: Get log from symfony
+      run: docker exec -it cc-php tail var/log/prod.log
 
     - name: Stop containers
       if: always()
