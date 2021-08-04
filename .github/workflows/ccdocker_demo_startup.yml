@@ -47,7 +47,7 @@ jobs:
     - name: Get log from cc-redis
       run: docker logs cc-redis
 
-     -name: Get log from symfony
+    - name: Get log from symfony
       run: docker exec -it cc-php tail var/log/prod.log
 
     - name: Stop containers
