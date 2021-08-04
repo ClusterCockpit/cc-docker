@@ -26,8 +26,8 @@ jobs:
     - name: Run containers
       run: docker-compose -f "docker-compose.yml" up -d
 
-    - name: Giving containers 10s to load
-      run: sleep 10s
+    - name: Giving containers 30s to load
+      run: sleep 30s
 
     - name: Show containers
       run: docker ps -a
@@ -35,20 +35,17 @@ jobs:
     - name: Get log from cc-nginx
       run: docker logs cc-nginx
 
-    - name: Get log from cc-php
-      run: docker logs cc-php
-
-    - name: Get log from cc-influxdb
-      run: docker logs cc-influxdb | tail
+    - name: Get log from cc-redis
+      run: docker logs cc-redis
 
     - name: Get log from cc-db
       run: docker logs cc-db
 
-    - name: Get log from cc-redis
-      run: docker logs cc-redis
+    - name: Get log from cc-php
+      run: docker logs cc-php
 
     - name: Get log from symfony
-      run: docker exec -it cc-php tail var/log/prod.log
+      run: docker exec cc-php tail var/log/prod.log
 
     - name: Stop containers
       if: always()
