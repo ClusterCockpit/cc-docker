@@ -5,6 +5,9 @@ wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais
 tar xJf job-archive.tar.xz
 rm ./job-archive.tar.xz
 
+# Default: Copy SQL source for demo use - Includes no INFLUX-Job Metadata
+cp ./sql-source/ClusterCockpit-demo.sql ./sql-init/ClusterCockpit.sql
+
 if [ $# -gt 0 ]; then
     if [ $1 == "dev" ]; then
         # 101 is the uid and gid of the user and group www in the cc-php container running php-fpm.
@@ -16,5 +19,8 @@ if [ $# -gt 0 ]; then
         cd influxdb/data
         tar xJf ../../influxdbv2-data.tar.xz
         rm ../../influxdbv2-data.tar.xz
+
+        # If development: Use SQL source including INFLUX-Job Metadata instead
+        cp ./sql-source/ClusterCockpit-dev.sql ./sql-init/ClusterCockpit.sql
     fi
 fi
