@@ -41,11 +41,13 @@ jobs:
     - name: Get log from cc-db
       run: docker logs cc-db
 
+    - name: Attempt to curl localhost:80/login
+      run: |
+           chmod +x ./.github/accessTest.sh
+           ./.github/accessTest.sh
+
     - name: Get log from cc-php
       run: docker logs cc-php
-
-    - name: Try to get response from localhost:90/login
-      run: curl -X GET localhost:80/login
 
     - name: Stop containers
       if: always()
