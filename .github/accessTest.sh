@@ -14,7 +14,7 @@ do
     echo "... Success!"
     break
 	else
-    echo "... No response!"
+    echo "... Bad response!"
   fi
 
   if [ $x -lt $attempts ]

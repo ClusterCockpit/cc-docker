@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 10
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Runs a single command using the runners shell
+    # Checkout latest cc-docker, build and start containers
     - name: Checkout latest cc-docker
       uses: actions/checkout@v2
 
@@ -26,27 +26,33 @@ jobs:
     - name: Run containers
       run: docker-compose -f "docker-compose.yml" up -d
 
+    # Allow entrypoint of cc-php to load, then show container status and start accessTest
     - name: Giving containers 60s to load
       run: sleep 60s
 
     - name: Show containers
       run: docker ps -a
 
-    - name: Get log from cc-nginx
-      run: docker logs cc-nginx
-
-    - name: Get log from cc-redis
-      run: docker logs cc-redis
-
-    - name: Get log from cc-db
-      run: docker logs cc-db
-
     - name: Attempt to curl localhost:80/login
       run: |
            chmod +x ./.github/accessTest.sh
            ./.github/accessTest.sh
 
+    # Get logs and stop containers independent from accessTest result
+    - name: Get log from cc-nginx
+      if: always()
+      run: docker logs cc-nginx
+
+    - name: Get log from cc-redis
+      if: always()
+      run: docker logs cc-redis
+
+    - name: Get log from cc-db
+      if: always()
+      run: docker logs cc-db
+
     - name: Get log from cc-php
+      if: always()
       run: docker logs cc-php
 
     - name: Stop containers
