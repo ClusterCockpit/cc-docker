@@ -20,6 +20,7 @@ if [ $# -gt 0 ]; then
         tar xJf ../../influxdbv2-data.tar.xz
         rm ../../influxdbv2-data.tar.xz
 
+        cd ../..
         # If development: Use SQL source including INFLUX-Job Metadata instead
         cp ./sql-source/ClusterCockpit-dev.sql ./sql-init/ClusterCockpit.sql
     fi
