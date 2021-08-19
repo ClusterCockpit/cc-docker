@@ -16,6 +16,11 @@ services:
     redis:
         container_name: cc-redis
         image: redis
+        command: [
+            "redis-server",
+            "--save",             "",
+            "--maxmemory",        "1gb",
+            "--maxmemory-policy", "allkeys-lru"]
 
     php:
         container_name: cc-php
