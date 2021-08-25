@@ -25,7 +25,7 @@ services:
         container_name: cc-phpmyadmin
         image: phpmyadmin
         environment:
-            - PMA_HOST=db
+            - PMA_HOST=cc-db
             - PMA_USER=root
             - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
         ports:

@@ -5,8 +5,8 @@ services:
         command: ["--default-authentication-plugin=mysql_native_password"]
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ClusterCockpit
-            MYSQL_USER: symfony
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
             - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
@@ -28,8 +28,11 @@ services:
             context: ./php-fpm
             args:
                 SYMFONY_CLI_VERSION: 4.23.2
+                MYSQL_DATABASE: ${MYSQL_DATABASE}
+                MYSQL_USER: ${MYSQL_USER}
                 MYSQL_PASSWORD: ${MYSQL_PASSWORD}
                 INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD}
+                INFLUXDB_PORT: ${INFLUXDB_PORT}
                 INFLUXDB_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
                 APP_ENVIRONMENT: ${APP_ENVIRONMENT}
         environment:
@@ -61,4 +64,3 @@ services:
             - NGINX_SYMFONY_SERVER_NAME=${NGINX_SYMFONY_SERVER_NAME}
         volumes:
           - ${DATADIR}/symfony:/var/www/symfony:cached
-
