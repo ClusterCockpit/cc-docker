@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+if [ -d symfony ]; then
+    echo "Data already initialized!"
+    echo -n "Perform a fresh initialisation? Answer yes to proceed and no to exit.  "
+    read -r answer
+    if [ "$answer" == "yes" ]; then
+        echo "Cleaning directories ..."
+        rm -rf symfony
+        sudo rm -rf job-archive
+        rm -rf influxdb/data/*
+        echo "done."
+    else
+        echo "Aborting ..."
+        exit
+    fi
+fi
+
 mkdir symfony
 wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive.tar.xz
 tar xJf job-archive.tar.xz
