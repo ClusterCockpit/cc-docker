@@ -6,6 +6,7 @@ It creates containers for:
 * mysql
 * php-fpm
 * nginx
+* openldap
 * influxdb (only in dev mode)
 * phpmyadmin (only in dev mode), this did not work with Chrome for me.
 
