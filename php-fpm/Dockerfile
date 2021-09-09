@@ -1,46 +1,38 @@
-FROM alpine:3.13
+FROM php:8.0-fpm-alpine3.13
 
-LABEL maintainer="Vincent Composieux <vincent.composieux@gmail.com>"
-
-RUN apk add --no-cache \
-    coreutils \
-    gettext \
-    php8-fpm \
-    php8-ctype \
-    php8-curl \
-    php8-dom \
-    php8-gd \
-    php8-iconv \
-    php8-json \
-    php8-intl \
-    php8-fileinfo\
-    php8-mbstring \
-    php8-opcache \
-    php8-openssl \
-    php8-pdo \
-    php8-pdo_mysql \
-    php8-mysqli \
-    php8-xml \
-    php8-xsl \
-    php8-zlib \
-    php8-phar \
-    php8-tokenizer \
-    php8-session \
-    php8-simplexml \
-    php8-zip \
-    php8-xmlwriter \
-    php8-sodium \
-    php8-pecl-apcu \
-    php8-ldap \
-    bash \
-    make \
+RUN apk add --no-cache $PHPIZE_DEPS \
     git \
-    curl
+    gettext \
+    bash \
+    ldb-dev \
+    libldap \
+    openldap-dev
+
+RUN pecl install xdebug-3.0.4 \
+    && docker-php-ext-enable xdebug
+
+RUN docker-php-ext-install ldap mysqli pdo_mysql
+
+# Enable php8-xdebug if $PHP_XDEBUG_MODE is not empty
+ARG PHP_XDEBUG_MODE=off
+ARG PHP_XDEBUG_CLIENT_PORT=5902
+ARG PHP_XDEBUG_CLIENT_HOST=host.docker.internal
+COPY xdebug.ini  /etc/php8/conf.d/xdebug.ini.template
+RUN if [[ "$PHP_XDEBUG_MODE" != "" ]]; then \
+        export PHP_XDEBUG_MODE=$PHP_XDEBUG_MODE; \
+        export PHP_XDEBUG_CLIENT_PORT=$PHP_XDEBUG_CLIENT_PORT; \
+        export PHP_XDEBUG_CLIENT_HOST=$PHP_XDEBUG_CLIENT_HOST; \
+        envsubst < /etc/php8/conf.d/xdebug.ini.template > /etc/php8/conf.d/xdebug.ini; \
+    fi
+RUN rm -f /etc/php8/conf.d/xdebug.ini.template
+
+RUN cp /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.back
+RUN cp /etc/php8/conf.d/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
 
 RUN curl -sS https://getcomposer.org/installer | tee composer-setup.php \
-    && php8 composer-setup.php && rm composer-setup.php* \
-    && chmod +x composer.phar && mv composer.phar /usr/bin/composer \
-    && ln -s /usr/bin/php8 /usr/local/bin/php
+    && php composer-setup.php && rm composer-setup.php* \
+    && chmod +x composer.phar && mv composer.phar /usr/bin/composer
 
 ARG SYMFONY_CLI_VERSION
 RUN wget https://github.com/symfony/cli/releases/download/v$SYMFONY_CLI_VERSION/symfony_linux_amd64.gz \
@@ -76,6 +68,8 @@ ARG INFLUXDB_PASSWORD
 ARG INFLUXDB_ADMIN_TOKEN
 ENV INFLUXDB_URL=http://cc-influxdb:${INFLUXDB_PORT}
 ENV INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+ARG LDAP_PASSWORD
+ENV LDAP_PW=${LDAP_PASSWORD}
 ARG MYSQL_USER
 ARG MYSQL_PASSWORD
 ARG MYSQL_DATABASE
@@ -85,6 +79,6 @@ ENV CORS_ALLOW_ORIGIN=^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$
 WORKDIR /var/www/symfony
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["php-fpm8", "-F"]
+CMD ["php-fpm", "-F", "-y/etc/php8/php-fpm.d/symfony.pool.conf"]
 
 EXPOSE 9001
