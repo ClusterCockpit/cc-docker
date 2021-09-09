@@ -30,6 +30,19 @@ RUN cp /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/co
 RUN cp /etc/php8/conf.d/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
 
+# Enable php8-xdebug if $PHP_XDEBUG_MODE is not empty
+ARG PHP_XDEBUG_MODE=off
+ARG PHP_XDEBUG_CLIENT_PORT=5902
+ARG PHP_XDEBUG_CLIENT_HOST=host.docker.internal
+COPY xdebug.ini  /etc/php8/conf.d/xdebug.ini.template
+RUN if [[ "$PHP_XDEBUG_MODE" != "" ]]; then \
+        export PHP_XDEBUG_MODE=$PHP_XDEBUG_MODE; \
+        export PHP_XDEBUG_CLIENT_PORT=$PHP_XDEBUG_CLIENT_PORT; \
+        export PHP_XDEBUG_CLIENT_HOST=$PHP_XDEBUG_CLIENT_HOST; \
+        envsubst < /etc/php8/conf.d/xdebug.ini.template > /etc/php8/conf.d/xdebug.ini; \
+    fi
+RUN rm -f /etc/php8/conf.d/xdebug.ini.template
+
 RUN curl -sS https://getcomposer.org/installer | tee composer-setup.php \
     && php composer-setup.php && rm composer-setup.php* \
     && chmod +x composer.phar && mv composer.phar /usr/bin/composer
