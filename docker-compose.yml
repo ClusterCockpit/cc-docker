@@ -59,7 +59,6 @@ services:
                 APP_ENVIRONMENT: ${APP_ENVIRONMENT}
         ports:
             - "127.0.0.1:${NGINX_PORT}:80"
-            - "127.0.0.1:${PHP_XDEBUG_CLIENT_PORT}:${PHP_XDEBUG_CLIENT_PORT}"
         depends_on:
             - php
         environment:
