@@ -27,6 +27,7 @@ services:
         build:
             context: ./php-fpm
             args:
+                PHP_XDEBUG_INIT: ${PHP_XDEBUG_INIT}
                 PHP_XDEBUG_MODE: ${PHP_XDEBUG_MODE}
                 PHP_XDEBUG_CLIENT_PORT: ${PHP_XDEBUG_CLIENT_PORT}
                 PHP_XDEBUG_CLIENT_HOST: ${PHP_XDEBUG_CLIENT_HOST}

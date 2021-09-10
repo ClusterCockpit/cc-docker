@@ -8,27 +8,29 @@ RUN apk add --no-cache $PHPIZE_DEPS \
     libldap \
     openldap-dev
 
-RUN pecl install xdebug-3.0.4 \
-    && docker-php-ext-enable xdebug
+RUN docker-php-ext-install ldap \ 
+    mysqli \
+    pdo_mysql \
+    opcache
 
-RUN docker-php-ext-install ldap mysqli pdo_mysql
-
-# Enable php8-xdebug if $PHP_XDEBUG_MODE is not empty
+# Enable php8-xdebug if $PHP_XDEBUG_INIT is true
+ARG PHP_XDEBUG_INIT=false
 ARG PHP_XDEBUG_MODE=off
 ARG PHP_XDEBUG_CLIENT_PORT=5902
 ARG PHP_XDEBUG_CLIENT_HOST=host.docker.internal
 COPY xdebug.ini  /etc/php8/conf.d/xdebug.ini.template
-RUN if [[ "$PHP_XDEBUG_MODE" != "" ]]; then \
+COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
+RUN if [[ "$PHP_XDEBUG_INIT" == "true" ]]; then \
+        pecl install xdebug-3.0.4; \
+        docker-php-ext-enable xdebug; \
         export PHP_XDEBUG_MODE=$PHP_XDEBUG_MODE; \
         export PHP_XDEBUG_CLIENT_PORT=$PHP_XDEBUG_CLIENT_PORT; \
         export PHP_XDEBUG_CLIENT_HOST=$PHP_XDEBUG_CLIENT_HOST; \
         envsubst < /etc/php8/conf.d/xdebug.ini.template > /etc/php8/conf.d/xdebug.ini; \
+        cp /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.back; \
+        cp /etc/php8/conf.d/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+        rm -f /etc/php8/conf.d/xdebug.ini.template; \
     fi
-RUN rm -f /etc/php8/conf.d/xdebug.ini.template
-
-RUN cp /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.back
-RUN cp /etc/php8/conf.d/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
 
 RUN curl -sS https://getcomposer.org/installer | tee composer-setup.php \
     && php composer-setup.php && rm composer-setup.php* \
