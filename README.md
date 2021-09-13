@@ -1,8 +1,8 @@
 # cc-docker
 
-This is a setup for `docker compose` to try out a complete ClusterCockpit Application Stack including all external components. This docker setup can be easily configured to be used as demo or as a development environment for ClusterCockpit.
+This is a `docker compose` setup to try out the complete ClusterCockpit Application Stack including all external components. This docker setup can be easily configured to be used as demo or as a development environment.
 
-It creates containers for:
+It includes the following containers:
 * mysql
 * php-fpm
 * nginx
@@ -11,7 +11,8 @@ It creates containers for:
 * influxdb
 * phpmyadmin
 
-All settings are configured in `.env`. The setup comes with fixture data for a job archive, influxDB, mySQL and a LDAP user directory.
+Settings are configured in `.env`.
+The setup comes with fixture data for a job archive, influxDB, mySQL, and a LDAP user directory.
 
 ## Known Issues
 
@@ -21,18 +22,18 @@ All settings are configured in `.env`. The setup comes with fixture data for a j
 
 ## Configuration
 
-While many aspects of this docker compose setup can be configured you ussually only need to adapt the following three settings in `.env`:
+While many aspects of this docker compose setup can be configured you usually only need to adapt the following three settings in `.env`:
 * `CLUSTERCOCKPIT_BRANCH` (Default: `develop`): The branch to checkout from ClusterCockpit git repository. May also be a tag.
-* `APP_CLUSTERCOCKPIT_INIT` (Default: true): Wether the Symfony tree (located at `./data/symfony`) should be deleted and freshly cloned and setup on every container startup.
-* `APP_ENVIRONMENT` (Default: `dev`): The Symfony App environment. With `dev` you get a Debugging Toolbar and more extensive error handling. Using `prod` is a setup for productions usage.
+* `APP_CLUSTERCOCKPIT_INIT` (Default: true): Wether the Symfony tree (located at `./data/symfony`) should be deleted and freshly cloned and initialized on every container startup.
+* `APP_ENVIRONMENT` (Default: `dev`): The Symfony app environment. With `dev` you get the symfony debug toolbar and more extensive error handling. The `prod` environment is a setup for productions use.
 
 ## Setup
 
 * `$ cd data`
-* `$ ./init.sh`: The script asks for sudo rights as the file ownership needs to changed for some folders. **NOTICE** The script will download files of total size of 338MB (most for the InfluxDB data).
+* `$ ./init.sh`: The script asks for sudo rights as the file ownership needs to changed for some folders. **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).
 
-After that from the root of the repository you can start up the containers with:
-* `docker-compose up`
+After that from the root of the cc-docker sandbox you can start up the containers with:
+* `$ docker-compose up`
 * Wait... and wait a little longer
 
 Before you can use ClusterCockpit the following disclaimer must be shown. To download and build all ClusterCockpit components may take up to several minutes:
@@ -67,7 +68,7 @@ Before you can use ClusterCockpit the following disclaimer must be shown. To dow
  -------------------- ---------------------------------
  ```
  
-By default, you can access ClusterCockpit in your browser at http://localhost . If the `NGINX_PORT` environment variable was changed, use `http://localhost:$PORT` . You can shutdown the containers by pressing `CTRL-C`.
+By default, you can access ClusterCockpit in your browser at `http://localhost`. If the `NGINX_PORT` environment variable was changed, you have to use `http://localhost:$PORT` . You can shutdown the containers by pressing `CTRL-C`. Refer to the common docker documentation how to start the environment in the background.
 
 ## Usage
 
