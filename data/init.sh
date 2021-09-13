@@ -9,6 +9,7 @@ if [ -d symfony ]; then
         rm -rf symfony
         sudo rm -rf job-archive
         rm -rf influxdb/data/*
+        rm -rf sqldata/*
         echo "done."
     else
         echo "Aborting ..."
