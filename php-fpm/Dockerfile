@@ -8,13 +8,13 @@ RUN apk add --no-cache $PHPIZE_DEPS \
     libldap \
     openldap-dev
 
-RUN docker-php-ext-install ldap \ 
+RUN docker-php-ext-install ldap \
     mysqli \
     pdo_mysql \
     opcache
 
 # Enable php8-xdebug if $PHP_XDEBUG_INIT is true
-ARG PHP_XDEBUG_INIT=false
+ARG PHP_XDEBUG_INIT="false"
 ARG PHP_XDEBUG_MODE=off
 ARG PHP_XDEBUG_CLIENT_PORT=5902
 ARG PHP_XDEBUG_CLIENT_HOST=host.docker.internal
@@ -50,9 +50,9 @@ RUN mkdir -p /var/lib/job-archive
 RUN mkdir -p /var/www/symfony
 VOLUME /var/www/symfony /var/lib/job-archive
 
-COPY symfony.ini /etc/php8/conf.d/
-COPY symfony.ini /etc/php8/cli/conf.d/
-
+COPY php.ini /usr/local/etc/php/
+COPY symfony.ini /usr/local/etc/php/conf.d/
+COPY symfony.ini /usr/local/etc/php/cli/conf.d/
 COPY symfony.pool.conf /etc/php8/php-fpm.d/
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
