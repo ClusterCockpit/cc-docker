@@ -1,4 +1,4 @@
-FROM php:8.0-fpm-alpine3.13
+FROM php:8.0-fpm-alpine
 
 RUN apk add --no-cache $PHPIZE_DEPS \
     git \
@@ -81,7 +81,7 @@ ENV CORS_ALLOW_ORIGIN=^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$
 
 WORKDIR /var/www/symfony
 
-ENTRYPOINT ["/entrypoint.sh"]8
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm", "-F", "-y/usr/local/etc/php/php-fpm.d/symfony.pool.conf"]
 
 EXPOSE 9001
