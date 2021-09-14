@@ -30,7 +30,13 @@ While many aspects of this docker compose setup can be configured you usually on
 ## Setup
 
 * `$ cd data`
-* `$ ./init.sh`: The script asks for sudo rights as the file ownership needs to changed for some folders. **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).
+* `$ ./init.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).
+
+If you want to test the REST API and also write to the job archive from Cluster Cockpit you have to comment out the following lines in `./data/init.sh`:
+```
+echo "This script needs to chown the job-archive directory so that the application can write to it:"
+sudo chown -R 82:82 ./job-archive
+```
 
 After that from the root of the cc-docker sandbox you can start up the containers with:
 * `$ docker-compose up`
