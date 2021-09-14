@@ -79,6 +79,7 @@ services:
     depends_on:
       - db
       - redis
+      - influxdb
 
   nginx:
     container_name: cc-nginx
