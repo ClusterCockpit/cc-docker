@@ -15,6 +15,7 @@ if [ "$APP_CLUSTERCOCKPIT_INIT" = true ]; then
     fi
 
     ln -s /var/lib/job-archive var/job-archive
+    chown -R www-data:www-data /var/www/symfony/* /var/www/symfony/.??*
 fi
 
 # Reports php environment on container startup

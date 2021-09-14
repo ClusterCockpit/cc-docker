@@ -57,12 +57,9 @@ COPY symfony.pool.conf /usr/local/etc/php/php-fpm.d/
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-RUN addgroup -S www
-RUN adduser -S -D -H -g "php-fpm user" -G www -s /sbin/nologin www
-
 ARG APP_ENVIRONMENT
 ENV APP_ENV=${APP_ENVIRONMENT}
-ENV APP_SECRET=67d829bf61dc5f87a73fd814e2c9f629
+ENV APP_SECRET=${APP_SECRET}
 ENV APP_DEBUG=1
 ENV REDIS_URL=redis://cc-redis
 ENV LDAP_URL=ldap://cc-ldap
