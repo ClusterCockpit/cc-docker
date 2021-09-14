@@ -53,7 +53,7 @@ VOLUME /var/www/symfony /var/lib/job-archive
 COPY php.ini /usr/local/etc/php/
 COPY symfony.ini /usr/local/etc/php/conf.d/
 COPY symfony.ini /usr/local/etc/php/cli/conf.d/
-COPY symfony.pool.conf /etc/php8/php-fpm.d/
+COPY symfony.pool.conf /usr/local/etc/php/php-fpm.d/
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
@@ -81,7 +81,7 @@ ENV CORS_ALLOW_ORIGIN=^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$
 
 WORKDIR /var/www/symfony
 
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["php-fpm", "-F", "-y/etc/php8/php-fpm.d/symfony.pool.conf"]
+ENTRYPOINT ["/entrypoint.sh"]8
+CMD ["php-fpm", "-F", "-y/usr/local/etc/php/php-fpm.d/symfony.pool.conf"]
 
 EXPOSE 9001
