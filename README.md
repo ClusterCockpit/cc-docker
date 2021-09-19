@@ -85,6 +85,6 @@ Credentials for the preconfigured admin user are:
 You can also login as regular user using any credential in the LDAP user directory at `./data/ldap/users.ldif`.
 
 The job archive with 1867 jobs originates from the second half of 2020.
-Roughly 2700 jobs from the first week of 2021 are loaded with data loaded from InfluxDB.
+Roughly 2700 jobs from the first week of 2021 are loaded with data from InfluxDB.
 Some views of ClusterCockpit (e.g. the Users view) show the last week or month.
 To show some data there you have to set the filter to time periods with jobs (August 2020 to January 2021).
