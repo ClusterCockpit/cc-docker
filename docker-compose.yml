@@ -10,7 +10,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
-      - ${DATADIR}/sqldata:/var/lib/mysql
+      # - ${DATADIR}/sqldata:/var/lib/mysql
     cap_add:
       - SYS_NICE
 
@@ -105,4 +105,3 @@ services:
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
       - "127.0.0.1:${PHPMYADMIN_PORT}:80"
-    restart: always

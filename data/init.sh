@@ -2,12 +2,12 @@
 
 if [ -d symfony ]; then
     echo "Data already initialized!"
-    echo -n "Perform a fresh initialisation? Answer yes to proceed and no to exit.  "
+    echo -n "Perform a fresh initialisation? [yes to proceed / no to exit]  "
     read -r answer
     if [ "$answer" == "yes" ]; then
         echo "Cleaning directories ..."
         rm -rf symfony
-        sudo rm -rf job-archive
+        rm -rf job-archive
         rm -rf influxdb/data/*
         rm -rf sqldata/*
         echo "done."
