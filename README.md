@@ -12,7 +12,7 @@ It includes the following containers:
 * phpmyadmin
 
 Settings are configured in `.env`.
-The setup comes with fixture data for a job archive, influxDB, mySQL, and a LDAP user directory.
+The setup comes with fixture data for a Job archive, InfluxDB, MySQL, and a LDAP user directory.
 
 ## Known Issues
 
