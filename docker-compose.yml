@@ -73,6 +73,8 @@ services:
     environment:
       - APP_CLUSTERCOCKPIT_INIT=${APP_CLUSTERCOCKPIT_INIT}
       - CLUSTERCOCKPIT_BRANCH=${CLUSTERCOCKPIT_BRANCH}
+      - APP_JWT_PUB_KEY=${APP_JWT_PUB_KEY}
+      - APP_JWT_PRIV_KEY=${APP_JWT_PRIV_KEY}
     volumes:
       - ${DATADIR}/symfony:/var/www/symfony:cached
       - ${DATADIR}/job-archive:/var/lib/job-archive:cached
