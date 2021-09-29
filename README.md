@@ -1,6 +1,7 @@
 # cc-docker
 
 This is a `docker compose` setup to try out the complete ClusterCockpit Application Stack including all external components. This docker setup can be easily configured to be used as demo or as a development environment.
+For a docker setup targeted to server environment you may have a look at https://github.com/ClusterCockpit/cc-docker-server .
 
 It includes the following containers:
 * mysql
@@ -12,7 +13,7 @@ It includes the following containers:
 * phpmyadmin
 
 Settings are configured in `.env`.
-The setup comes with fixture data for a job archive, influxDB, mySQL, and a LDAP user directory.
+The setup comes with fixture data for a Job archive, InfluxDB, MySQL, and a LDAP user directory.
 
 ## Known Issues
 
