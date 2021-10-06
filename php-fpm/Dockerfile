@@ -1,12 +1,21 @@
-FROM php:8.0-fpm-alpine
+FROM php:8.0-fpm
 
-RUN apk add --no-cache $PHPIZE_DEPS \
+RUN apt-get update && apt-get install -y \
+    $PHPIZE_DEPS \
     git \
+    wget \
     gettext \
     bash \
-    ldb-dev \
-    libldap \
-    openldap-dev
+    libldb-dev \
+    libldap-2.4-2 \
+    libldap-common \
+    libldap2-dev \
+    npm \
+    nodejs
+
+RUN apt-get clean
+
+RUN npm install --global yarn
 
 RUN docker-php-ext-install ldap \
     mysqli \
@@ -42,9 +51,6 @@ RUN wget https://github.com/symfony/cli/releases/download/v$SYMFONY_CLI_VERSION/
     && mv symfony_linux_amd64 symfony \
     && chmod +x symfony \
     && mv symfony /usr/local/bin/
-
-RUN apk add --update nodejs npm \
-    && npm install --global yarn
 
 RUN mkdir -p /var/lib/job-archive
 RUN mkdir -p /var/www/symfony
