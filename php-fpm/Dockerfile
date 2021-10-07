@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y \
     $PHPIZE_DEPS \
     git \
     wget \
+    zip \
     gettext \
     bash \
     libldb-dev \
