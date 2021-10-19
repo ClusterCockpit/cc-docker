@@ -32,7 +32,7 @@ CREATE TABLE `configuration` (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `feedback` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `configuration` (
 
 LOCK TABLES `configuration` WRITE;
 /*!40000 ALTER TABLE `configuration` DISABLE KEYS */;
-INSERT INTO `configuration` VALUES (1,'plot_view_showRoofline','true','default','Show roofline plot','true|false',NULL,'Enter true or false'),(2,'plot_view_showPolarplot','true','default','Show polar plot','true|false',NULL,'Enter true or false'),(3,'plot_view_showStatTable','true','default','Show stat table','true|false',NULL,'Enter true or false'),(4,'plot_view_plotsPerRow','4','default','Plots per row in job view','[0-9]+',NULL,'Enter a positive integer'),(8,'plot_general_colorscheme','Accent','default','Plot color scheme','',NULL,''),(9,'plot_general_interactive','false','default','Interactive plots in job view','true|false',NULL,'Enter true or false'),(10,'plot_general_lineWidth','2','default','Line width for plots','[0-9]+',NULL,'Enter a positive integer'),(11,'plot_general_colorBackground','true','default','Color plot background','true|false',NULL,'Enter true or false'),(21,'general_user_scramble','false','default','Anonymize user names','',NULL,''),(22,'general_user_emailbase','@mail.de','default','Email base adress used in user imports','',NULL,''),(23,'plot_list_selectedMetrics','[\"cpu_load\",\"flops_any\",\"mem_bw\",\"mem_used\"]','default','Metrics to show in job list','',NULL,'Enter a JSON list'),(24,'plot_list_selectedMetrics','[\"cpu_load\",\"cpi\",\"flops_any\",\"mem_used\",\"mem_bw\"]','admin','Metrics to show in job list','',NULL,'Enter a JSON list'),(25,'analysis_view_histogramMetrics','[\"cpu_load\",\"mem_used\",\"flops_any\",\"mem_bw\",\"cpi\",\"clock\"]','admin','Metrics to show in histograms in analysis view','',NULL,'Enter a JSON list'),(30,'job_view_nodestats_selectedMetrics','[\"flops_any\",\"mem_bw\",\"mem_used\",\"cpu_load\",\"clock\"]','admin','Metrics to show in stats table in job view','',NULL,'Enter a JSON list'),(31,'job_view_selectedMetrics','[\"flops_any\",\"mem_bw\",\"mem_used\",\"cpu_load\",\"cpi\",\"clock\",\"rapl_power\"]','admin','Metrics to show as plots in job view','',NULL,'Enter a JSON list'),(32,'analysis_view_scatterPlotMetrics','[[\"flops_any\",\"mem_bw\"],[\"flops_any\",\"cpu_load\"],[\"mem_bw\",\"cpu_load\"],[\"flops_any\",\"mem_used\"]]','admin','Metrics to show in scatter plots in analysis view','',NULL,'Enter a JSON list of metric pairs'),(34,'plot_list_jobsPerPage','25','default','Jobs per page in job list','',NULL,'Enter a positive integer'),(36,'ldap_user_base','ou=hpc,dc=rrze,dc=uni-erlangen,dc=de','default','Base DN users','[\\s]+',NULL,'Enter a ldif expression'),(37,'ldap_search_dn','cn=admin,dc=rrze,dc=uni-erlangen,dc=de','default','Search DN','[\\s]+',NULL,'Enter a ldif expression'),(38,'ldap_user_filter','(&(objectclass=posixAccount)(uid=*))','default','User query filter','[\\s]+',NULL,'Enter a ldif expression'),(42,'ldap_user_bind','uid={username},ou=hpc,dc=rrze,dc=uni-erlangen,dc=de','default','User bind DN string','[\\s]',NULL,'Enter a ldif expression');
+INSERT INTO `configuration` VALUES (1,'plot_view_showRoofline','true','default','Show roofline plot','true|false',NULL,'Enter true or false'),(2,'plot_view_showPolarplot','true','default','Show polar plot','true|false',NULL,'Enter true or false'),(3,'plot_view_showStatTable','true','default','Show stat table','true|false',NULL,'Enter true or false'),(4,'plot_view_plotsPerRow','4','default','Plots per row in job view','[0-9]+',NULL,'Enter a positive integer'),(8,'plot_general_colorscheme','Accent','default','Plot color scheme','',NULL,''),(9,'plot_general_interactive','false','default','Interactive plots in job view','true|false',NULL,'Enter true or false'),(10,'plot_general_lineWidth','2','default','Line width for plots','[0-9]+',NULL,'Enter a positive integer'),(11,'plot_general_colorBackground','true','default','Color plot background','true|false',NULL,'Enter true or false'),(21,'general_user_scramble','false','default','Anonymize user names','',NULL,''),(22,'general_user_emailbase','@mail.de','default','Email base adress used in user imports','',NULL,''),(23,'plot_list_selectedMetrics','[\"cpu_load\",\"flops_any\",\"mem_bw\",\"mem_used\"]','default','Metrics to show in job list','',NULL,'Enter a JSON list'),(24,'plot_list_selectedMetrics','[\"cpu_load\",\"cpi\",\"flops_any\",\"mem_used\",\"mem_bw\"]','admin','Metrics to show in job list','',NULL,'Enter a JSON list'),(25,'analysis_view_histogramMetrics','[\"cpu_load\",\"mem_used\",\"flops_any\",\"mem_bw\",\"cpi\",\"clock\"]','admin','Metrics to show in histograms in analysis view','',NULL,'Enter a JSON list'),(30,'job_view_nodestats_selectedMetrics','[\"flops_any\",\"mem_bw\",\"mem_used\",\"cpu_load\",\"clock\"]','admin','Metrics to show in stats table in job view','',NULL,'Enter a JSON list'),(31,'job_view_selectedMetrics','[\"flops_any\",\"mem_bw\",\"mem_used\",\"cpu_load\",\"cpi\",\"clock\",\"rapl_power\"]','admin','Metrics to show as plots in job view','',NULL,'Enter a JSON list'),(32,'analysis_view_scatterPlotMetrics','[[\"flops_any\",\"mem_bw\"],[\"flops_any\",\"cpu_load\"],[\"mem_bw\",\"cpu_load\"],[\"flops_any\",\"mem_used\"]]','admin','Metrics to show in scatter plots in analysis view','',NULL,'Enter a JSON list of metric pairs'),(34,'plot_list_jobsPerPage','25','default','Jobs per page in job list','',NULL,'Enter a positive integer'),(36,'ldap_user_base','ou=hpc,dc=rrze,dc=uni-erlangen,dc=de','default','Base DN users','[\\s]+',NULL,'Enter a ldif expression'),(37,'ldap_search_dn','cn=admin,dc=rrze,dc=uni-erlangen,dc=de','default','Search DN','[\\s]+',NULL,'Enter a ldif expression'),(38,'ldap_user_filter','(&(objectclass=posixAccount)(uid=*))','default','User query filter','[\\s]+',NULL,'Enter a ldif expression'),(42,'ldap_user_bind','uid={username},ou=hpc,dc=rrze,dc=uni-erlangen,dc=de','default','User bind DN string','[\\s]+',NULL,'Enter a ldif expression'),(43,'plot_list_jobsPerPage','10','admin','Jobs per page in job list','',NULL,'Enter a positive integer'),(44,'plot_view_polarPlotMetrics','[ \'flops_any\', \'mem_bw\', \'mem_used\', \'net_bw\']','default','Metrics to show in polar plot of job view','[\\s]+',NULL,'Enter a JSON list');
 /*!40000 ALTER TABLE `configuration` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -72,7 +72,7 @@ CREATE TABLE `job` (
   `file_bw_avg` double NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `search_idx` (`is_running`,`cluster_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4690 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4695 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -109,7 +109,7 @@ CREATE TABLE `job_job_tag` (
 
 LOCK TABLES `job_job_tag` WRITE;
 /*!40000 ALTER TABLE `job_job_tag` DISABLE KEYS */;
-INSERT INTO `job_job_tag` VALUES (1269,3),(1269,4),(1270,4),(1327,3),(1351,1),(1351,2),(1355,1),(1355,2),(1357,1),(1366,1),(1460,1),(1462,1),(1463,1),(1464,1),(1464,2),(1465,1),(1465,5),(1467,1);
+INSERT INTO `job_job_tag` VALUES (1269,3),(1269,4),(1270,4),(1320,2),(1327,3),(1351,1),(1351,2),(1355,1),(1355,2),(1357,1),(1366,1),(1460,1),(1462,1),(1463,1),(1464,1),(1464,2),(1465,1),(1465,5),(1467,1);
 /*!40000 ALTER TABLE `job_job_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -177,4 +177,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-08-20  9:49:18
+-- Dump completed on 2021-10-19  8:14:23
