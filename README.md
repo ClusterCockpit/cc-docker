@@ -23,8 +23,11 @@ The setup comes with fixture data for a Job archive, InfluxDB, MySQL, and a LDAP
 
 ## Configuration
 
+The main branch of this repository will work with the latest ClusterCockpit release (main branch) including the fixture data.
+For ClusterCockpit development on the develop branch use the cc-docker develop branch.
+
 While many aspects of this docker compose setup can be configured you usually only need to adapt the following three settings in `.env`:
-* `CLUSTERCOCKPIT_BRANCH` (Default: `develop`): The branch to checkout from ClusterCockpit git repository. May also be a tag.
+* `CLUSTERCOCKPIT_BRANCH`: The branch to checkout from ClusterCockpit git repository. May also be a tag. This should not be changed as it may be that the fixture data may not be compatible between stable and develop.
 * `APP_CLUSTERCOCKPIT_INIT` (Default: true): Wether the Symfony tree (located at `./data/symfony`) should be deleted and freshly cloned and initialized on every container startup.
 * `APP_ENVIRONMENT` (Default: `dev`): The Symfony app environment. With `dev` you get the symfony debug toolbar and more extensive error handling. The `prod` environment is a setup for productions use.
 
