@@ -1,4 +1,11 @@
 services:
+  nats:
+    container_name: nats
+    image: nats:alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
   db:
     container_name: cc-db
     image: mysql:8.0.22
@@ -31,6 +38,13 @@ services:
     volumes:
       - ${DATADIR}/influxdb/data:/var/lib/influxdb2
       - ${DATADIR}/influxdb/config:/etc/influxdb2
+
+  cc-metric-store:
+    container_name: metric-store
+    build:
+      context: ./cc-metric-store
+    depends_on:
+      - nats
 
   openldap:
     container_name: cc-ldap
