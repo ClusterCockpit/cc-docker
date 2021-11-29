@@ -32,3 +32,16 @@ wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais
 cd influxdb/data
 tar xJf ../../influxdbv2-data.tar.xz
 rm ../../influxdbv2-data.tar.xz
+cd ../..
+
+# Download checkpoint files for cc-metric-store
+mkdir -p cc-metric-store/checkpoints
+mkdir -p cc-metric-store/archive
+cd cc-metric-store/checkpoints
+wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/cc-metric-store.checkpoints-emmy.tar.gz
+wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/cc-metric-store.checkpoints-woody.tar.gz
+tar xf cc-metric-store.checkpoints-emmy.tar.gz
+tar xf cc-metric-store.checkpoints-woody.tar.gz
+rm cc-metric-store.checkpoints-emmy.tar.gz cc-metric-store.checkpoints-woody.tar.gz
+cd ../..
+

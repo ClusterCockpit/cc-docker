@@ -4,3 +4,4 @@ data/symfony
 data/symfony/**
 data/influxdb
 data/sqldata
+data/cc-metric-store

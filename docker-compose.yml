@@ -1,6 +1,6 @@
 services:
   nats:
-    container_name: nats
+    container_name: cc-nats
     image: nats:alpine
     ports:
       - "4222:4222"
@@ -40,9 +40,13 @@ services:
       - ${DATADIR}/influxdb/config:/etc/influxdb2
 
   cc-metric-store:
-    container_name: metric-store
+    container_name: cc-metric-store
     build:
       context: ./cc-metric-store
+    ports:
+      - "8081:8081"
+    volumes:
+      - ${DATADIR}/cc-metric-store:/data
     depends_on:
       - nats
 

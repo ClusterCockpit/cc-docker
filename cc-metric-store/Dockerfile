@@ -13,5 +13,7 @@ RUN cd /cc-metric-store && go build
 RUN mv /cc-metric-store/cc-metric-store /go/bin
 COPY config.json  /go/bin
 
+VOLUME /data
+
 WORKDIR /go/bin
 CMD ["./cc-metric-store"]
