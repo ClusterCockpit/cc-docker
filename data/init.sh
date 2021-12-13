@@ -6,7 +6,6 @@ if [ -d symfony ]; then
     read -r answer
     if [ "$answer" == "yes" ]; then
         echo "Cleaning directories ..."
-        rm -rf symfony
         rm -rf job-archive
         rm -rf influxdb/data/*
         rm -rf sqldata/*
@@ -42,4 +41,3 @@ wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais
 tar xf cc-metric-store-checkpoints.tar.xz
 rm cc-metric-store-checkpoints.tar.xz
 cd ../..
-
