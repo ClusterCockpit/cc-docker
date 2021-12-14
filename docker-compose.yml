@@ -97,8 +97,8 @@ services:
       - APP_JWT_PUB_KEY=${APP_JWT_PUB_KEY}
       - APP_JWT_PRIV_KEY=${APP_JWT_PRIV_KEY}
     volumes:
-      - ${DATADIR}/symfony:/var/www/symfony:cached
-      - ${DATADIR}/job-archive:/var/lib/job-archive:cached
+      - ${DATADIR}/symfony:/var/www/symfony
+      - ${DATADIR}/job-archive:/var/lib/job-archive
     depends_on:
       - db
       - redis
@@ -117,7 +117,7 @@ services:
       - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
       - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
     volumes:
-      - ${DATADIR}/symfony:/var/www/symfony:cached
+      - ${DATADIR}/symfony:/var/www/symfony
 
   phpmyadmin:
     container_name: cc-phpmyadmin
