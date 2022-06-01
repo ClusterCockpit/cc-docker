@@ -1,0 +1,29 @@
+services:
+  influxdb:
+    container_name: cc-influxdb
+    image: influxdb
+    command: ["--reporting-disabled"]
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: symfony
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
+      DOCKER_INFLUXDB_INIT_RETENTION: 100w
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
+    ports:
+      - "127.0.0.1:${INFLUXDB_PORT}:8086"
+    volumes:
+      - ${DATADIR}/influxdb/data:/var/lib/influxdb2
+      - ${DATADIR}/influxdb/config:/etc/influxdb2
+
+  openldap:
+    container_name: cc-ldap
+    image: osixia/openldap:1.5.0
+    command: --copy-service --loglevel debug
+    environment:
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
+      - LDAP_ORGANISATION=${LDAP_ORGANISATION}
+      - LDAP_DOMAIN=${LDAP_DOMAIN}
+    volumes:
+      - ${DATADIR}/ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom

@@ -1,0 +1,29 @@
+services:
+  nats:
+    container_name: cc-nats
+    image: nats:alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  cc-metric-store:
+    container_name: cc-metric-store
+    build:
+      context: ./cc-metric-store
+    ports:
+      - "8084:8084"
+    volumes:
+      - ${DATADIR}/cc-metric-store:/data
+    depends_on:
+      - nats
+
+  openldap:
+    container_name: cc-ldap
+    image: osixia/openldap:1.5.0
+    command: --copy-service --loglevel debug
+    environment:
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
+      - LDAP_ORGANISATION=${LDAP_ORGANISATION}
+      - LDAP_DOMAIN=${LDAP_DOMAIN}
+    volumes:
+      - ${DATADIR}/ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom

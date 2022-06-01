@@ -1,86 +1,50 @@
 # cc-docker
 
-This is a `docker compose` setup to try out the complete ClusterCockpit Application Stack including all external components. This docker setup can be easily configured to be used as demo or as a development environment.
-For a docker setup targeted to server environment you may have a look at https://github.com/ClusterCockpit/cc-docker-server .
+**Please note: This repo is under ongoing construction**
+
+This is a `docker-compose` setup which provides a quickly started environment for ClusterCockpit development and testing, using the modules `cc-backend` (GoLang) and `cc-frontend` (Svelte). A number of services is readily available as docker container (nats, cc-metric-store, InfluxDB, LDAP), or easily added by manual configuration (MySQL).
 
 It includes the following containers:
-* mysql
-* php-fpm
-* nginx
-* redis
-* openldap
-* influxdb
-* phpmyadmin
+* nats (Default)
+* cc-metric-store (Default)
+* influxdb (Optional)
+* openldap (Default)
+* mysql (Optional, Manual)
+* phpmyadmin (Optional, Manual)
 
-Settings are configured in `.env`.
-The setup comes with fixture data for a Job archive, InfluxDB, MySQL, and a LDAP user directory.
+The setup comes with fixture data for a Job archive, cc-metric-store checkpoints, InfluxDB, MySQL, and a LDAP user directory.
 
 ## Known Issues
 
 * `docker-compose` installed on Ubuntu (18.04, 20.04) via `apt-get` can not correctly parse `docker-compose.yml` due to version differences. Install latest version of `docker-compose` from https://docs.docker.com/compose/install/ instead.
-* You need to ensure that no other web server is running on port 80 (e.g. Apache2). If port 80 is already in use, edit NGINX_PORT environment variable in `.env`.
+* You need to ensure that no other web server is running on ports 8080 (cc-backend), 8081 (phpmyadmin), 8084 (cc-metric-store), 8086 (nfluxDB), 4222 and 8222 (Nats), or 3306 (MySQL). If one or more ports are already in use, you habe to adapt the related config accordingly.
 * Existing VPN connections sometimes cause problems with docker. If `docker-compose` does not start up correctly, try disabling any active VPN connection. Refer to https://stackoverflow.com/questions/45692255/how-make-openvpn-work-with-docker for further information.
 
-## Configuration
+## Configuration Templates
 
-While many aspects of this docker compose setup can be configured you usually only need to adapt the following three settings in `.env`:
-* `CLUSTERCOCKPIT_BRANCH` (Default: `develop`): The branch to checkout from ClusterCockpit git repository. May also be a tag.
-* `APP_CLUSTERCOCKPIT_INIT` (Default: true): Wether the Symfony tree (located at `./data/symfony`) should be deleted and freshly cloned and initialized on every container startup.
-* `APP_ENVIRONMENT` (Default: `dev`): The Symfony app environment. With `dev` you get the symfony debug toolbar and more extensive error handling. The `prod` environment is a setup for productions use.
+Located in `./templates`  
+* `docker-compose.yml.ccms`: Docker-Compose file to setup cc-metric-store metric database and LDAP containers (Default). Used in `setupDev.sh`.
+* `docker-compose.yml.influxdb`: Docker-Compose file to setup influxDB metric database and LDAP containers. Used in `setupDev.sh`.
+* `docker-compose.yml.mysql`: Docker-Compose configuration template if additional MySQL and phpmyadmin containers are desired.
+* `env.ccms`: Environment variables for setup with cc-metric-store metric database and LDAP containers (Default). Used in `setupDev.sh`.
+* `env.influxdb`: Environment variables for setup with influxDB metric database and LDAP containers. Used in `setupDev.sh`.
+* `env.mysql`: Additional environment variables required if additional MySQL and phpmyadmin containers are desired.
 
 ## Setup
 
-* `$ cd data`
-* `$ ./init.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).
+1. `$ ./setupDev.sh [help|ccms|influxdb]`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).  
+    * `help`: Displays help.
+    * `ccms`: Copies according docker-compose.yml and env-file to root directory, downloads cc-metric-store checkpoint data, and builds containers.
+    * `influxdb`: Copies according docker-compose.yml and env-file to root directory, downloads influxDB data, and builds containers.
 
-If you want to test the REST API and also write to the job archive from Cluster Cockpit you have to comment out the following lines in `./data/init.sh`:
-```
-echo "This script needs to chown the job-archive directory so that the application can write to it:"
-sudo chown -R 82:82 ./job-archive
-```
+2. After that from the root of the cc-docker sandbox you can start up the containers and launch cc-backend with: `$ ./startDev.sh`
 
-After that from the root of the cc-docker sandbox you can start up the containers with:
-* `$ docker-compose up`
-* Wait... and wait a little longer
-
-Before you can use ClusterCockpit the following disclaimer must be shown. To download and build all ClusterCockpit components may take up to several minutes:
-```
--------------------- ---------------------------------
-  Symfony
- -------------------- ---------------------------------
-  Version              5.3.7
-  Long-Term Support    No
-  End of maintenance   01/2022 (in +140 days)
-  End of life          01/2022 (in +140 days)
- -------------------- ---------------------------------
-  Kernel
- -------------------- ---------------------------------
-  Type                 App\Kernel
-  Environment          dev
-  Debug                true
-  Charset              UTF-8
-  Cache directory      ./var/cache/dev (6.5 MiB)
-  Build directory      ./var/cache/dev (6.5 MiB)
-  Log directory        ./var/log (249 B)
- -------------------- ---------------------------------
-  PHP
- -------------------- ---------------------------------
-  Version              8.0.10
-  Architecture         64 bits
-  Intl locale          n/a
-  Timezone             UTC (2021-09-13T09:41:33+00:00)
-  OPcache              true
-  APCu                 false
-  Xdebug               false
- -------------------- ---------------------------------
- ```
- 
-By default, you can access ClusterCockpit in your browser at `http://localhost`. If the `NGINX_PORT` environment variable was changed, you have to use `http://localhost:$PORT` . You can shutdown the containers by pressing `CTRL-C`. Refer to the common docker documentation how to start the environment in the background.
+3. By default, you can access cc-backend in your browser at `http://localhost:8080`. You can shut down the cc-backend server by pressing `CTRL-C`, remember to also shut down all containers via `docker-compose down` afterwards.
 
 ## Usage
 
-Credentials for the preconfigured admin user are:
-* User: `admin`
+Credentials for the preconfigured demo user are:
+* User: `demo`
 * Password: `AdminDev`
 
 You can also login as regular user using any credential in the LDAP user directory at `./data/ldap/users.ldif`.

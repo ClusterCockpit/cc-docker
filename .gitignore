@@ -1,7 +1,6 @@
 data/job-archive
 data/job-archive/**
-data/symfony
-data/symfony/**
 data/influxdb
 data/sqldata
 data/cc-metric-store
+.vscode
