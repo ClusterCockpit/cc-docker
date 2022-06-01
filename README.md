@@ -41,6 +41,25 @@ Located in `./templates`
 
 3. By default, you can access cc-backend in your browser at `http://localhost:8080`. You can shut down the cc-backend server by pressing `CTRL-C`, remember to also shut down all containers via `docker-compose down` afterwards.
 
+## Post-Setup Adjustment for using `influxdb`
+
+When using `influxdb` containers, one must adjust the following files:  
+* `cc-backend/var/job-archive/emmy/cluster.json`
+* `cc-backend/var/job-archive/woody/cluster.json`
+
+In the JSON, exchange the content of the `metricDataRepository`-Entry (By default configured for `cc-metric-store`) with:
+```
+"metricDataRepository": {
+    "kind": "influxdb",
+    "url": "http://localhost:8086",
+    "token": "egLfcf7fx0FESqFYU3RpAAbj",
+    "bucket": "ClusterCockpit",
+    "org": "ClusterCockpit",
+    "skiptls": false
+}
+```
+
+
 ## Usage
 
 Credentials for the preconfigured demo user are:
