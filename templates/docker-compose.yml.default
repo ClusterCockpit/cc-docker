@@ -1,4 +1,22 @@
 services:
+  nats:
+    container_name: cc-nats
+    image: nats:alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  cc-metric-store:
+    container_name: cc-metric-store
+    build:
+      context: ./cc-metric-store
+    ports:
+      - "8084:8084"
+    volumes:
+      - ${DATADIR}/cc-metric-store:/data
+    depends_on:
+      - nats
+
   influxdb:
     container_name: cc-influxdb
     image: influxdb

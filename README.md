@@ -7,10 +7,11 @@ This is a `docker-compose` setup which provides a quickly started environment fo
 It includes the following containers:
 * nats (Default)
 * cc-metric-store (Default)
-* influxdb (Optional)
+* influxdb (Default)
 * openldap (Default)
-* mysql (Optional, Manual)
-* phpmyadmin (Optional, Manual)
+* mysql (Optional)
+* mariadb (Optional)
+* phpmyadmin (Optional)
 
 The setup comes with fixture data for a Job archive, cc-metric-store checkpoints, InfluxDB, MySQL, and a LDAP user directory.
 
@@ -23,19 +24,16 @@ The setup comes with fixture data for a Job archive, cc-metric-store checkpoints
 ## Configuration Templates
 
 Located in `./templates`  
-* `docker-compose.yml.ccms`: Docker-Compose file to setup cc-metric-store metric database and LDAP containers (Default). Used in `setupDev.sh`.
-* `docker-compose.yml.influxdb`: Docker-Compose file to setup influxDB metric database and LDAP containers. Used in `setupDev.sh`.
+* `docker-compose.yml.default`: Docker-Compose file to setup cc-metric-store, InfluxDB, and LDAP containers (Default). Used in `setupDev.sh`.
 * `docker-compose.yml.mysql`: Docker-Compose configuration template if additional MySQL and phpmyadmin containers are desired.
-* `env.ccms`: Environment variables for setup with cc-metric-store metric database and LDAP containers (Default). Used in `setupDev.sh`.
-* `env.influxdb`: Environment variables for setup with influxDB metric database and LDAP containers. Used in `setupDev.sh`.
+* `docker-compose.yml.mariadb`: Docker-Compose configuration template if additional MariaDB and phpmyadmin containers are desired.
+* `env.default`: Environment variables for setup with cc-metric-store, InfluxDB, and LDAP containers (Default). Used in `setupDev.sh`.
 * `env.mysql`: Additional environment variables required if additional MySQL and phpmyadmin containers are desired.
+* `env.mariadb`: Additional environment variables required if additional MariaDB and phpmyadmin containers are desired.
 
 ## Setup
 
-1. `$ ./setupDev.sh [help|ccms|influxdb]`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).  
-    * `help`: Displays help.
-    * `ccms`: Copies according docker-compose.yml and env-file to root directory, downloads cc-metric-store checkpoint data, and builds containers.
-    * `influxdb`: Copies according docker-compose.yml and env-file to root directory, downloads influxDB data, and builds containers.
+1. `$ ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).  
 
 2. After that from the root of the cc-docker sandbox you can start up the containers and launch cc-backend with: `$ ./startDev.sh`
 
@@ -43,7 +41,7 @@ Located in `./templates`
 
 ## Post-Setup Adjustment for using `influxdb`
 
-When using `influxdb` containers, one must adjust the following files:  
+When using `influxdb` as a metric database, one must adjust the following files:  
 * `cc-backend/var/job-archive/emmy/cluster.json`
 * `cc-backend/var/job-archive/woody/cluster.json`
 
