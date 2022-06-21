@@ -11,6 +11,7 @@ use Data::Dumper;
 use Data::Walk;
 use Scalar::Util qw( reftype );
 use Time::Piece;
+use Sort::Versions;
 
 ## NOTE: Based on Jan: migrateCC-jobArchive.pl
 
@@ -54,11 +55,11 @@ my $targetDir = './cc-backend/var/job-archive';
 my @Clusters;
 my $src = './data/job-archive';
 
-chomp($checkpointStart=`date --date 'TZ="Europe/Berlin" 0:00 7 days ago' +%s`);
+chomp(my $checkpointStart=`date --date 'TZ="Europe/Berlin" 0:00 7 days ago' +%s`);
 my $halfday = 43200;
-my $targetDirCheckpoints = './data/cc-metric-store_new'
-my $srcCheckpoints = './data/cc-metric-store'
-my @ClustersCheckpoints
+my $targetDirCheckpoints = './data/cc-metric-store_new';
+my $srcCheckpoints = './data/cc-metric-store';
+my @ClustersCheckpoints;
 
 ## Get Clusters
 opendir my $dh, $src  or die "can't open directory: $!";
@@ -81,7 +82,7 @@ while ( readdir $dhc ) {
 
 # start for jobarchive
 foreach my $cluster ( @Clusters ) {
-  print "Starting to update startTime for $cluster\n";
+  print "Starting to update startTime in job-archive for $cluster\n";
 
 	opendir my $dhLevel1, "$src/$cluster" or die "can't open directory: $!";
 	while ( readdir $dhLevel1 ) {
@@ -95,22 +96,24 @@ foreach my $cluster ( @Clusters ) {
 				my $level2 = $_;
 				my $src = "$src/$cluster/$level1/$level2";
 				my $target = "$targetDir/$cluster/$level1/$level2/";
+        my $oldsrc = $src;
 
-                my $oldsrc = $src;
-				if ( ! -e "$src/meta.json") {
+        if ( ! -e "$src/meta.json") {
 					my @files = read_dir($src);
-                    if (!@files) {
-                        next;
-                    }
+          if (!@files) {
+            next;
+          }
 					$src = "$src/".$files[0];
 				}
 
-                if ( ! -e "$src/meta.json") {
-                    rmtree $oldsrc;
-                    next;
-                }
+        if ( ! -e "$src/meta.json") {
+          rmtree $oldsrc;
+          next;
+        }
+
 				my $str = read_file("$src/meta.json");
 				my $json = decode_json($str);
+
 				$FIRST = 1;
 				walk \&process, $json;
 
@@ -125,9 +128,9 @@ foreach my $cluster ( @Clusters ) {
 				$target .= $json->{startTime};
 
 				if ( not -d $target ){
-          print "Writing files\n";
+          # print "Writing files\n";
 
-					print "$cluster/$level1/$level2\n";
+					# print "$cluster/$level1/$level2\n";
 					make_path($target);
 
       		$str = encode_json($json);
@@ -142,5 +145,78 @@ foreach my $cluster ( @Clusters ) {
 		}
 	}
 }
+print "Done for job-archive\n";
+sleep(2);
 
-print "Done\n";
+# start for checkpoints
+foreach my $cluster ( @ClustersCheckpoints ) {
+  print "Starting to update startTime in checkpoint-files for $cluster\n";
+
+	opendir my $dhLevel1, "$srcCheckpoints/$cluster" or die "can't open directory: $!";
+	while ( readdir $dhLevel1 ) {
+		chomp; next if $_ eq '.' or $_ eq '..';
+		my $level1 = $_;
+
+		if ( -d "$srcCheckpoints/$cluster/$level1" ) {
+
+			my $srcCheckpoints = "$srcCheckpoints/$cluster/$level1/";
+			my $target = "$targetDirCheckpoints/$cluster/$level1/";
+      my $oldsrc = $srcCheckpoints;
+      my @files;
+
+			if ( -e "$srcCheckpoints/1609459200.json") { # 1609459200 == First Checkpoint time in latest dump
+				@files = read_dir($srcCheckpoints);
+        my $length = @files;
+        if (!@files || $length != 14) { # needs 14 files == 7 days worth of data
+          next;
+        }
+			}
+
+      if ( ! -e "$srcCheckpoints/1609459200.json") {
+        # rmtree $oldsrc;
+        next;
+      }
+
+      my @sortedFiles = sort { versioncmp($a,$b) } @files; # sort alphanumerically: _Really_ start with index == 0 == 1609459200.json
+
+      while (my ($index, $file) = each(@sortedFiles)) {
+        # print "$file\n";
+        my $str = read_file("$srcCheckpoints/$file");
+        my $json = decode_json($str);
+
+        my $timestamp = $checkpointStart + ($index * $halfday);
+        my $oldTimestamp = $json->{from};
+
+        # print "$oldTimestamp -> $timestamp in $srcCheckpoints\n";
+
+        $json->{from} = $timestamp;
+
+        foreach my $metric (keys %{$json->{metrics}}) {
+          $json->{metrics}->{$metric}->{start} -= $oldTimestamp;
+          $json->{metrics}->{$metric}->{start} += $timestamp;
+        }
+
+        my $targetFile = "$target/$timestamp.json";
+        make_path($target);
+        $str = encode_json($json);
+        write_file("$targetFile", $str);
+      }
+
+				# if ( not -d $target ){
+        #   print "Writing files\n";
+        #
+				# 	print "$cluster/$level1/$level2\n";
+				# 	make_path($target);
+        #
+      	# 	$str = encode_json($json);
+				# 	write_file("$target/meta.json", $str);
+        #
+				# 	$str = read_file("$srcCheckpoints/data.json");
+				# 	write_file("$target/data.json", $str);
+        # } else {
+        #   #rmtree $src;
+        # }
+		}
+	}
+}
+print "Done for checkpoints\n";
