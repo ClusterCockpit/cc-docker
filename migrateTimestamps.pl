@@ -4,80 +4,26 @@ use warnings;
 use utf8;
 
 use File::Path qw( make_path rmtree );
-use String::CamelCase qw(camelize);
 use Cpanel::JSON::XS qw( decode_json encode_json );
 use File::Slurp;
 use Data::Dumper;
-use Data::Walk;
-use Scalar::Util qw( reftype );
 use Time::Piece;
 use Sort::Versions;
 
-## NOTE: Based on Jan: migrateCC-jobArchive.pl
-
-my $FIRST=1;
-my @METRICS = ('flops_any', 'cpu_load', 'mem_used', 'flops_sp',
-    'flops_dp', 'mem_bw',  'cpi', 'cpi_avg', 'clock', 'rapl_power');
-
-my %UNITS = (
-    'flops_any' => 'GF/s',
-    'cpu_load' => 'load',
-    'mem_used' => 'GB',
-    'flops_sp' => 'GF/s',
-    'flops_dp' => 'GF/s',
-    'mem_bw' => 'GB/s',
-    'clock' => 'MHz',
-    'rapl_power' => 'W'
-);
-
-sub process {
-if ( $Data::Walk::type eq 'HASH' && !($Data::Walk::index%2)) {
-
-    if ( ! $FIRST ) {
-        my $key = $_;
-        if ( ! grep( /^$key$/, @METRICS) ) {
-            my $str = lcfirst(camelize($key));
-            my $hashref = $Data::Walk::container;
-            my $value = delete ${$hashref}{$key};
-            ${$hashref}{$str} = $value;
-        }
-    }
-
-    if ( $FIRST ) {
-        $FIRST = 0;
-    }
-}
-}
-
+### JOB-ARCHIVE
 my $localtime = localtime;
 my $epochtime = $localtime->epoch;
 my $targetDir = './cc-backend/var/job-archive';
 my @Clusters;
 my $src = './data/job-archive';
 
-chomp(my $checkpointStart=`date --date 'TZ="Europe/Berlin" 0:00 7 days ago' +%s`);
-my $halfday = 43200;
-my $targetDirCheckpoints = './data/cc-metric-store_new';
-my $srcCheckpoints = './data/cc-metric-store';
-my @ClustersCheckpoints;
-
-## Get Clusters
+# Get clusters by folder
 opendir my $dh, $src  or die "can't open directory: $!";
-
 while ( readdir $dh ) {
     chomp; next if $_ eq '.' or $_ eq '..'  or $_ eq 'job-archive';
 
     my $cluster = $_;
     push @Clusters, $cluster;
-}
-
-opendir my $dhc, $srcCheckpoints  or die "can't open directory: $!";
-
-while ( readdir $dhc ) {
-    chomp; next if $_ eq '.' or $_ eq '..'  or $_ eq 'job-archive';
-
-    my $cluster = $_;
-    push @ClustersCheckpoints, $cluster;
 }
 
 # start for jobarchive
@@ -114,9 +60,6 @@ foreach my $cluster ( @Clusters ) {
 				my $str = read_file("$src/meta.json");
 				my $json = decode_json($str);
 
-				$FIRST = 1;
-				walk \&process, $json;
-
         # NOTE Start meta.json iteration here
         # my $random_number = int(rand(UPPERLIMIT)) + LOWERLIMIT;
         # Set new startTime: Between 5 days and 1 day before now
@@ -147,6 +90,22 @@ foreach my $cluster ( @Clusters ) {
 }
 print "Done for job-archive\n";
 sleep(2);
+
+## CHECKPOINTS
+chomp(my $checkpointStart=`date --date 'TZ="Europe/Berlin" 0:00 7 days ago' +%s`);
+my $halfday = 43200;
+my $targetDirCheckpoints = './data/cc-metric-store_new';
+my $srcCheckpoints = './data/cc-metric-store';
+my @ClustersCheckpoints;
+
+# Get clusters by folder
+opendir my $dhc, $srcCheckpoints  or die "can't open directory: $!";
+while ( readdir $dhc ) {
+    chomp; next if $_ eq '.' or $_ eq '..'  or $_ eq 'job-archive';
+
+    my $cluster = $_;
+    push @ClustersCheckpoints, $cluster;
+}
 
 # start for checkpoints
 foreach my $cluster ( @ClustersCheckpoints ) {
