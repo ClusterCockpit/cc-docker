@@ -9,9 +9,9 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "127.0.0.1:3336:3306"
-    volumes:
-      - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
+      - "127.0.0.1:${MYSQL_PORT}:3306"
+    # volumes:
+      # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
       # - ${DATADIR}/sqldata:/var/lib/mysql
     cap_add:
       - SYS_NICE
