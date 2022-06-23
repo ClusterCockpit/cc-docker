@@ -18,73 +18,48 @@ else
 fi
 
 
-# Download unedited job-archibe to /data
-if [ ! -d data/job-archive ]; then
+# Download unedited job-archive to ./data/job-archive-source
+if [ ! -d data/job-archive-source ]; then
     cd data
     wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive.tar.xz
     tar xJf job-archive.tar.xz
+    mv ./job-archive ./job-archive-source
     rm ./job-archive.tar.xz
     cd ..
-fi
-
-
-
-# Download data for influxdb2
-if [ ! -d data/influxdb ]; then
-    mkdir -p data/influxdb/data
-    cd data/influxdb/data
-    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/influxdbv2-data.tar.xz
-    tar xJf influxdbv2-data.tar.xz
-    rm influxdbv2-data.tar.xz
-    cd ../../../
 else
-    echo "'data/influxdb' already exists!"
-    echo -n "Remove existing folder and redownload? [yes to redownload / no to continue]  "
-    read -r answer
-    if [ "$answer" == "yes" ]; then
-        echo "Removing 'data/influxdb' ..."
-        rm -rf data/influxdb
-        echo "Reinstall 'data/influxdb'..."
-        mkdir -p data/influxdb/data
-        cd data/influxdb/data
-        wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/influxdbv2-data.tar.xz
-        tar xJf influxdbv2-data.tar.xz
-        rm influxdbv2-data.tar.xz
-        cd ../../../
-        echo "done."
-    else
-        echo "'data/influxdb' unchanged."
-    fi
+    echo "'data/job-archive-source' already exists!"
 fi
 
-# Download checkpoint files for cc-metric-store
-if [ ! -d data/cc-metric-store ]; then
-  mkdir -p data/cc-metric-store/checkpoints
-  mkdir -p data/cc-metric-store/archive
-  cd data/cc-metric-store/checkpoints
+# Download unedited checkpoint files to ./data/cc-metric-store-source/checkpoints
+if [ ! -d data/cc-metric-store-source ]; then
+  mkdir -p data/cc-metric-store-source/checkpoints
+  cd data/cc-metric-store-source/checkpoints
   wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/cc-metric-store-checkpoints.tar.xz
   tar xf cc-metric-store-checkpoints.tar.xz
   rm cc-metric-store-checkpoints.tar.xz
   cd ../../../
 else
-    echo "'data/cc-metric-store' already exists!"
-    echo -n "Remove existing folder and redownload? [yes to redownload / no to continue]  "
-    read -r answer
-    if [ "$answer" == "yes" ]; then
-        echo "Removing 'data/cc-metric-store' ..."
-        rm -rf data/cc-metric-store
-        echo "Reinstall 'data/cc-metric-store'..."
-        mkdir -p data/cc-metric-store/checkpoints
-        mkdir -p data/cc-metric-store/archive
-        cd data/cc-metric-store/checkpoints
-        wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/cc-metric-store-checkpoints.tar.xz
-        tar xf cc-metric-store-checkpoints.tar.xz
-        rm cc-metric-store-checkpoints.tar.xz
-        cd ../../../
-        echo "done."
-    else
-        echo "'data/cc-metric-store' unchanged."
-    fi
+    echo "'data/cc-metric-store-source' already exists!"
+fi
+
+# Update timestamps
+perl ./migrateTimestamps.pl
+
+# Create archive folder for rewrtitten ccms checkpoints
+if [ ! -d data/cc-metric-store/archive ]; then
+    mkdir -p data/cc-metric-store/archive
+fi
+
+# cleanup sources
+# rm -r ./data/job-archive-source
+# rm -r ./data/cc-metric-store-source
+
+# prepare folders for influxdb2
+if [ ! -d data/influxdb ]; then
+    mkdir -p data/influxdb/data
+    mkdir -p data/influxdb/config/influx-configs
+else
+    echo "'data/influxdb' already exists!"
 fi
 
 # Check dotenv-file and docker-compose-yml, copy accordingly if not present and build docker services
@@ -98,6 +73,11 @@ if [ ! -d docker-compose.yml ]; then
 fi
 
 docker-compose build
+./cc-backend/cc-backend --init-db --add-user demo:admin:AdminDev --no-server
+docker-compose up -d
 
 echo ""
-echo "Setup complete. Use 'startDev.sh' to boot containers and start cc-backend."
+echo "Setup complete, containers are up by default: Shut down with 'docker-compose down'."
+echo "Use './cc-backend/cc-backend' to start cc-backend."
+echo "Use scripts in /scripts to load data into influx or mariadb."
+# ./cc-backend/cc-backend
