@@ -16,7 +16,7 @@ my $newCheckpoints = './data/cc-metric-store/checkpoints';
 my @CheckpClusters;
 my $verbose = 1;
 my $restClient = REST::Client->new();
-$restClient->setHost('http://localhost:8087'); # Adapt port here!
+$restClient->setHost('http://localhost:8086'); # Adapt port here!
 $restClient->addHeader('Authorization', "Token 74008ea2a8dad5e6f856838a90c6392e"); # compare .env file
 $restClient->addHeader('Content-Type', 'text/plain; charset=utf-8');
 $restClient->addHeader('Accept', 'application/json');
