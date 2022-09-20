@@ -24,20 +24,22 @@ The setup comes with fixture data for a Job archive, cc-metric-store checkpoints
 ## Configuration Templates
 
 Located in `./templates`  
-* `docker-compose.yml.default`: Docker-Compose file to setup cc-metric-store, InfluxDB, and LDAP containers (Default). Used in `setupDev.sh`.
-* `docker-compose.yml.mysql`: Docker-Compose configuration template if additional MySQL and phpmyadmin containers are desired.
-* `docker-compose.yml.mariadb`: Docker-Compose configuration template if additional MariaDB and phpmyadmin containers are desired.
-* `env.default`: Environment variables for setup with cc-metric-store, InfluxDB, and LDAP containers (Default). Used in `setupDev.sh`.
-* `env.mysql`: Additional environment variables required if additional MySQL and phpmyadmin containers are desired.
-* `env.mariadb`: Additional environment variables required if additional MariaDB and phpmyadmin containers are desired.
+* `docker-compose.yml.default`: Docker-Compose file to setup cc-metric-store, InfluxDB, MariaDB, PhpMyadmin, and LDAP containers (Default). Used in `setupDev.sh`.
+* `docker-compose.yml.mysql`: Docker-Compose configuration template if MySQL is desired instead of MariaDB.
+* `env.default`: Environment variables for setup with cc-metric-store, InfluxDB, MariaDB, PhpMyadmin, and LDAP containers (Default). Used in `setupDev.sh`.
+* `env.mysql`: Additional environment variables required if MySQL is desired instead of MariaDB.
 
 ## Setup
 
-1. `$ ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).  
+1. Clone `cc-backend` repository in chosen base folder: `$> git clone https://github.com/ClusterCockpit/cc-backend.git`
 
-2. After that from the root of the cc-docker sandbox you can start up the containers and launch cc-backend with: `$ ./startDev.sh`
+2. Run `$ ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).  
 
-3. By default, you can access cc-backend in your browser at `http://localhost:8080`. You can shut down the cc-backend server by pressing `CTRL-C`, remember to also shut down all containers via `docker-compose down` afterwards.
+3. The setup-script launches the supporting container stack in the background automatically if everything went well. Run `$> ./cc-backend/cc-backend` to start `cc-backend.`
+
+4. By default, you can access `cc-backend` in your browser at `http://localhost:8080`. You can shut down the cc-backend server by pressing `CTRL-C`, remember to also shut down all containers via `$> docker-compose down` afterwards.
+
+5. You can restart the containers with: `$> docker-compose up -d`.
 
 ## Post-Setup Adjustment for using `influxdb`
 

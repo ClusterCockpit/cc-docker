@@ -63,7 +63,6 @@ else
 fi
 
 # Check dotenv-file and docker-compose-yml, copy accordingly if not present and build docker services
-# !! By default, this decides which metric database is used based on the selected argument !!
 if [ ! -d .env ]; then
     cp templates/env.default ./.env
 fi
@@ -73,7 +72,7 @@ if [ ! -d docker-compose.yml ]; then
 fi
 
 docker-compose build
-./cc-backend/cc-backend --init-db --add-user demo:admin:AdminDev --no-server
+./cc-backend/cc-backend --init-db --add-user demo:admin:AdminDev
 docker-compose up -d
 
 echo ""

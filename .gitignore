@@ -3,4 +3,8 @@ data/job-archive/**
 data/influxdb
 data/sqldata
 data/cc-metric-store
+cc-backend
+cc-backend/**
 .vscode
+docker-compose.yml
+.env
