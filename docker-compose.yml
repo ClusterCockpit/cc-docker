@@ -62,22 +62,22 @@ services:
     cap_add:
       - SYS_NICE
 
-  mysql:
-    container_name: cc-mysql
-    image: mysql:8.0.22
-    command: ["--default-authentication-plugin=mysql_native_password"]
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "127.0.0.1:${MYSQL_PORT}:3306"
-    # volumes:
-      # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
-      # - ${DATADIR}/sqldata:/var/lib/mysql
-    cap_add:
-      - SYS_NICE
+  # mysql:
+  #   container_name: cc-mysql
+  #   image: mysql:8.0.22
+  #   command: ["--default-authentication-plugin=mysql_native_password"]
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #   ports:
+  #     - "127.0.0.1:${MYSQL_PORT}:3306"
+  #   # volumes:
+  #     # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
+  #     # - ${DATADIR}/sqldata:/var/lib/mysql
+  #   cap_add:
+  #     - SYS_NICE
 
   phpmyadmin:
     container_name: cc-phpmyadmin
@@ -89,4 +89,76 @@ services:
     ports:
       - "127.0.0.1:${PHPMYADMIN_PORT}:80"
     depends_on:
-      - db
+      - mariadb
+
+  slurm-controller:
+    container_name: slurm-controller
+    build:
+      context: ./slurm/controller
+    privileged: true
+    volumes:
+      - ./home:/home
+      - ./secret:/.secret
+    restart: always
+    environment:
+      USE_SLURMDBD: 'true'
+      CLUSTER_NAME: snowflake
+      CONTROL_MACHINE: controller
+      SLURMCTLD_PORT: 6817
+      SLURMD_PORT: 6818
+      ACCOUNTING_STORAGE_HOST: database
+      ACCOUNTING_STORAGE_PORT: 6819
+      COMPUTE_NODES: worker01 worker02
+      PARTITION_NAME: docker
+
+  slurm-database:
+    container_name: slurm-database
+    build:
+      context: ./slurm/database
+    depends_on:
+      - slurm-controller
+    privileged: true
+    volumes:
+      - ./home:/home
+      - ./secret:/.secret
+    restart: always
+    environment:
+      DBD_ADDR: database
+      DBD_HOST: database
+      DBD_PORT: 6819
+      STORAGE_HOST: database.local.dev
+      STORAGE_PORT: 3306
+      STORAGE_PASS: password
+      STORAGE_USER: slurm
+
+  slurm-worker01:
+    container_name: slurm-worker01
+    build:
+      context: ./slurm/worker
+    depends_on:
+      - slurm-controller
+    privileged: true
+    volumes:
+      - ./home:/home
+      - ./secret:/.secret
+    restart: always
+    environment:
+      CONTROL_MACHINE: controller
+      ACCOUNTING_STORAGE_HOST: database
+      COMPUTE_NODES: worker01 worker02
+
+  slurm-worker02:
+    container_name: slurm-worker02
+    build:
+      context: ./slurm/worker
+    depends_on:
+      - slurm-controller
+    privileged: true
+    volumes:
+      - ./home:/home
+      - ./secret:/.secret
+    restart: always
+    environment:
+      CONTROL_MACHINE: controller
+      ACCOUNTING_STORAGE_HOST: database
+      COMPUTE_NODES: worker01 worker02
