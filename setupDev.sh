@@ -21,10 +21,10 @@ fi
 # Download unedited job-archive to ./data/job-archive-source
 if [ ! -d data/job-archive-source ]; then
     cd data
-    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive.tar.xz
-    tar xJf job-archive.tar.xz
+    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
+    tar xf job-archive-demo.tar
     mv ./job-archive ./job-archive-source
-    rm ./job-archive.tar.xz
+    rm ./job-archive-demo.tar
     cd ..
 else
     echo "'data/job-archive-source' already exists!"
@@ -45,7 +45,7 @@ fi
 # Update timestamps
 perl ./migrateTimestamps.pl
 
-# Create archive folder for rewrtitten ccms checkpoints
+# Create archive folder for rewritten ccms checkpoints
 if [ ! -d data/cc-metric-store/archive ]; then
     mkdir -p data/cc-metric-store/archive
 fi

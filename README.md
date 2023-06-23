@@ -1,8 +1,7 @@
 # cc-docker
 
-**Please note: This repo is under ongoing construction**
-
-This is a `docker-compose` setup which provides a quickly started environment for ClusterCockpit development and testing, using the modules `cc-backend` (GoLang) and `cc-frontend` (Svelte). A number of services is readily available as docker container (nats, cc-metric-store, InfluxDB, LDAP), or easily added by manual configuration (MySQL).
+This is a `docker-compose` setup which provides a quickly started environment for ClusterCockpit development and testing, using `cc-backend`.
+A number of services is readily available as docker container (nats, cc-metric-store, InfluxDB, LDAP), or easily added by manual configuration (MySQL).
 
 It includes the following containers:
 * nats (Default)
@@ -23,7 +22,7 @@ The setup comes with fixture data for a Job archive, cc-metric-store checkpoints
 
 ## Configuration Templates
 
-Located in `./templates`  
+Located in `./templates`
 * `docker-compose.yml.default`: Docker-Compose file to setup cc-metric-store, InfluxDB, MariaDB, PhpMyadmin, and LDAP containers (Default). Used in `setupDev.sh`.
 * `docker-compose.yml.mysql`: Docker-Compose configuration template if MySQL is desired instead of MariaDB.
 * `env.default`: Environment variables for setup with cc-metric-store, InfluxDB, MariaDB, PhpMyadmin, and LDAP containers (Default). Used in `setupDev.sh`.
@@ -33,7 +32,7 @@ Located in `./templates`
 
 1. Clone `cc-backend` repository in chosen base folder: `$> git clone https://github.com/ClusterCockpit/cc-backend.git`
 
-2. Run `$ ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).  
+2. Run `$ ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the InfluxDB data).
 
 3. The setup-script launches the supporting container stack in the background automatically if everything went well. Run `$> ./cc-backend/cc-backend` to start `cc-backend.`
 
@@ -43,7 +42,7 @@ Located in `./templates`
 
 ## Post-Setup Adjustment for using `influxdb`
 
-When using `influxdb` as a metric database, one must adjust the following files:  
+When using `influxdb` as a metric database, one must adjust the following files:
 * `cc-backend/var/job-archive/emmy/cluster.json`
 * `cc-backend/var/job-archive/woody/cluster.json`
 
@@ -68,6 +67,7 @@ Credentials for the preconfigured demo user are:
 
 You can also login as regular user using any credential in the LDAP user directory at `./data/ldap/users.ldif`.
 
+TODO: Update job archive and all other metric data.
 The job archive with 1867 jobs originates from the second half of 2020.
 Roughly 2700 jobs from the first week of 2021 are loaded with data from InfluxDB.
 Some views of ClusterCockpit (e.g. the Users view) show the last week or month.
