@@ -41,7 +41,7 @@ _mariadb_start() {
 # start munge using existing key
 _munge_start_using_key() {
   if [ ! -f /.secret/munge.key ]; then
-    echo -n "cheking for munge.key"
+    echo -n "checking for munge.key"
     while [ ! -f /.secret/munge.key ]; do
       echo -n "."
       sleep 1
@@ -63,7 +63,7 @@ _munge_start_using_key() {
 # wait for worker user in shared /home volume
 _wait_for_worker() {
   if [ ! -f /home/worker/.ssh/id_rsa.pub ]; then
-    echo -n "cheking for id_rsa.pub"
+    echo -n "checking for id_rsa.pub"
     while [ ! -f /home/worker/.ssh/id_rsa.pub ]; do
       echo -n "."
       sleep 1

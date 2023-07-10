@@ -45,7 +45,7 @@ _wait_for_worker() {
 # run slurmd
 _slurmd() {
   if [ ! -f /.secret/slurm.conf ]; then
-    echo -n "cheking for slurm.conf"
+    echo -n "checking for slurm.conf"
     while [ ! -f /.secret/slurm.conf ]; do
       echo -n "."
       sleep 1

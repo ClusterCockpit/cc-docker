@@ -131,34 +131,34 @@ services:
       STORAGE_PASS: password
       STORAGE_USER: slurm
 
-  slurm-worker01:
-    container_name: slurm-worker01
-    build:
-      context: ./slurm/worker
-    depends_on:
-      - slurm-controller
-    privileged: true
-    volumes:
-      - ./home:/home
-      - ./secret:/.secret
-    restart: always
-    environment:
-      CONTROL_MACHINE: controller
-      ACCOUNTING_STORAGE_HOST: database
-      COMPUTE_NODES: worker01 worker02
+  # slurm-worker01:
+  #   container_name: slurm-worker01
+  #   build:
+  #     context: ./slurm/worker
+  #   depends_on:
+  #     - slurm-controller
+  #   privileged: true
+  #   volumes:
+  #     - ./home:/home
+  #     - ./secret:/.secret
+  #   restart: always
+  #   environment:
+  #     CONTROL_MACHINE: controller
+  #     ACCOUNTING_STORAGE_HOST: database
+  #     COMPUTE_NODES: worker01 worker02
 
-  slurm-worker02:
-    container_name: slurm-worker02
-    build:
-      context: ./slurm/worker
-    depends_on:
-      - slurm-controller
-    privileged: true
-    volumes:
-      - ./home:/home
-      - ./secret:/.secret
-    restart: always
-    environment:
-      CONTROL_MACHINE: controller
-      ACCOUNTING_STORAGE_HOST: database
-      COMPUTE_NODES: worker01 worker02
+  # slurm-worker02:
+  #   container_name: slurm-worker02
+  #   build:
+  #     context: ./slurm/worker
+  #   depends_on:
+  #     - slurm-controller
+  #   privileged: true
+  #   volumes:
+  #     - ./home:/home
+  #     - ./secret:/.secret
+  #   restart: always
+  #   environment:
+  #     CONTROL_MACHINE: controller
+  #     ACCOUNTING_STORAGE_HOST: database
+  #     COMPUTE_NODES: worker01 worker02
