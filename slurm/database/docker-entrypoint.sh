@@ -16,10 +16,10 @@ _sshd_host() {
 _slurm_acct_db() {
   {
     echo "create database slurm_acct_db;"
-    echo "create user '${STORAGE_USER}'@'${STORAGE_HOST}';"
-    echo "set password for '${STORAGE_USER}'@'${STORAGE_HOST}' = password('${STORAGE_PASS}');"
-    echo "grant usage on *.* to '${STORAGE_USER}'@'${STORAGE_HOST}';"
-    echo "grant all privileges on slurm_acct_db.* to '${STORAGE_USER}'@'${STORAGE_HOST}';"
+    echo "create user 'slurm'@slurmdb'';"
+    echo "set password for 'slurm'@'slurmdb' = password('demo');"
+    echo "grant usage on *.* to 'slurm'@'slurmdb';"
+    echo "grant all privileges on slurm_acct_db.* to 'slurm'@'slurmdb';"
     echo "flush privileges;"
   } >> $SLURM_ACCT_DB_SQL
 }
@@ -72,50 +72,6 @@ _wait_for_worker() {
   fi
 }
 
-# generate slurmdbd.conf
-_generate_slurmdbd_conf() {
-  cat > /etc/slurm/slurmdbd.conf <<EOF
-#
-# Example slurmdbd.conf file.
-#
-# See the slurmdbd.conf man page for more information.
-#
-# Archive info
-#ArchiveJobs=yes
-#ArchiveDir="/tmp"
-#ArchiveSteps=yes
-#ArchiveScript=
-#JobPurge=12
-#StepPurge=1
-#
-# Authentication info
-AuthType=auth/munge
-AuthInfo=/var/run/munge/munge.socket.2
-#
-# slurmDBD info
-DbdAddr=$DBD_ADDR
-DbdHost=$DBD_HOST
-DbdPort=$DBD_PORT
-SlurmUser=slurm
-#MessageTimeout=300
-DebugLevel=4
-#DefaultQOS=normal,standby
-LogFile=/var/log/slurm/slurmdbd.log
-PidFile=/var/run/slurmdbd.pid
-#PluginDir=/usr/lib/slurm
-#PrivateData=accounts,users,usage,jobs
-#TrackWCKey=yes
-#
-# Database info
-StorageType=accounting_storage/mysql
-StorageHost=$STORAGE_HOST
-StoragePort=$STORAGE_PORT
-StoragePass=$STORAGE_PASS
-StorageUser=$STORAGE_USER
-StorageLoc=slurm_acct_db
-EOF
-}
-
 # run slurmdbd
 _slurmdbd() {
   mkdir -p /var/spool/slurm/d \
@@ -123,8 +79,8 @@ _slurmdbd() {
   chown slurm: /var/spool/slurm/d \
     /var/log/slurm
   if [[ ! -f /home/config/slurmdbd.conf ]]; then
-    echo "### generate slurmdbd.conf ###"
-    _generate_slurmdbd_conf
+    echo "### Missing slurmdbd.conf ###"
+    exit
   else
     echo "### use provided slurmdbd.conf ###"
     cp /home/config/slurmdbd.conf /etc/slurm/slurmdbd.conf
