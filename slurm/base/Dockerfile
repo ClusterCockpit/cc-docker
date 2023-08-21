@@ -18,6 +18,7 @@ RUN dnf --enablerepo=powertools install munge-devel -y
 RUN yum install rng-tools -y
 
 RUN yum install -y python3 gcc openssl openssl-devel \
+openssh-server openssh-clients dbus-devel \
 pam-devel numactl numactl-devel hwloc sudo \
 lua readline-devel ncurses-devel man2html \
 libibmad libibumad rpm-build  perl-ExtUtils-MakeMaker.noarch rpm-build make wget
@@ -42,4 +43,4 @@ VOLUME ["/home", "/.secret"]
 # 6817:         SlurmCtlD
 # 6818:         SlurmD
 # 6819:         SlurmDBD
-EXPOSE 22 3306 6817 6818 6819
+EXPOSE 22 6817 6818 6819

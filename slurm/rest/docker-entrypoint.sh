@@ -7,7 +7,6 @@ _sshd_host() {
     mkdir /var/run/sshd
     ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
   fi
-  echo "Starting sshd"
   /usr/sbin/sshd
 }
 
@@ -41,7 +40,6 @@ EOF2
 
 # start munge and generate key
 _munge_start() {
-    echo  "Starting munge"
     chown -R munge: /etc/munge /var/lib/munge /var/log/munge /var/run/munge
     chmod 0700 /etc/munge
     chmod 0711 /var/lib/munge
@@ -62,7 +60,7 @@ _munge_start() {
 # copy secrets to /.secret directory for other nodes
 _copy_secrets() {
   cp /home/worker/worker-secret.tar.gz /.secret/worker-secret.tar.gz
-  cp /home/worker/setup-worker-ssh.sh /.secret/setup-worker-ssh.sh
+  cp thome/worker/setup-worker-ssh.sh /.secret/setup-worker-ssh.sh
   cp /etc/munge/munge.key /.secret/munge.key
   rm -f /home/worker/worker-secret.tar.gz
   rm -f /home/worker/setup-worker-ssh.sh
@@ -75,8 +73,9 @@ _slurmctld() {
         slurm-perlapi-22.05.6-1.el8.aarch64.rpm \
         slurm-slurmd-22.05.6-1.el8.aarch64.rpm \
         slurm-torque-22.05.6-1.el8.aarch64.rpm \
-        slurm-slurmctld-22.05.6-1.el8.aarch64.rpm
-    echo "checking for slurmdbd.conf"
+        slurm-slurmctld-22.05.6-1.el8.aarch64.rpm \
+        slurm-slurmrestd-22.05.6-1.el8.aarch64.rpm
+    echo -n "checking for slurmdbd.conf"
     while [ ! -f /.secret/slurmdbd.conf ]; do
         echo -n "."
         sleep 1
@@ -92,14 +91,11 @@ _slurmctld() {
     else
         echo "### use provided slurm.conf ###"
         cp /home/config/slurm.conf /etc/slurm/slurm.conf
-        chown slurm: /etc/slurm/slurm.conf
-        chmod 600 /etc/slurm/slurm.conf
     fi
     sacctmgr -i add cluster "snowflake"
     sleep 2s
-    echo  "Starting slurmctld"
-    cp -f /etc/slurm/slurm.conf /.secret/
     /usr/sbin/slurmctld
+    cp -f /etc/slurm/slurm.conf /.secret/
 }
 
 ### main ###

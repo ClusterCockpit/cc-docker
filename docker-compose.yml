@@ -52,12 +52,13 @@ services:
     command: ["--default-authentication-plugin=mysql_native_password"]
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_DATABASE: slurm_acct_db
+      MARIADB_USER: slurm
+      MARIADB_PASSWORD: demo
     ports:
       - "127.0.0.1:${MARIADB_PORT}:3306"
-    # volumes:
+    volumes:
+      - ${DATADIR}/mariadb:/etc/mysql/conf.d
       # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
     cap_add:
       - SYS_NICE
@@ -81,72 +82,47 @@ services:
 
   slurm-controller:
     container_name: slurmctld
+    hostname: slurmctld
     build:
       context: ./slurm/controller
     privileged: true
     volumes:
-      - ./home:/home
-      - ./secret:/.secret
-    restart: always
-    environment:
-      USE_SLURMDBD: 'true'
-      CLUSTER_NAME: snowflake
-      CONTROL_MACHINE: controller
-      SLURMCTLD_PORT: 6817
-      SLURMD_PORT: 6818
-      ACCOUNTING_STORAGE_HOST: database
-      ACCOUNTING_STORAGE_PORT: 6819
-      COMPUTE_NODES: worker01 worker02
-      PARTITION_NAME: docker
+      - ${DATADIR}/slurm/home:/home
+      - ${DATADIR}/slurm/secret:/.secret
 
   slurm-database:
     container_name: slurmdb
+    hostname: slurmdb
     build:
       context: ./slurm/database
     depends_on:
+      - mariadb
       - slurm-controller
     privileged: true
     volumes:
-      - ./home:/home
-      - ./secret:/.secret
-    restart: always
-    environment:
-      DBD_ADDR: database
-      DBD_HOST: database
-      DBD_PORT: 6819
-      STORAGE_HOST: database.local.dev
-      STORAGE_PORT: 3306
-      STORAGE_PASS: password
-      STORAGE_USER: slurm
+      - ${DATADIR}/slurm/home:/home
+      - ${DATADIR}/slurm/secret:/.secret
 
   slurm-worker01:
     container_name: node01
+    hostname: node01
     build:
       context: ./slurm/worker
     depends_on:
       - slurm-controller
     privileged: true
     volumes:
-      - ./home:/home
-      - ./secret:/.secret
-    restart: always
-    environment:
-      CONTROL_MACHINE: controller
-      ACCOUNTING_STORAGE_HOST: database
-      COMPUTE_NODES: worker01 worker02
+      - ${DATADIR}/slurm/home:/home
+      - ${DATADIR}/slurm/secret:/.secret
 
   # slurm-worker02:
-  #   container_name: slurm-worker02
+  #   container_name: node02
+    # hostname: node02
   #   build:
   #     context: ./slurm/worker
   #   depends_on:
   #     - slurm-controller
   #   privileged: true
   #   volumes:
-  #     - ./home:/home
-  #     - ./secret:/.secret
-  #   restart: always
-  #   environment:
-  #     CONTROL_MACHINE: controller
-  #     ACCOUNTING_STORAGE_HOST: database
-  #     COMPUTE_NODES: worker01 worker02
+      # - ${DATADIR}/slurm/home:/home
+      # - ${DATADIR}/slurm/secret:/.secret

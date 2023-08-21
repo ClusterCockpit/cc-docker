@@ -1,4 +1,5 @@
-IMAGE = scidas/slurm.base
+include ../../.env
+IMAGE = clustercockpit/slurm.base
 
 .PHONY: build clean
 

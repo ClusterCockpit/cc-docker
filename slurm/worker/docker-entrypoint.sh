@@ -33,7 +33,7 @@ _munge_start_using_key() {
 # wait for worker user in shared /home volume
 _wait_for_worker() {
   if [ ! -f /home/worker/.ssh/id_rsa.pub ]; then
-    echo -n "cheking for id_rsa.pub"
+    echo -n "checking for id_rsa.pub"
     while [ ! -f /home/worker/.ssh/id_rsa.pub ]; do
       echo -n "."
       sleep 1
@@ -42,28 +42,46 @@ _wait_for_worker() {
   fi
 }
 
+_start_dbus() {
+    dbus-uuidgen > /var/lib/dbus/machine-id
+    mkdir -p /var/run/dbus
+    dbus-daemon --config-file=/usr/share/dbus-1/system.conf --print-address
+}
+
 # run slurmd
 _slurmd() {
-  if [ ! -f /.secret/slurm.conf ]; then
-    echo -n "checking for slurm.conf"
-    while [ ! -f /.secret/slurm.conf ]; do
-      echo -n "."
-      sleep 1
-    done
-    echo ""
-  fi
-  mkdir -p /var/spool/slurm/d
-  chown slurm: /var/spool/slurm/d
-  cp /.secret/slurm.conf /etc/slurm/slurm.conf
-  touch /var/log/slurmd.log
-  chown slurm: /var/log/slurmd.log
-  /usr/sbin/slurmd
+    cd /root/rpmbuild/RPMS/aarch64
+    yum -y --nogpgcheck localinstall slurm-22.05.6-1.el8.aarch64.rpm \
+        slurm-perlapi-22.05.6-1.el8.aarch64.rpm \
+        slurm-slurmd-22.05.6-1.el8.aarch64.rpm \
+        slurm-torque-22.05.6-1.el8.aarch64.rpm
+    if [ ! -f /.secret/slurm.conf ]; then
+        echo -n "checking for slurm.conf"
+        while [ ! -f /.secret/slurm.conf ]; do
+          echo -n "."
+          sleep 1
+        done
+        echo ""
+    fi
+    mkdir -p /var/spool/slurm/d /etc/slurm
+    chown slurm: /var/spool/slurm/d
+    cp /home/config/cgroup.conf /etc/slurm/cgroup.conf
+    chown slurm: /etc/slurm/cgroup.conf
+    chmod 600 /etc/slurm/cgroup.conf
+    cp /home/config/slurm.conf /etc/slurm/slurm.conf
+    chown slurm: /etc/slurm/slurm.conf
+    chmod 600 /etc/slurm/slurm.conf
+    touch /var/log/slurmd.log
+    chown slurm: /var/log/slurmd.log
+    echo -n "Starting slurmd"
+    /usr/sbin/slurmd
 }
 
 ### main ###
 _sshd_host
 _munge_start_using_key
 _wait_for_worker
+_start_dbus
 _slurmd
 
 tail -f /dev/null

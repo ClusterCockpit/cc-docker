@@ -1,4 +1,4 @@
-FROM clustercockpit/slurm.base:latest
+FROM clustercockpit/slurm.base:22.05.6
 MAINTAINER Jan Eitzinger <jan.eitzinger@fau.de>
 
 # clean up
