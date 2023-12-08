@@ -1,128 +1,84 @@
+version: "2.2"
+
 services:
-  nats:
-    container_name: nats
-    image: nats:alpine
-    ports:
-      - "4222:4222"
-      - "8222:8222"
+  mysql:
+    image: mariadb:10.10
+    hostname: mysql
+    container_name: mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: slurm_acct_db
+      MYSQL_USER: slurm
+      MYSQL_PASSWORD: password
+    volumes:
+      - var_lib_mysql:/var/lib/mysql
 
-  cc-metric-store:
-    container_name: cc-metric-store
+  slurmdbd:
+    image: slurm-docker-cluster:${IMAGE_TAG:-21.08}
     build:
-      context: ./cc-metric-store
-    ports:
-      - "8084:8084"
+      context: .
+      args:
+        SLURM_TAG: ${SLURM_TAG:-slurm-21-08-6-1}
+    command: ["slurmdbd"]
+    container_name: slurmdbd
+    hostname: slurmdbd
     volumes:
-      - ${DATADIR}/cc-metric-store:/data
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6819"
     depends_on:
-      - nats
+      - mysql
 
-  influxdb:
-    container_name: influxdb
-    image: influxdb
-    command: ["--reporting-disabled"]
-    environment:
-      DOCKER_INFLUXDB_INIT_MODE: setup
-      DOCKER_INFLUXDB_INIT_USERNAME: devel
-      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
-      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
-      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
-      DOCKER_INFLUXDB_INIT_RETENTION: 100w
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
-    ports:
-      - "127.0.0.1:${INFLUXDB_PORT}:8086"
-    volumes:
-      - ${DATADIR}/influxdb/data:/var/lib/influxdb2
-      - ${DATADIR}/influxdb/config:/etc/influxdb2
-
-  openldap:
-    container_name: ldap
-    image: osixia/openldap:1.5.0
-    command: --copy-service --loglevel debug
-    environment:
-      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
-      - LDAP_ORGANISATION=${LDAP_ORGANISATION}
-      - LDAP_DOMAIN=${LDAP_DOMAIN}
-    volumes:
-      - ${DATADIR}/ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom
-
-  mariadb:
-    container_name: mariadb
-    image: mariadb:latest
-    command: ["--default-authentication-plugin=mysql_native_password"]
-    environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: slurm_acct_db
-      MARIADB_USER: slurm
-      MARIADB_PASSWORD: demo
-    ports:
-      - "127.0.0.1:${MARIADB_PORT}:3306"
-    volumes:
-      - ${DATADIR}/mariadb:/etc/mysql/conf.d
-      # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
-    cap_add:
-      - SYS_NICE
-
-  # mysql:
-  #   container_name: mysql
-  #   image: mysql:8.0.22
-  #   command: ["--default-authentication-plugin=mysql_native_password"]
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
-  #     MYSQL_USER: ${MYSQL_USER}
-  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-  #   ports:
-  #     - "127.0.0.1:${MYSQL_PORT}:3306"
-  #   # volumes:
-  #     # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
-  #     # - ${DATADIR}/sqldata:/var/lib/mysql
-  #   cap_add:
-  #     - SYS_NICE
-
-  slurm-controller:
+  slurmctld:
+    image: slurm-docker-cluster:${IMAGE_TAG:-21.08}
+    command: ["slurmctld"]
     container_name: slurmctld
     hostname: slurmctld
-    build:
-      context: ./slurm/controller
-    privileged: true
     volumes:
-      - ${DATADIR}/slurm/home:/home
-      - ${DATADIR}/slurm/secret:/.secret
-
-  slurm-database:
-    container_name: slurmdb
-    hostname: slurmdb
-    build:
-      context: ./slurm/database
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - slurm_jobdir:/data
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6817"
     depends_on:
-      - mariadb
-      - slurm-controller
-    privileged: true
-    volumes:
-      - ${DATADIR}/slurm/home:/home
-      - ${DATADIR}/slurm/secret:/.secret
+      - "slurmdbd"
 
-  slurm-worker01:
-    container_name: node01
-    hostname: node01
-    build:
-      context: ./slurm/worker
+  c1:
+    image: slurm-docker-cluster:${IMAGE_TAG:-21.08}
+    command: ["slurmd"]
+    hostname: c1
+    container_name: c1
+    volumes:
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - slurm_jobdir:/data
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6818"
     depends_on:
-      - slurm-controller
-    privileged: true
-    volumes:
-      - ${DATADIR}/slurm/home:/home
-      - ${DATADIR}/slurm/secret:/.secret
+      - "slurmctld"
 
-  # slurm-worker02:
-  #   container_name: node02
-    # hostname: node02
-  #   build:
-  #     context: ./slurm/worker
-  #   depends_on:
-  #     - slurm-controller
-  #   privileged: true
-  #   volumes:
-      # - ${DATADIR}/slurm/home:/home
-      # - ${DATADIR}/slurm/secret:/.secret
+  c2:
+    image: slurm-docker-cluster:${IMAGE_TAG:-21.08}
+    command: ["slurmd"]
+    hostname: c2
+    container_name: c2
+    volumes:
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - slurm_jobdir:/data
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6818"
+    depends_on:
+      - "slurmctld"
+
+volumes:
+  etc_munge:
+  etc_slurm:
+  slurm_jobdir:
+  var_lib_mysql:
+  var_log_slurm:
