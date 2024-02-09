@@ -1,6 +1,6 @@
 FROM rockylinux:8
 
-LABEL org.opencontainers.image.source="https://github.com/giovtorres/slurm-docker-cluster" \
+LABEL org.opencontainers.image.source="https://github.com/ClusterCockpit/cc-docker/" \
       org.opencontainers.image.title="slurm-docker-cluster" \
       org.opencontainers.image.description="Slurm Docker cluster on Rocky Linux 8" \
       org.label-schema.docker.cmd="docker-compose up -d" \
@@ -8,6 +8,7 @@ LABEL org.opencontainers.image.source="https://github.com/giovtorres/slurm-docke
 
 ARG SLURM_TAG=slurm-21-08-6-1
 ARG GOSU_VERSION=1.11
+ARG SLURM_PATH=/srv
 
 RUN set -ex \
     && yum makecache \
@@ -69,7 +70,7 @@ RUN set -x \
     && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && popd \
-    && cp -r slurm /opt \
+    && cp -r slurm /srv \
     && groupadd -r --gid=990 slurm \
     && useradd -r -g slurm --uid=990 slurm \
     && mkdir /etc/sysconfig/slurm \
