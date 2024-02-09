@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.source="https://github.com/giovtorres/slurm-docke
       org.opencontainers.image.title="slurm-docker-cluster" \
       org.opencontainers.image.description="Slurm Docker cluster on Rocky Linux 8" \
       org.label-schema.docker.cmd="docker-compose up -d" \
-      maintainer="Giovanni Torres"
+      maintainer="Bole Ma, Giovanni Torres"
 
 ARG SLURM_TAG=slurm-21-08-6-1
 ARG GOSU_VERSION=1.11
@@ -54,7 +54,7 @@ RUN set -ex \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true
 
-WORKDIR /home
+WORKDIR /srv
 
 RUN set -x \
     && git clone https://gitlab.hrz.tu-chemnitz.de/pika/pika-packages.git \
@@ -91,8 +91,8 @@ RUN set -x \
     && chown -R slurm:slurm /var/*/slurm* \
     && /sbin/create-munge-key
 
-COPY slurm-prep-pika_v4.c /home/slurm-prep-pika_v4.c
-COPY makefile /home/makefile
+COPY slurm-prep-pika_v4.c /srv/slurm-prep-pika_v4.c
+COPY makefile /srv/makefile
 
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
