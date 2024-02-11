@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source="https://github.com/ClusterCockpit/cc-dock
 
 ARG SLURM_TAG=slurm-21-08-6-1
 ARG GOSU_VERSION=1.11
-ARG SLURM_PATH=/srv
+ARG SLURM_PATH=/opt
 
 RUN set -ex \
     && yum makecache \
@@ -55,7 +55,7 @@ RUN set -ex \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true
 
-WORKDIR /srv
+WORKDIR /opt
 
 RUN set -x \
     && git clone https://gitlab.hrz.tu-chemnitz.de/pika/pika-packages.git \
@@ -70,7 +70,7 @@ RUN set -x \
     && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && popd \
-    && cp -r slurm /srv \
+    && cp -r slurm /opt \
     && groupadd -r --gid=990 slurm \
     && useradd -r -g slurm --uid=990 slurm \
     && mkdir /etc/sysconfig/slurm \
@@ -92,8 +92,8 @@ RUN set -x \
     && chown -R slurm:slurm /var/*/slurm* \
     && /sbin/create-munge-key
 
-COPY slurm-prep-pika_v4.c /srv/slurm-prep-pika_v4.c
-COPY makefile /srv/makefile
+COPY slurm-prep-pika_v4.c /opt/slurm-prep-pika_v4.c
+COPY makefile /opt/makefile
 
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
