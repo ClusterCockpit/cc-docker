@@ -22,6 +22,10 @@
 #include "src/common/parse_time.h"
 #include "src/common/uid.h"
 
+#include "src/interfaces/data_parser.h"
+#include "src/common/data.h"
+#include "src/common/openapi.h"
+#include "src/slurmrestd/plugins/openapi/slurmctld/api.h"
 
 #define P_NAME "PrEp-pika: "
 #define BUFF_LEN 128

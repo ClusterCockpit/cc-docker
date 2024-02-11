@@ -1,21 +1,21 @@
-FROM rockylinux:8
+FROM rockylinux:9
 
 LABEL org.opencontainers.image.source="https://github.com/ClusterCockpit/cc-docker/" \
       org.opencontainers.image.title="slurm-docker-cluster" \
-      org.opencontainers.image.description="Slurm Docker cluster on Rocky Linux 8" \
+      org.opencontainers.image.description="Slurm Docker cluster on Rocky Linux 9" \
       org.label-schema.docker.cmd="docker-compose up -d" \
       maintainer="Bole Ma, Giovanni Torres"
 
-ARG SLURM_TAG=slurm-21-08-6-1
-ARG GOSU_VERSION=1.11
+ARG SLURM_TAG=slurm-22-05-2
+ARG GOSU_VERSION=1.17
 ARG SLURM_PATH=/opt
 
 RUN set -ex \
-    && yum makecache \
-    && yum -y update \
-    && yum -y install dnf-plugins-core \
-    && yum config-manager --set-enabled powertools \
-    && yum -y install \
+    && dnf makecache \
+    && dnf -y update \
+    && dnf -y install dnf-plugins-core \
+    && dnf config-manager --set-enabled powertools \
+    && dnf -y install \
        wget \
        bzip2 \
        cmake \
@@ -38,8 +38,8 @@ RUN set -ex \
        vim-enhanced \
        http-parser-devel \
        json-c-devel \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
 
 RUN alternatives --set python /usr/bin/python3
 
