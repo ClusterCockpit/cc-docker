@@ -41,7 +41,7 @@ RUN set -ex \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
-RUN alternatives --set python /usr/bin/python3
+#RUN alternatives --set python /usr/bin/python3
 
 RUN pip3 install Cython nose
 
