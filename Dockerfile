@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.source="https://github.com/ClusterCockpit/cc-dock
       org.label-schema.docker.cmd="docker-compose up -d" \
       maintainer="Bole Ma, Giovanni Torres"
 
-ARG SLURM_TAG=slurm-22-05-2
+ARG SLURM_TAG=slurm-22-05-2-1
 ARG GOSU_VERSION=1.17
 ARG SLURM_PATH=/opt
 
