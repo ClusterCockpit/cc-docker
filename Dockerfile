@@ -55,7 +55,7 @@ RUN set -ex \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true
 
-WORKDIR /opt
+WORKDIR /home
 
 RUN set -x \
     && git clone https://gitlab.hrz.tu-chemnitz.de/pika/pika-packages.git \
