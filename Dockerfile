@@ -14,7 +14,7 @@ RUN set -ex \
     && dnf makecache \
     && dnf -y update \
     && dnf -y install dnf-plugins-core \
-    && dnf config-manager --set-enabled powertools \
+    && dnf config-manager --enable crb \
     && dnf -y install \
        wget \
        bzip2 \
