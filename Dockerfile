@@ -90,7 +90,11 @@ RUN set -x \
         /var/lib/slurmd/qos_usage \
         /var/lib/slurmd/fed_mgr_state \
     && chown -R slurm:slurm /var/*/slurm* \
-    && /sbin/create-munge-key
+    && /sbin/create-munge-key \
+    && pushd nats.c \
+    && cmake . -DNATS_BUILD_STREAMING=OFF \
+    && make install \
+    && popd
 
 COPY slurm-prep-pika_v4.c /opt/slurm-prep-pika_v4.c
 COPY makefile /opt/makefile
