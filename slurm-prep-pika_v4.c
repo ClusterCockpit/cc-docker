@@ -4,7 +4,7 @@
  *****************************************************************************
  *  Written by Mike Arnhold and Frank Winkler
  *
- *  https://gitlab.hrz.tu-chemnitz.de/pika/pika-packages/-/raw/master/pika-prep-plugin/slurm-prep-pika_v4.c
+ *  LICENSE NOTICE ?!?!?!?!
 \*****************************************************************************/
 
 #include <stdarg.h>
@@ -22,10 +22,6 @@
 #include "src/common/parse_time.h"
 #include "src/common/uid.h"
 
-#include "src/interfaces/data_parser.h"
-#include "src/common/data.h"
-#include "src/common/openapi.h"
-#include "src/slurmrestd/plugins/openapi/slurmctld/api.h"
 
 #define P_NAME "PrEp-pika: "
 #define BUFF_LEN 128
@@ -322,27 +318,31 @@ extern void prep_p_register_callbacks(prep_callbacks_t *callbacks)
 extern int prep_p_prolog(job_env_t *job_env, slurm_cred_t *cred)
 {
     printf("Started job id: %d\n", job_env->jobid);
+    char *json;
+    job_record_t *job_ptr = find_job_record(job_env->jobid);
+    int rc;
+    internal_error_t _rc = job_ptr_to_json(job_ptr, &json, false);
+    if (_rc) {
+        slurm_error(P_NAME "%s", error_to_string(_rc));
+        rc = SLURM_ERROR;
+    }
 
-	job_info_msg_t *job_info_ptr = NULL;
-	int rc;
+    // Some async task
+    if (rc == SLURM_SUCCESS) {
+        pika_metadata_log(job_ptr->job_id, json, false);
 
-	printf("%s: jobs handler called", __func__);
+		natsConnection *nc  = NULL;
+		natsSubscription *sub = NULL;
 
-	rc = slurm_load_job(&job_info_ptr, job_env->jobid, SHOW_ALL | SHOW_DETAIL);
+		// Connects to the default NATS Server running locally
+		natsConnection_ConnectTo(&nc, NATS_DEFAULT_URL);
 
-	if (rc == SLURM_ERROR || rc == SLURM_UNEXPECTED_MSG_ERROR) {
-		printf("Unable to query job: %d\n", job_env->jobid);
-		slurm_free_job_info_msg(job_info_ptr);
+		// Simple publisher to send the given json string to subject "slurm_start_job"
+		natsConnection_PublishString(nc, "slurm_start_job", json);
 
-		return SLURM_ERROR;
-	}
-
-	ctxt_t *ctxt = NULL;
-	// init_connection(context_id, method, parameters, query, tag, resp, auth);
-	DATA_DUMP(ctxt->parser, JOB_INFO_MSG, *job_info_ptr,
-		  data_key_set(resp, "jobs"));
-
-	slurm_free_job_info_msg(job_info_ptr);
+		natsSubscription_Destroy(sub);
+		natsConnection_Close(nc);
+    }
 
 	return SLURM_SUCCESS;
 }
@@ -350,6 +350,32 @@ extern int prep_p_prolog(job_env_t *job_env, slurm_cred_t *cred)
 extern int prep_p_epilog(job_env_t *job_env, slurm_cred_t *cred)
 {
     printf("Ended job id: %d, exit code: %d\n", job_env->jobid, job_env->exit_code);
+    char *json;
+    job_record_t *job_ptr = find_job_record(job_env->jobid);
+    int rc;
+    internal_error_t _rc = job_ptr_to_json(job_ptr, &json, false);
+    if (_rc) {
+        slurm_error(P_NAME "%s", error_to_string(_rc));
+        rc = SLURM_ERROR;
+    }
+
+    // Some async task
+    if (rc == SLURM_SUCCESS) {
+        pika_metadata_log(job_ptr->job_id, json, false);
+
+		natsConnection *nc  = NULL;
+		natsSubscription *sub = NULL;
+
+		// Connects to the default NATS Server running locally
+		natsConnection_ConnectTo(&nc, NATS_DEFAULT_URL);
+
+		// Simple publisher to send the given json string to subject "slurm_start_job"
+		natsConnection_PublishString(nc, "slurm_start_job", json);
+
+		natsSubscription_Destroy(sub);
+		natsConnection_Close(nc);
+    }
+
 	return SLURM_SUCCESS;
 }
 
@@ -382,18 +408,6 @@ extern int prep_p_prolog_slurmctld(job_record_t *job_ptr, bool *async)
     // Some async task
     if (rc == SLURM_SUCCESS) {
         pika_metadata_log(job_ptr->job_id, json, false);
-
-		natsConnection *nc  = NULL;
-		natsSubscription *sub = NULL;
-
-		// Connects to the default NATS Server running locally
-		natsConnection_ConnectTo(&nc, NATS_DEFAULT_URL);
-
-		// Simple publisher to send the given json string to subject "slurm_start_job"
-		natsConnection_PublishString(nc, "slurm_start_job", json);
-
-		natsSubscription_Destroy(sub);
-		natsConnection_Close(nc);
     }
 
     return rc;
@@ -990,7 +1004,7 @@ static int pika_metadata_log(int job_id, char *json, bool is_epilog)
     internal_error_t rc = SUCCESS;
     char file_path[100];
     sprintf(file_path, "/tmp/pika_debug/pika_prep_%d.log", job_id);
-    //sprintf(file_path, "/var/log/slurm/pika.log");
+    // sprintf(file_path, "/var/log/slurm/pika.log");
 
     slurm_mutex_lock(&plugin_log_lock);
 
@@ -1014,3 +1028,4 @@ static int pika_metadata_log(int job_id, char *json, bool is_epilog)
 
     return rc >= 0 ? SUCCESS : rc;
 }
+

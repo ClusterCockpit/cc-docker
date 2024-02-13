@@ -79,6 +79,7 @@ RUN set -x \
         /var/run/slurmdbd \
         /var/lib/slurmd \
         /var/log/slurm \
+        /tmp/pika_debug \
         /data \
     && touch /var/lib/slurmd/node_state \
         /var/lib/slurmd/front_end_state \
