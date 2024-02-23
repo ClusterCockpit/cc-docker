@@ -36,7 +36,26 @@ RUN set -ex \
        psmisc \
        bash-completion \
        vim-enhanced \
+       jansson-devel \
+       jq \
        http-parser-devel \
+       libseccomp-devel \
+       libassuan-devel \
+       libyaml-devel \
+       pam-devel \
+       lua-devel \
+       iproute \
+       procps-ng \
+       rsync \
+       crun \
+       gpgme-devel \
+       net-tools \
+       socat \
+       gettext-devel \
+       libseccomp-devel \
+       numactl-devel \
+       dbus-devel \
+       glib2-devel \
        json-c-devel \
     && dnf clean all \
     && rm -rf /var/cache/dnf
@@ -62,10 +81,10 @@ RUN set -x \
     && git clone https://github.com/nats-io/nats.c.git \
     && git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
     && pushd slurm \
-    && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
+    && ./configure  --enable-slurmrestd  --enable-developer --disable-optimizations --with-ebpf --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
         --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
     && make install \
-    && install -D -m644 etc/cgroup.conf.example /etc/slurm/cgroup.conf.example \
+    && install -D -m644 etc/cgroup.conf.example /etc/slurm/cgroup.conf \
     && install -D -m644 etc/slurm.conf.example /etc/slurm/slurm.conf.example \
     && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
@@ -101,6 +120,7 @@ COPY slurm-prep-pika_v4.c /opt/slurm-prep-pika_v4.c
 COPY makefile /opt/makefile
 
 COPY slurm.conf /etc/slurm/slurm.conf
+COPY cgroup.conf /etc/slurm/cgroup.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 RUN set -x \
     && chown slurm:slurm /etc/slurm/slurmdbd.conf \
