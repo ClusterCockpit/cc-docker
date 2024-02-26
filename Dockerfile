@@ -77,7 +77,7 @@ RUN set -ex \
 WORKDIR /home
 
 RUN set -x \
-    && git clone https://github.com/ClusterCockpit/cc-slurmPrEpPlugin \
+#    && git clone https://github.com/ClusterCockpit/cc-slurmPrEpPlugin \
     && git clone https://github.com/nats-io/nats.c.git \
     && git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
     && pushd slurm \
