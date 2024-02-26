@@ -1,8 +1,8 @@
 FROM rockylinux:9
 
 LABEL org.opencontainers.image.source="https://github.com/ClusterCockpit/cc-docker/" \
-      org.opencontainers.image.title="slurm-docker-cluster" \
-      org.opencontainers.image.description="Slurm Docker cluster on Rocky Linux 9" \
+      org.opencontainers.image.title="cc-docker" \
+      org.opencontainers.image.description="Docker Slurm ClusterCockpit on Rocky Linux 9" \
       org.label-schema.docker.cmd="docker-compose up -d" \
       maintainer="Bole Ma, Giovanni Torres"
 
@@ -58,7 +58,7 @@ RUN set -ex \
 WORKDIR /home
 
 RUN set -x \
-    && git clone https://gitlab.hrz.tu-chemnitz.de/pika/pika-packages.git \
+    && git clone https://github.com/ClusterCockpit/cc-slurmPrEpPlugin \
     && git clone https://github.com/nats-io/nats.c.git \
     && git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
     && pushd slurm \
