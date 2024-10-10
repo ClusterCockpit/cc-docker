@@ -81,6 +81,7 @@ services:
   #     - SYS_NICE
 
   slurm-controller:
+    image: cc-docker:22.05
     container_name: slurmctld
     hostname: slurmctld
     build:

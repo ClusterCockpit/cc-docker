@@ -9,7 +9,6 @@ use File::Slurp;
 use Data::Dumper;
 use Time::Piece;
 use Sort::Versions;
-use REST::Client;
 
 ### JOB-ARCHIVE
 my $localtime = localtime;
@@ -19,80 +18,80 @@ my $archiveSrc = './data/job-archive-source';
 my @ArchiveClusters;
 
 # Get clusters by job-archive/$subfolder
-opendir my $dh, $archiveSrc  or die "can't open directory: $!";
-while ( readdir $dh ) {
-    chomp; next if $_ eq '.' or $_ eq '..'  or $_ eq 'job-archive';
+# opendir my $dh, $archiveSrc  or die "can't open directory: $!";
+# while ( readdir $dh ) {
+#     chomp; next if $_ eq '.' or $_ eq '..'  or $_ eq 'job-archive' or $_ eq 'version.txt';
 
-    my $cluster = $_;
-    push @ArchiveClusters, $cluster;
-}
+#     my $cluster = $_;
+#     push @ArchiveClusters, $cluster;
+# }
 
-# start for jobarchive
-foreach my $cluster ( @ArchiveClusters ) {
-  print "Starting to update start- and stoptimes in job-archive for $cluster\n";
+# # start for jobarchive
+# foreach my $cluster ( @ArchiveClusters ) {
+#   print "Starting to update start- and stoptimes in job-archive for $cluster\n";
 
-	opendir my $dhLevel1, "$archiveSrc/$cluster" or die "can't open directory: $!";
-	while ( readdir $dhLevel1 ) {
-		chomp; next if $_ eq '.' or $_ eq '..';
-		my $level1 = $_;
+# 	opendir my $dhLevel1, "$archiveSrc/$cluster" or die "can't open directory: $!";
+# 	while ( readdir $dhLevel1 ) {
+# 		chomp; next if $_ eq '.' or $_ eq '..';
+# 		my $level1 = $_;
 
-		if ( -d "$archiveSrc/$cluster/$level1" ) {
-			opendir my $dhLevel2, "$archiveSrc/$cluster/$level1" or die "can't open directory: $!";
-			while ( readdir $dhLevel2 ) {
-				chomp; next if $_ eq '.' or $_ eq '..';
-				my $level2 = $_;
-				my $jobSource = "$archiveSrc/$cluster/$level1/$level2";
-				my $jobTarget = "$archiveTarget/$cluster/$level1/$level2/";
-        my $jobOrigin = $jobSource;
-        # check if files are directly accessible (old format) else get subfolders as file and update path
-        if ( ! -e "$jobSource/meta.json") {
-					my @folders = read_dir($jobSource);
-          if (!@folders) {
-            next;
-          }
-          # Only use first subfolder for now TODO
-					$jobSource = "$jobSource/".$folders[0];
-				}
-        # check if subfolder contains file, else remove source and skip
-        if ( ! -e "$jobSource/meta.json") {
-          # rmtree $jobOrigin;
-          next;
-        }
+# 		if ( -d "$archiveSrc/$cluster/$level1" ) {
+# 			opendir my $dhLevel2, "$archiveSrc/$cluster/$level1" or die "can't open directory: $!";
+# 			while ( readdir $dhLevel2 ) {
+# 				chomp; next if $_ eq '.' or $_ eq '..';
+# 				my $level2 = $_;
+# 				my $jobSource = "$archiveSrc/$cluster/$level1/$level2";
+# 				my $jobTarget = "$archiveTarget/$cluster/$level1/$level2/";
+#         my $jobOrigin = $jobSource;
+#         # check if files are directly accessible (old format) else get subfolders as file and update path
+#         if ( ! -e "$jobSource/meta.json") {
+# 					my @folders = read_dir($jobSource);
+#           if (!@folders) {
+#             next;
+#           }
+#           # Only use first subfolder for now TODO
+# 					$jobSource = "$jobSource/".$folders[0];
+# 				}
+#         # check if subfolder contains file, else remove source and skip
+#         if ( ! -e "$jobSource/meta.json") {
+#           # rmtree $jobOrigin;
+#           next;
+#         }
 
-				my $rawstr = read_file("$jobSource/meta.json");
-				my $json = decode_json($rawstr);
+# 				my $rawstr = read_file("$jobSource/meta.json");
+# 				my $json = decode_json($rawstr);
 
-        # NOTE Start meta.json iteration here
-        # my $random_number = int(rand(UPPERLIMIT)) + LOWERLIMIT;
-        # Set new startTime: Between 5 days and 1 day before now
+#         # NOTE Start meta.json iteration here
+#         # my $random_number = int(rand(UPPERLIMIT)) + LOWERLIMIT;
+#         # Set new startTime: Between 5 days and 1 day before now
 
-				#  Remove id from attributes
-				$json->{startTime} = $epochtime - (int(rand(432000)) + 86400);
-				$json->{stopTime} = $json->{startTime} + $json->{duration};
+# 				#  Remove id from attributes
+# 				$json->{startTime} = $epochtime - (int(rand(432000)) + 86400);
+# 				$json->{stopTime} = $json->{startTime} + $json->{duration};
 
-        # Add starttime subfolder to target path
-				$jobTarget .= $json->{startTime};
+#         # Add starttime subfolder to target path
+# 				$jobTarget .= $json->{startTime};
 
-        # target is not directory
-				if ( not -d $jobTarget ){
-          # print "Writing files\n";
-					# print "$cluster/$level1/$level2\n";
-					make_path($jobTarget);
+#         # target is not directory
+# 				if ( not -d $jobTarget ){
+#           # print "Writing files\n";
+# 					# print "$cluster/$level1/$level2\n";
+# 					make_path($jobTarget);
 
-      		my $outstr = encode_json($json);
-					write_file("$jobTarget/meta.json", $outstr);
+#       		my $outstr = encode_json($json);
+# 					write_file("$jobTarget/meta.json", $outstr);
 
-					my $datstr = read_file("$jobSource/data.json");
-					write_file("$jobTarget/data.json", $datstr);
-        } else {
-          # rmtree $jobSource;
-        }
-			}
-		}
-	}
-}
-print "Done for job-archive\n";
-sleep(1);
+# 					my $datstr = read_file("$jobSource/data.json.gz");
+# 					write_file("$jobTarget/data.json.gz", $datstr);
+#         } else {
+#           # rmtree $jobSource;
+#         }
+# 			}
+# 		}
+# 	}
+# }
+# print "Done for job-archive\n";
+# sleep(1);
 
 ## CHECKPOINTS
 chomp(my $checkpointStart=`date --date 'TZ="Europe/Berlin" 0:00 7 days ago' +%s`);

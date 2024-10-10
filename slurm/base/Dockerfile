@@ -1,5 +1,5 @@
 FROM rockylinux:8
-MAINTAINER Jan Eitzinger <jan.eitzinger@fau.de>
+LABEL org.opencontainers.image.authors="jan.eitzinger@fau.de"
 
 ENV SLURM_VERSION=22.05.6
 ENV ARCH=aarch64
