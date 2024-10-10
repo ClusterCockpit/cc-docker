@@ -19,8 +19,8 @@ services:
 
   influxdb:
     container_name: influxdb
-    image: influxdb
-    command: ["--reporting-disabled"]
+    image: influxdb:latest
+    command: ["--reporting-disabled", "--log-level=debug"]
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
       DOCKER_INFLUXDB_INIT_USERNAME: devel

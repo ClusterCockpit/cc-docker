@@ -7,11 +7,16 @@ if [ ! -d cc-backend ]; then
     exit
 else
     cd cc-backend
+    make
+
     if [ ! -d var ]; then
         wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
         tar xf job-archive-demo.tar
         rm ./job-archive-demo.tar
-        make
+
+        cp ./configs/env-template.txt .env
+        cp ./configs/config-demo.json config.json
+
         ./cc-backend -migrate-db
         ./cc-backend --init-db --add-user demo:admin:AdminDev
         cd ..
@@ -22,8 +27,6 @@ else
     #     exit
     fi
 fi
-
-ls
 
 # Download unedited checkpoint files to ./data/cc-metric-store-source/checkpoints
 if [ ! -d data/cc-metric-store-source ]; then
@@ -52,7 +55,7 @@ fi
 # prepare folders for influxdb2
 if [ ! -d data/influxdb ]; then
     mkdir -p data/influxdb/data
-    mkdir -p data/influxdb/config/influx-configs
+    mkdir -p data/influxdb/config
 else
     echo "'data/influxdb' already exists!"
 fi
