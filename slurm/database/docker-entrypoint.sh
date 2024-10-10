@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# Determine the system architecture dynamically
+ARCH=$(uname -m)
+
 SLURM_ACCT_DB_SQL=/slurm_acct_db.sql
 
 # start sshd server
@@ -48,10 +51,10 @@ _wait_for_worker() {
 
 # run slurmdbd
 _slurmdbd() {
-   cd /root/rpmbuild/RPMS/aarch64
-   yum -y --nogpgcheck localinstall slurm-22.05.6-1.el8.aarch64.rpm \
-       slurm-perlapi-22.05.6-1.el8.aarch64.rpm \
-       slurm-slurmdbd-22.05.6-1.el8.aarch64.rpm
+   cd /root/rpmbuild/RPMS/$ARCH
+   yum -y --nogpgcheck localinstall slurm-22.05.6-1.el8.$ARCH.rpm \
+       slurm-perlapi-22.05.6-1.el8.$ARCH.rpm \
+       slurm-slurmdbd-22.05.6-1.el8.$ARCH.rpm
   mkdir -p /var/spool/slurm/d /var/log/slurm /etc/slurm
   chown slurm: /var/spool/slurm/d /var/log/slurm
   if [[ ! -f /home/config/slurmdbd.conf ]]; then

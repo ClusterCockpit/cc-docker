@@ -8,28 +8,22 @@ if [ ! -d cc-backend ]; then
 else
     cd cc-backend
     if [ ! -d var ]; then
-        mkdir var
-        touch var/job.db
+        wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
+        tar xf job-archive-demo.tar
+        rm ./job-archive-demo.tar
         make
+        ./cc-backend -migrate-db
+        ./cc-backend --init-db --add-user demo:admin:AdminDev
+        cd ..
     else
-        echo "'cc-backend/var' exists. Cautiously exiting."
-        echo -n "Stopped."
-        exit
+        cd ..
+    #     echo "'cc-backend/var' exists. Cautiously exiting."
+    #     echo -n "Stopped."
+    #     exit
     fi
 fi
 
-# Download unedited job-archive to ./data/job-archive-source
-if [ ! -d data/job-archive-source ]; then
-    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
-    tar xf job-archive-demo.tar
-    # mv ./var/job-archive ./job-archive-source
-    # mv -f ./var/job.db ./cc-backend/var/
-    # rm -rf ./var
-    rm ./job-archive-demo.tar
-    cd ..
-else
-    echo "'data/job-archive-source' already exists!"
-fi
+ls
 
 # Download unedited checkpoint files to ./data/cc-metric-store-source/checkpoints
 if [ ! -d data/cc-metric-store-source ]; then
@@ -53,7 +47,7 @@ fi
 
 # cleanup sources
 # rm -r ./data/job-archive-source
-rm -r ./data/cc-metric-store-source
+# rm -r ./data/cc-metric-store-source
 
 # prepare folders for influxdb2
 if [ ! -d data/influxdb ]; then
@@ -72,12 +66,17 @@ if [ ! -f docker-compose.yml ]; then
     cp templates/docker-compose.yml.default ./docker-compose.yml
 fi
 
+docker-compose down
+
+cd slurm/base/
+make
+cd ../..
+
 docker-compose build
-./cc-backend/cc-backend --init-db --add-user demo:admin:AdminDev
 docker-compose up -d
 
-# echo ""
-# echo "Setup complete, containers are up by default: Shut down with 'docker-compose down'."
-# echo "Use './cc-backend/cc-backend' to start cc-backend."
-# echo "Use scripts in /scripts to load data into influx or mariadb."
-# # ./cc-backend/cc-backend
+echo ""
+echo "Setup complete, containers are up by default: Shut down with 'docker-compose down'."
+echo "Use './cc-backend/cc-backend' to start cc-backend."
+echo "Use scripts in /scripts to load data into influx or mariadb."
+# ./cc-backend/cc-backend

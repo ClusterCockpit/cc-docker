@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# Determine the system architecture dynamically
+ARCH=$(uname -m)
+
 # start sshd server
 _sshd_host() {
   if [ ! -d /var/run/sshd ]; then
@@ -70,12 +73,12 @@ _copy_secrets() {
 
 # run slurmctld
 _slurmctld() {
-    cd /root/rpmbuild/RPMS/aarch64
-    yum -y --nogpgcheck localinstall slurm-22.05.6-1.el8.aarch64.rpm \
-        slurm-perlapi-22.05.6-1.el8.aarch64.rpm \
-        slurm-slurmd-22.05.6-1.el8.aarch64.rpm \
-        slurm-torque-22.05.6-1.el8.aarch64.rpm \
-        slurm-slurmctld-22.05.6-1.el8.aarch64.rpm
+    cd /root/rpmbuild/RPMS/$ARCH
+    yum -y --nogpgcheck localinstall slurm-22.05.6-1.el8.$ARCH.rpm \
+        slurm-perlapi-22.05.6-1.el8.$ARCH.rpm \
+        slurm-slurmd-22.05.6-1.el8.$ARCH.rpm \
+        slurm-torque-22.05.6-1.el8.$ARCH.rpm \
+        slurm-slurmctld-22.05.6-1.el8.$ARCH.rpm
     echo "checking for slurmdbd.conf"
     while [ ! -f /.secret/slurmdbd.conf ]; do
         echo -n "."
