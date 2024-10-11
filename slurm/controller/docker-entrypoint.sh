@@ -6,21 +6,21 @@ ARCH=$(uname -m)
 
 # start sshd server
 _sshd_host() {
-  if [ ! -d /var/run/sshd ]; then
-    mkdir /var/run/sshd
-    ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
-  fi
-  echo "Starting sshd"
-  /usr/sbin/sshd
+    if [ ! -d /var/run/sshd ]; then
+        mkdir /var/run/sshd
+        ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
+    fi
+    echo "Starting sshd"
+    /usr/sbin/sshd
 }
 
 # setup worker ssh to be passwordless
 _ssh_worker() {
-    if [[ ! -d /home/worker  ]]; then
+    if [[ ! -d /home/worker ]]; then
         mkdir -p /home/worker
         chown -R worker:worker /home/worker
     fi
-    cat > /home/worker/setup-worker-ssh.sh <<EOF2
+    cat >/home/worker/setup-worker-ssh.sh <<EOF2
 mkdir -p ~/.ssh
 chmod 0700 ~/.ssh
 ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N "" -C "$(whoami)@$(hostname)-$(date -I)"
@@ -44,7 +44,7 @@ EOF2
 
 # start munge and generate key
 _munge_start() {
-    echo  "Starting munge"
+    echo "Starting munge"
     chown -R munge: /etc/munge /var/lib/munge /var/log/munge /var/run/munge
     chmod 0700 /etc/munge
     chmod 0711 /var/lib/munge
@@ -53,7 +53,7 @@ _munge_start() {
     /sbin/create-munge-key -f
     rngd -r /dev/urandom
     /usr/sbin/create-munge-key -r -f
-    sh -c  "dd if=/dev/urandom bs=1 count=1024 > /etc/munge/munge.key"
+    sh -c "dd if=/dev/urandom bs=1 count=1024 > /etc/munge/munge.key"
     chown munge: /etc/munge/munge.key
     chmod 400 /etc/munge/munge.key
     sudo -u munge /sbin/munged
@@ -64,11 +64,11 @@ _munge_start() {
 
 # copy secrets to /.secret directory for other nodes
 _copy_secrets() {
-  cp /home/worker/worker-secret.tar.gz /.secret/worker-secret.tar.gz
-  cp /home/worker/setup-worker-ssh.sh /.secret/setup-worker-ssh.sh
-  cp /etc/munge/munge.key /.secret/munge.key
-  rm -f /home/worker/worker-secret.tar.gz
-  rm -f /home/worker/setup-worker-ssh.sh
+    cp /home/worker/worker-secret.tar.gz /.secret/worker-secret.tar.gz
+    cp /home/worker/setup-worker-ssh.sh /.secret/setup-worker-ssh.sh
+    cp /etc/munge/munge.key /.secret/munge.key
+    rm -f /home/worker/worker-secret.tar.gz
+    rm -f /home/worker/setup-worker-ssh.sh
 }
 
 # run slurmctld
@@ -85,8 +85,8 @@ _slurmctld() {
         sleep 1
     done
     echo ""
-    mkdir -p /var/spool/slurm/ctld /var/spool/slurm/d  /var/log/slurm /etc/slurm
-    chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d  /var/log/slurm
+    mkdir -p /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /etc/slurm
+    chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm
     touch /var/log/slurmctld.log
     chown slurm: /var/log/slurmctld.log
     if [[ ! -f /home/config/slurm.conf ]]; then
@@ -98,11 +98,13 @@ _slurmctld() {
         chown slurm: /etc/slurm/slurm.conf
         chmod 600 /etc/slurm/slurm.conf
     fi
+
     sacctmgr -i add cluster "snowflake"
     sleep 2s
-    echo  "Starting slurmctld"
+    echo "Starting slurmctld"
     cp -f /etc/slurm/slurm.conf /.secret/
     /usr/sbin/slurmctld
+    echo "Started slurmctld"
 }
 
 ### main ###

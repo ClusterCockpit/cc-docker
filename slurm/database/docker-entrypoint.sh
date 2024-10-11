@@ -69,6 +69,7 @@ _slurmdbd() {
   echo "Starting slurmdbd"
   cp /etc/slurm/slurmdbd.conf /.secret/slurmdbd.conf
   /usr/sbin/slurmdbd
+  echo "Started slurmdbd"
 }
 
 ### main ###

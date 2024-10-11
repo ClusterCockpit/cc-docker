@@ -63,58 +63,49 @@ services:
     cap_add:
       - SYS_NICE
 
-  # mysql:
-  #   container_name: mysql
-  #   image: mysql:8.0.22
-  #   command: ["--default-authentication-plugin=mysql_native_password"]
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
-  #     MYSQL_USER: ${MYSQL_USER}
-  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-  #   ports:
-  #     - "127.0.0.1:${MYSQL_PORT}:3306"
-  #   # volumes:
-  #     # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
-  #     # - ${DATADIR}/sqldata:/var/lib/mysql
-  #   cap_add:
-  #     - SYS_NICE
-
-  slurm-controller:
-    image: clustercockpit:22.05.6
+  slurmctld:
     container_name: slurmctld
     hostname: slurmctld
     build:
       context: ./slurm/controller
+    depends_on:
+      - slurmdbd
     privileged: true
+    ports:
+      - "6817:6817"
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/controller/slurm.conf:/home/config/slurm.conf
 
-  slurm-database:
-    container_name: slurmdb
-    hostname: slurmdb
+  slurmdbd:
+    container_name: slurmdbd
+    hostname: slurmdbd
     build:
       context: ./slurm/database
     depends_on:
       - mariadb
-      - slurm-controller
     privileged: true
+    ports:
+      - "6819:6819"
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/database/slurmdbd.conf:/home/config/slurmdbd.conf
 
-  slurm-worker01:
+  node01:
     container_name: node01
     hostname: node01
     build:
       context: ./slurm/worker
     depends_on:
-      - slurm-controller
+      - slurmctld
     privileged: true
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+    ports:
+      - "6818:6818"
 
   # slurm-worker02:
   #   container_name: node02

@@ -78,6 +78,7 @@ _slurmd() {
     chown slurm: /var/log/slurmd.log
     echo -n "Starting slurmd"
     /usr/sbin/slurmd
+    echo -n "Started slurmd"
 }
 
 ### main ###
