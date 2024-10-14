@@ -3,6 +3,10 @@ data/job-archive/**
 data/influxdb
 data/sqldata
 data/cc-metric-store
+data/cc-metric-store-source
+data/ldap
+data/mariadb
+data/slurm
 cc-backend
 cc-backend/**
 .vscode

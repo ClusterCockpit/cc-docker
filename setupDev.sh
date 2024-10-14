@@ -1,4 +1,20 @@
 #!/bin/bash
+echo ""
+echo "-----------------------------------------------------------------"
+echo "Welcome to cc-docker automatic deployment script."
+echo "Make sure you have sudo rights to run docker services"
+echo "This script assumes that docker command is added to sudo group"
+echo "This means that docker commands do not explicitly require"
+echo "'sudo' keyword to run. You can use this following command:"
+echo ""
+echo "sudo groupadd docker"
+echo "sudo usermod -aG docker $USER"
+echo ""
+echo "This will add docker to the sudo usergroup and all the docker"
+echo "command will run as sudo by default without requiring"
+echo "'sudo' keyword."  
+echo "-----------------------------------------------------------------"
+echo ""
 
 # Check cc-backend, touch job.db if exists
 if [ ! -d cc-backend ]; then
@@ -7,8 +23,6 @@ if [ ! -d cc-backend ]; then
     exit
 else
     cd cc-backend
-    make
-
     if [ ! -d var ]; then
         wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
         tar xf job-archive-demo.tar
@@ -16,6 +30,8 @@ else
 
         cp ./configs/env-template.txt .env
         cp ./configs/config-demo.json config.json
+
+        make
 
         ./cc-backend -migrate-db
         ./cc-backend --init-db --add-user demo:admin:AdminDev
@@ -27,6 +43,8 @@ else
     #     exit
     fi
 fi
+
+mkdir -m777 data
 
 # Download unedited checkpoint files to ./data/cc-metric-store-source/checkpoints
 if [ ! -d data/cc-metric-store-source ]; then
@@ -80,6 +98,5 @@ docker-compose up -d
 
 echo ""
 echo "Setup complete, containers are up by default: Shut down with 'docker-compose down'."
-echo "Use './cc-backend/cc-backend' to start cc-backend."
+echo "Use './cc-backend/cc-backend -server' to start cc-backend."
 echo "Use scripts in /scripts to load data into influx or mariadb."
-# ./cc-backend/cc-backend

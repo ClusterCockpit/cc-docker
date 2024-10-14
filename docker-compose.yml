@@ -104,6 +104,8 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/worker/cgroup.conf:/home/config/cgroup.conf
+      - ./slurm/controller/slurm.conf:/home/config/slurm.conf
     ports:
       - "6818:6818"
 

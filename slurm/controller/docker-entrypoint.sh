@@ -55,7 +55,7 @@ _munge_start() {
     /usr/sbin/create-munge-key -r -f
     sh -c "dd if=/dev/urandom bs=1 count=1024 > /etc/munge/munge.key"
     chown munge: /etc/munge/munge.key
-    chmod 400 /etc/munge/munge.key
+    chmod 600 /etc/munge/munge.key
     sudo -u munge /sbin/munged
     munge -n
     munge -n | unmunge
@@ -64,6 +64,10 @@ _munge_start() {
 
 # copy secrets to /.secret directory for other nodes
 _copy_secrets() {
+    while [ ! -f /home/worker/worker-secret.tar.gz ]; do
+        echo -n "."
+        sleep 1
+    done
     cp /home/worker/worker-secret.tar.gz /.secret/worker-secret.tar.gz
     cp /home/worker/setup-worker-ssh.sh /.secret/setup-worker-ssh.sh
     cp /etc/munge/munge.key /.secret/munge.key
