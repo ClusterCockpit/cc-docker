@@ -77,16 +77,20 @@ _slurmd() {
   fi
   echo "found slurm.conf"
 
-  mkdir -p /var/spool/slurm/d /etc/slurm
-  chown slurm: /var/spool/slurm/d
+  mkdir -p /var/spool/slurm/d /etc/slurm /var/run/slurm/d /var/log/slurm
+  chown slurm: /var/spool/slurm/d /var/run/slurm/d /var/log/slurm
   cp /home/config/cgroup.conf /etc/slurm/cgroup.conf
   chown slurm: /etc/slurm/cgroup.conf
   chmod 600 /etc/slurm/cgroup.conf
   cp /home/config/slurm.conf /etc/slurm/slurm.conf
   chown slurm: /etc/slurm/slurm.conf
   chmod 600 /etc/slurm/slurm.conf
-  touch /var/log/slurmd.log
-  chown slurm: /var/log/slurmd.log
+  touch /var/log/slurm/slurmd.log
+  chown slurm: /var/log/slurm/slurmd.log
+
+  touch /var/run/slurm/d/slurmd.pid
+  chmod 600 /var/run/slurm/d/slurmd.pid
+  chown slurm: /var/run/slurm/d/slurmd.pid
 
   echo "Starting slurmd"
   /usr/sbin/slurmd -Dvv

@@ -101,17 +101,21 @@ _slurmctld() {
         sleep 1
     done
     echo ""
-    mkdir -p /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /etc/slurm
-    chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /var/spool /var/lib
+    mkdir -p /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /etc/slurm /var/run/slurm/d /var/run/slurm/ctld /var/lib/slurm/d /var/lib/slurm/ctld
+    chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /var/spool /var/lib /var/run/slurm/d /var/run/slurm/ctld /var/lib/slurm/d /var/lib/slurm/ctld
     touch /var/log/slurmctld.log
     chown slurm: /var/log/slurmctld.log
     touch /var/log/slurmd.log
     chown slurm: /var/log/slurmd.log
 
-    # touch /var/run/slurm/d/slurmctld.pid
-    # chown slurm: /var/run/slurm/d/slurmctld.pid
-    # touch /var/run/slurm/d/slurmd.pid
-    # chown slurm:/var/run/slurm/d/slurmd.pid
+    touch /var/lib/slurm/d/job_state
+    chown slurm: /var/lib/slurm/d/job_state
+    touch /var/lib/slurm/d/fed_mgr_state
+    chown slurm: /var/lib/slurm/d/fed_mgr_state
+    touch /var/run/slurm/d/slurmctld.pid
+    chown slurm: /var/run/slurm/d/slurmctld.pid
+    touch /var/run/slurm/d/slurmd.pid
+    chown slurm: /var/run/slurm/d/slurmd.pid
 
     if [[ ! -f /home/config/slurm.conf ]]; then
         echo "### Missing slurm.conf ###"
