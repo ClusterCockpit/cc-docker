@@ -4,6 +4,18 @@ set -e
 # Determine the system architecture dynamically
 ARCH=$(uname -m)
 
+_delete_secrets() {
+    if [ -f /.secret/munge.key ]; then
+        echo "Removing secrets"
+        sudo rm -rf /.secret/munge.key
+        sudo rm -rf /.secret/worker-secret.tar.gz
+        sudo rm -rf /.secret/setup-worker-ssh.sh
+
+        echo "Done removing secrets"
+        ls /.secret/
+    fi
+}
+
 # start sshd server
 _sshd_host() {
     if [ ! -d /var/run/sshd ]; then
@@ -90,9 +102,17 @@ _slurmctld() {
     done
     echo ""
     mkdir -p /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /etc/slurm
-    chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm
+    chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /var/spool /var/lib
     touch /var/log/slurmctld.log
     chown slurm: /var/log/slurmctld.log
+    touch /var/log/slurmd.log
+    chown slurm: /var/log/slurmd.log
+
+    # touch /var/run/slurm/d/slurmctld.pid
+    # chown slurm: /var/run/slurm/d/slurmctld.pid
+    # touch /var/run/slurm/d/slurmd.pid
+    # chown slurm:/var/run/slurm/d/slurmd.pid
+
     if [[ ! -f /home/config/slurm.conf ]]; then
         echo "### Missing slurm.conf ###"
         exit
@@ -103,15 +123,25 @@ _slurmctld() {
         chmod 600 /etc/slurm/slurm.conf
     fi
 
-    sacctmgr -i add cluster "snowflake"
+    sudo yum install -y nc
+    sudo yum install -y procps
+    sudo yum install -y iputils
+
+    while ! nc -z slurmdbd 6819; do
+        echo "Waiting for slurmdbd to be ready..."
+        sleep 2
+    done
+
+    sacctmgr -i add cluster name=linux
     sleep 2s
     echo "Starting slurmctld"
     cp -f /etc/slurm/slurm.conf /.secret/
-    /usr/sbin/slurmctld
+    /usr/sbin/slurmctld -Dvv
     echo "Started slurmctld"
 }
 
 ### main ###
+_delete_secrets
 _sshd_host
 _ssh_worker
 _munge_start

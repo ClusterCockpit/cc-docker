@@ -68,8 +68,6 @@ services:
     hostname: slurmctld
     build:
       context: ./slurm/controller
-    depends_on:
-      - slurmdbd
     privileged: true
     ports:
       - "6817:6817"
@@ -77,6 +75,8 @@ services:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
 
   slurmdbd:
     container_name: slurmdbd
@@ -85,6 +85,7 @@ services:
       context: ./slurm/database
     depends_on:
       - mariadb
+      - slurmctld
     privileged: true
     ports:
       - "6819:6819"
@@ -92,6 +93,8 @@ services:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
       - ./slurm/database/slurmdbd.conf:/home/config/slurmdbd.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
 
   node01:
     container_name: node01
@@ -106,17 +109,7 @@ services:
       - ${DATADIR}/slurm/secret:/.secret
       - ./slurm/worker/cgroup.conf:/home/config/cgroup.conf
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - "6818:6818"
-
-  # slurm-worker02:
-  #   container_name: node02
-    # hostname: node02
-  #   build:
-  #     context: ./slurm/worker
-  #   depends_on:
-  #     - slurm-controller
-  #   privileged: true
-  #   volumes:
-      # - ${DATADIR}/slurm/home:/home
-      # - ${DATADIR}/slurm/secret:/.secret
