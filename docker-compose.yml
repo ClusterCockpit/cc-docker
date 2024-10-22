@@ -69,8 +69,6 @@ services:
     build:
       context: ./slurm/controller
     privileged: true
-    ports:
-      - "6817:6817"
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
@@ -78,6 +76,8 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - ${DATADIR}/slurm/state:/var/lib/slurm/d
+    ports:
+      - "6817:6817"
 
   slurmdbd:
     container_name: slurmdbd
@@ -88,14 +88,15 @@ services:
       - mariadb
       - slurmctld
     privileged: true
-    ports:
-      - "6819:6819"
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
       - ./slurm/database/slurmdbd.conf:/home/config/slurmdbd.conf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - ${DATADIR}/slurm/state:/var/lib/slurm/d
+    ports:
+      - "6819:6819"
 
   node01:
     container_name: node01
@@ -114,3 +115,21 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "6818:6818"
+
+  slurmrestd:
+    container_name: slurmrestd
+    hostname: slurmrestd
+    build:
+      context: ./slurm/rest
+    depends_on:
+      - slurmctld
+    privileged: true
+    volumes:
+      - ${DATADIR}/slurm/home:/home
+      - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/controller/slurm.conf:/home/config/slurm.conf
+      - ./slurm/rest/slurmrestd.conf:/home/config/slurmrestd.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "6820:6820"

@@ -3,6 +3,7 @@ set -e
 
 # Determine the system architecture dynamically
 ARCH=$(uname -m)
+SLURM_VERSION="24.05.3"
 
 # start sshd server
 _sshd_host() {
@@ -61,10 +62,10 @@ _start_dbus() {
 # run slurmd
 _slurmd() {
   cd /root/rpmbuild/RPMS/$ARCH
-  yum -y --nogpgcheck localinstall slurm-22.05.6-1.el8.$ARCH.rpm \
-    slurm-perlapi-22.05.6-1.el8.$ARCH.rpm \
-    slurm-slurmd-22.05.6-1.el8.$ARCH.rpm \
-    slurm-torque-22.05.6-1.el8.$ARCH.rpm
+  yum -y --nogpgcheck localinstall slurm-$SLURM_VERSION*.$ARCH.rpm \
+    slurm-perlapi-$SLURM_VERSION*.$ARCH.rpm \
+    slurm-slurmd-$SLURM_VERSION*.$ARCH.rpm \
+    slurm-torque-$SLURM_VERSION*.$ARCH.rpm
 
   echo "checking for slurm.conf"
   if [ ! -f /.secret/slurm.conf ]; then

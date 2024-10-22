@@ -88,6 +88,7 @@ if [ ! -f docker-compose.yml ]; then
 fi
 
 docker-compose down
+docker-compose down --remove-orphans
 
 cd slurm/base/
 make

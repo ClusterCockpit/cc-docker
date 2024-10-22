@@ -1,6 +1,6 @@
 include ../../.env
 IMAGE = clustercockpit/slurm.base
-
+SLURM_VERSION = 24.05.3
 .PHONY: build clean
 
 build:

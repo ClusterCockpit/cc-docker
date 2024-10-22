@@ -1,4 +1,4 @@
-FROM clustercockpit/slurm.base:22.05.6
+FROM clustercockpit/slurm.base:24.05.3
 LABEL org.opencontainers.image.authors="jan.eitzinger@fau.de"
 
 # clean up

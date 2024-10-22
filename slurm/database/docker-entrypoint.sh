@@ -3,6 +3,7 @@ set -e
 
 # Determine the system architecture dynamically
 ARCH=$(uname -m)
+SLURM_VERSION="24.05.3"
 
 SLURM_ACCT_DB_SQL=/slurm_acct_db.sql
 
@@ -52,9 +53,9 @@ _wait_for_worker() {
 # run slurmdbd
 _slurmdbd() {
    cd /root/rpmbuild/RPMS/$ARCH
-   yum -y --nogpgcheck localinstall slurm-22.05.6-1.el8.$ARCH.rpm \
-       slurm-perlapi-22.05.6-1.el8.$ARCH.rpm \
-       slurm-slurmdbd-22.05.6-1.el8.$ARCH.rpm
+   yum -y --nogpgcheck localinstall slurm-$SLURM_VERSION*.$ARCH.rpm \
+       slurm-perlapi-$SLURM_VERSION*.$ARCH.rpm \
+       slurm-slurmdbd-$SLURM_VERSION*.$ARCH.rpm
   mkdir -p /var/spool/slurm/d /var/log/slurm /etc/slurm
   chown slurm: /var/spool/slurm/d /var/log/slurm
   if [[ ! -f /home/config/slurmdbd.conf ]]; then
