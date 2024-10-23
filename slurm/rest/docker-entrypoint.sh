@@ -54,6 +54,10 @@ _slurmrestd() {
     echo ""
     # mkdir -p /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /etc/slurm
     # chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm
+
+    mkdir -p /etc/config /var/spool/slurm /var/spool/slurm/restd /var/spool/slurm/restd/rest
+    chown -R slurm: /etc/config /var/spool/slurm /var/spool/slurm/restd /var/spool/slurm/restd/rest
+
     touch /var/log/slurmrestd.log
     chown slurm: /var/log/slurmrestd.log
     if [[ ! -f /home/config/slurmrestd.conf ]]; then
@@ -62,9 +66,12 @@ _slurmrestd() {
     else
         echo "### use provided slurmrestd.conf ###"
         cp /home/config/slurmrestd.conf /etc/config/slurmrestd.conf
+        cp /home/config/slurm.conf /etc/config/slurm.conf
+
     fi
     sleep 2s
-    /usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf 0.0.0.0:6820 -Dvv
+    export SLURMRESTD=/var/spool/slurm/restd/rest
+    /usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -s dbv0.0.39,v0.0.39 -vv -u slurm 0.0.0.0:6820
 }
 
 ### main ###

@@ -27,7 +27,7 @@ RUN dnf --enablerepo=powertools install -y munge-devel rrdtool-devel lua-devel h
 RUN mkdir -p /usr/local/slurm-tmp \ 
     && cd /usr/local/slurm-tmp \
     && wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 \
-    && rpmbuild -ta --with slurmrestd slurm-${SLURM_VERSION}.tar.bz2
+    && rpmbuild -ta --with slurmrestd --with jwt slurm-${SLURM_VERSION}.tar.bz2
 
 RUN ARCH=$(uname -m) \
     && yum -y --nogpgcheck localinstall \
