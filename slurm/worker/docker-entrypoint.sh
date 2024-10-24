@@ -78,6 +78,10 @@ _slurmd() {
   fi
   echo "found slurm.conf"
 
+  sudo yum install -y nc
+  sudo yum install -y procps
+  sudo yum install -y iputils
+
   mkdir -p /var/spool/slurm/d /etc/slurm /var/run/slurm/d /var/log/slurm
   chown slurm: /var/spool/slurm/d /var/run/slurm/d /var/log/slurm
   cp /home/config/cgroup.conf /etc/slurm/cgroup.conf

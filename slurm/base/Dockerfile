@@ -19,7 +19,7 @@ RUN yum install -y munge munge-libs rng-tools \
     openssh-server openssh-clients dbus-devel \
     pam-devel numactl numactl-devel hwloc sudo \
     lua readline-devel ncurses-devel man2html \
-    autoconf automake json-c-devel \
+    autoconf automake json-c-devel libjwt-devel \
     libibmad libibumad rpm-build perl-ExtUtils-MakeMaker.noarch rpm-build make wget
 
 RUN dnf --enablerepo=powertools install -y munge-devel rrdtool-devel lua-devel hwloc-devel mariadb-server mariadb-devel

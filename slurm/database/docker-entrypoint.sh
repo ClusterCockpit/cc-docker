@@ -4,7 +4,7 @@ set -e
 # Determine the system architecture dynamically
 ARCH=$(uname -m)
 SLURM_VERSION="24.05.3"
-
+SLURM_JWT=daemon
 SLURM_ACCT_DB_SQL=/slurm_acct_db.sql
 
 # start sshd server
@@ -52,12 +52,16 @@ _wait_for_worker() {
 
 # run slurmdbd
 _slurmdbd() {
-   cd /root/rpmbuild/RPMS/$ARCH
-   yum -y --nogpgcheck localinstall slurm-$SLURM_VERSION*.$ARCH.rpm \
-       slurm-perlapi-$SLURM_VERSION*.$ARCH.rpm \
-       slurm-slurmdbd-$SLURM_VERSION*.$ARCH.rpm
+  cd /root/rpmbuild/RPMS/$ARCH
+  yum -y --nogpgcheck localinstall slurm-$SLURM_VERSION*.$ARCH.rpm \
+    slurm-perlapi-$SLURM_VERSION*.$ARCH.rpm \
+    slurm-slurmdbd-$SLURM_VERSION*.$ARCH.rpm
   mkdir -p /var/spool/slurm/d /var/log/slurm /etc/slurm
-  chown slurm: /var/spool/slurm/d /var/log/slurm
+  chown -R slurm: /var/spool/slurm/d /var/log/slurm
+
+  mkdir -p /etc/config
+  chown -R slurm: /etc/config
+
   if [[ ! -f /home/config/slurmdbd.conf ]]; then
     echo "### Missing slurmdbd.conf ###"
     exit
@@ -67,8 +71,26 @@ _slurmdbd() {
     chown slurm: /etc/slurm/slurmdbd.conf
     chmod 600 /etc/slurm/slurmdbd.conf
   fi
-  echo "Starting slurmdbd"
+
+  echo -n "checking for jwt.key"
+  while [ ! -f /.secret/jwt.key ]; do
+    echo -n "."
+    sleep 1
+  done
+
+  cp /.secret/jwt.key /etc/config/jwt.key
+  chown slurm: /etc/config/jwt.key
+  chmod 0400 /etc/config/jwt.key
+
+  echo ""
+
+  sudo yum install -y nc
+  sudo yum install -y procps
+  sudo yum install -y iputils
+  
   cp /etc/slurm/slurmdbd.conf /.secret/slurmdbd.conf
+
+  echo "Starting slurmdbd"
   /usr/sbin/slurmdbd -Dvv
   echo "Started slurmdbd"
 }

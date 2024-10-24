@@ -1,20 +1,23 @@
 #!/bin/bash
 echo ""
-echo "-----------------------------------------------------------------"
-echo "Welcome to cc-docker automatic deployment script."
-echo "Make sure you have sudo rights to run docker services"
-echo "This script assumes that docker command is added to sudo group"
-echo "This means that docker commands do not explicitly require"
-echo "'sudo' keyword to run. You can use this following command:"
+echo "|--------------------------------------------------------------------------------------|"
+echo "| Welcome to cc-docker automatic deployment script.                                    |"
+echo "| Make sure you have sudo rights to run docker services                                |"
+echo "| This script assumes that docker command is added to sudo group                       |"
+echo "| This means that docker commands do not explicitly require                            |"
+echo "| 'sudo' keyword to run. You can use this following command:                           |"
+echo "|                                                                                      |"
+echo "| > sudo groupadd docker                                                               |"
+echo "| > sudo usermod -aG docker $USER                                                      |"
+echo "|                                                                                      |"
+echo "| This will add docker to the sudo usergroup and all the docker                        |"
+echo "| command will run as sudo by default without requiring                                |"
+echo "| 'sudo' keyword.                                                                      |"  
+echo "|--------------------------------------------------------------------------------------|"
 echo ""
-echo "sudo groupadd docker"
-echo "sudo usermod -aG docker $USER"
-echo ""
-echo "This will add docker to the sudo usergroup and all the docker"
-echo "command will run as sudo by default without requiring"
-echo "'sudo' keyword."  
-echo "-----------------------------------------------------------------"
-echo ""
+
+export UID_U=$(id -u $USER)
+export GID_G=$(id -g $USER)
 
 # Check cc-backend, touch job.db if exists
 if [ ! -d cc-backend ]; then
@@ -98,6 +101,15 @@ docker-compose build
 docker-compose up -d
 
 echo ""
-echo "Setup complete, containers are up by default: Shut down with 'docker-compose down'."
-echo "Use './cc-backend/cc-backend -server' to start cc-backend."
-echo "Use scripts in /scripts to load data into influx or mariadb."
+echo "|--------------------------------------------------------------------------------------|"
+echo "| Check logs for each slurm service by using these commands:                           |"
+echo "| docker-compose logs slurmctld                                                        |"
+echo "| docker-compose logs slurmdbd                                                         |"
+echo "| docker-compose logs slurmrestd                                                       |"
+echo "| docker-compose logs node01                                                           |"
+echo "|======================================================================================|"
+echo "| Setup complete, containers are up by default: Shut down with 'docker-compose down'.  |"
+echo "| Use './cc-backend/cc-backend -server' to start cc-backend.                           |"
+echo "| Use scripts in /scripts to load data into influx or mariadb.                         |"
+echo "|--------------------------------------------------------------------------------------|"
+echo ""

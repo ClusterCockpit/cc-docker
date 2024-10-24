@@ -91,6 +91,7 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/database/slurmdbd.conf:/home/config/slurmdbd.conf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -109,6 +110,7 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/worker/cgroup.conf:/home/config/cgroup.conf
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
       - /etc/timezone:/etc/timezone:ro
@@ -121,12 +123,16 @@ services:
     hostname: slurmrestd
     build:
       context: ./slurm/rest
+      args:
+        uid_u: ${UID_U}
+        gid_g: ${GID_G}
     depends_on:
       - slurmctld
     privileged: true
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
       - ./slurm/rest/slurmrestd.conf:/home/config/slurmrestd.conf
       - /etc/timezone:/etc/timezone:ro

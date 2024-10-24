@@ -4,6 +4,8 @@ set -e
 # Determine the system architecture dynamically
 ARCH=$(uname -m)
 SLURM_VERSION="24.05.3"
+SLURM_JWT=daemon
+SLURMRESTD_SECURITY=disable_user_check
 
 _delete_secrets() {
     if [ -f /.secret/munge.key ]; then
@@ -11,6 +13,9 @@ _delete_secrets() {
         sudo rm -rf /.secret/munge.key
         sudo rm -rf /.secret/worker-secret.tar.gz
         sudo rm -rf /.secret/setup-worker-ssh.sh
+        sudo rm -rf /.secret/jwt.key
+        sudo rm -rf /.secret/jwt_public.key
+        sudo rm -rf /.secret/jwt_token.key
 
         echo "Done removing secrets"
         ls /.secret/
@@ -88,6 +93,31 @@ _copy_secrets() {
     rm -f /home/worker/setup-worker-ssh.sh
 }
 
+_openssl_jwt_key() {
+    cd /.secret
+    openssl rand -base64 32 > jwt.key
+    # openssl genpkey -algorithm RSA -out jwt.key -pkeyopt rsa_keygen_bits:2048
+    # openssl rsa -pubout -in jwt.key -out jwt_public.key
+    cd ..
+}
+
+_generate_jwt_token() {
+    PEM=$(cat /etc/config/jwt.key)
+    USER=\"slurm\"
+    NOW=$(date +%s)
+    IAT="${NOW}"
+    EXP=$((${NOW} + 3600000))
+    HEADER_RAW='{"alg":"HS256", "typ":"JWT"}'
+    HEADER=$(echo -n "${HEADER_RAW}" | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+    PAYLOAD_RAW='{"iss":'${USER}'}'
+    PAYLOAD=$(echo -n "${PAYLOAD_RAW}" | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+    HEADER_PAYLOAD="${HEADER}"."${PAYLOAD}"
+    SIGNATURE=$(openssl dgst -sha256 -sign <(echo -n "${PEM}") <(echo -n "${HEADER_PAYLOAD}") | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+    JWT="${HEADER_PAYLOAD}"."${SIGNATURE}"
+    echo $JWT | cat >/.secret/jwt_token.txt
+    chmod 777 /.secret/jwt_token.txt
+}
+
 # run slurmctld
 _slurmctld() {
     cd /root/rpmbuild/RPMS/$ARCH
@@ -105,19 +135,22 @@ _slurmctld() {
     echo ""
     mkdir -p /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /etc/slurm /var/run/slurm/d /var/run/slurm/ctld /var/lib/slurm/d /var/lib/slurm/ctld
     chown -R slurm: /var/spool/slurm/ctld /var/spool/slurm/d /var/log/slurm /var/spool /var/lib /var/run/slurm/d /var/run/slurm/ctld /var/lib/slurm/d /var/lib/slurm/ctld
+    mkdir -p /etc/config
+    chown -R slurm: /etc/config
+
     touch /var/log/slurmctld.log
-    chown slurm: /var/log/slurmctld.log
+    chown -R slurm: /var/log/slurmctld.log
     touch /var/log/slurmd.log
-    chown slurm: /var/log/slurmd.log
+    chown -R slurm: /var/log/slurmd.log
 
     touch /var/lib/slurm/d/job_state
-    chown slurm: /var/lib/slurm/d/job_state
+    chown -R slurm: /var/lib/slurm/d/job_state
     touch /var/lib/slurm/d/fed_mgr_state
-    chown slurm: /var/lib/slurm/d/fed_mgr_state
+    chown -R slurm: /var/lib/slurm/d/fed_mgr_state
     touch /var/run/slurm/d/slurmctld.pid
-    chown slurm: /var/run/slurm/d/slurmctld.pid
+    chown -R slurm: /var/run/slurm/d/slurmctld.pid
     touch /var/run/slurm/d/slurmd.pid
-    chown slurm: /var/run/slurm/d/slurmd.pid
+    chown -R slurm: /var/run/slurm/d/slurmd.pid
 
     if [[ ! -f /home/config/slurm.conf ]]; then
         echo "### Missing slurm.conf ###"
@@ -128,6 +161,19 @@ _slurmctld() {
         chown slurm: /etc/slurm/slurm.conf
         chmod 600 /etc/slurm/slurm.conf
     fi
+
+    _openssl_jwt_key
+
+    if [ ! -f /.secret/jwt.key ]; then
+        echo "### Missing jwt.key ###"
+        exit 1
+    else
+        cp /.secret/jwt.key /etc/config/jwt.key
+        chown slurm: /etc/config/jwt.key
+        chmod 0400 /etc/config/jwt.key
+    fi
+
+    _generate_jwt_token
 
     sudo yum install -y nc
     sudo yum install -y procps
@@ -149,6 +195,7 @@ _slurmctld() {
 ### main ###
 _delete_secrets
 _sshd_host
+
 _ssh_worker
 _munge_start
 _copy_secrets
