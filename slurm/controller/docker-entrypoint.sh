@@ -13,9 +13,8 @@ _delete_secrets() {
         sudo rm -rf /.secret/munge.key
         sudo rm -rf /.secret/worker-secret.tar.gz
         sudo rm -rf /.secret/setup-worker-ssh.sh
-        sudo rm -rf /.secret/jwt.key
-        sudo rm -rf /.secret/jwt_public.key
-        sudo rm -rf /.secret/jwt_token.key
+        sudo rm -rf /.secret/jwt_hs256.key
+        sudo rm -rf /.secret/jwt_token.txt
 
         echo "Done removing secrets"
         ls /.secret/
@@ -94,27 +93,48 @@ _copy_secrets() {
 }
 
 _openssl_jwt_key() {
-    cd /.secret
-    openssl rand -base64 32 > jwt.key
-    # openssl genpkey -algorithm RSA -out jwt.key -pkeyopt rsa_keygen_bits:2048
-    # openssl rsa -pubout -in jwt.key -out jwt_public.key
-    cd ..
+
+    mkdir -p /var/spool/slurm/statesave
+    dd if=/dev/random of=/var/spool/slurm/statesave/jwt_hs256.key bs=32 count=1
+    chown slurm:slurm /var/spool/slurm/statesave/jwt_hs256.key
+    chmod 0600 /var/spool/slurm/statesave/jwt_hs256.key
+    chown slurm:slurm /var/spool/slurm/statesave
+    chmod 0755 /var/spool/slurm/statesave
+    cp /var/spool/slurm/statesave/jwt_hs256.key /.secret/jwt_hs256.key
+    chmod 777 /.secret/jwt_hs256.key
 }
 
 _generate_jwt_token() {
-    PEM=$(cat /etc/config/jwt.key)
-    USER=\"slurm\"
-    NOW=$(date +%s)
-    IAT="${NOW}"
-    EXP=$((${NOW} + 3600000))
-    HEADER_RAW='{"alg":"HS256", "typ":"JWT"}'
-    HEADER=$(echo -n "${HEADER_RAW}" | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-    PAYLOAD_RAW='{"iss":'${USER}'}'
-    PAYLOAD=$(echo -n "${PAYLOAD_RAW}" | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-    HEADER_PAYLOAD="${HEADER}"."${PAYLOAD}"
-    SIGNATURE=$(openssl dgst -sha256 -sign <(echo -n "${PEM}") <(echo -n "${HEADER_PAYLOAD}") | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-    JWT="${HEADER_PAYLOAD}"."${SIGNATURE}"
-    echo $JWT | cat >/.secret/jwt_token.txt
+
+    secret_key=$(cat /var/spool/slurm/statesave/jwt_hs256.key)
+    start_time=$(date +%s)
+    exp_time=$((start_time + 100000000))
+    base64url() {
+        # Don't wrap, make URL-safe, delete trailer.
+        base64 -w 0 | tr '+/' '-_' | tr -d '='
+    }
+
+    jwt_header=$(echo -n '{"alg":"HS256","typ":"JWT"}' | base64url)
+
+    jwt_claims=$(cat <<EOF |
+{
+  "sun": "root",
+  "exp": $exp_time,
+  "iat": $start_time
+}
+EOF
+        jq -Mcj '.' | base64url)
+    # jq -Mcj => Monochrome output, compact output, join lines
+
+    jwt_signature=$(echo -n "${jwt_header}.${jwt_claims}" |
+        openssl dgst -sha256 -hmac "$secret_key" -binary | base64url)
+
+    # Use the same colours as jwt.io, more-or-less.
+    echo "$(tput setaf 1)${jwt_header}$(tput sgr0).$(tput setaf 5)${jwt_claims}$(tput sgr0).$(tput setaf 6)${jwt_signature}$(tput sgr0)"
+
+    jwt="${jwt_header}.${jwt_claims}.${jwt_signature}"
+
+    echo $jwt | cat >/.secret/jwt_token.txt
     chmod 777 /.secret/jwt_token.txt
 }
 
@@ -162,23 +182,24 @@ _slurmctld() {
         chmod 600 /etc/slurm/slurm.conf
     fi
 
-    _openssl_jwt_key
-
-    if [ ! -f /.secret/jwt.key ]; then
-        echo "### Missing jwt.key ###"
-        exit 1
-    else
-        cp /.secret/jwt.key /etc/config/jwt.key
-        chown slurm: /etc/config/jwt.key
-        chmod 0600 /etc/config/jwt.key
-    fi
-
-    _generate_jwt_token
-
     sudo yum install -y nc
     sudo yum install -y procps
     sudo yum install -y iputils
     sudo yum install -y lsof
+    sudo yum install -y jq
+
+    _openssl_jwt_key
+
+    if [ ! -f /.secret/jwt_hs256.key ]; then
+        echo "### Missing jwt.key ###"
+        exit 1
+    else
+        cp /.secret/jwt_hs256.key /etc/config/jwt_hs256.key
+        chown slurm: /etc/config/jwt_hs256.key
+        chmod 0600 /etc/config/jwt_hs256.key
+    fi
+
+    _generate_jwt_token
 
     while ! nc -z slurmdbd 6819; do
         echo "Waiting for slurmdbd to be ready..."

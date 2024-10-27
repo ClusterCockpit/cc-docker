@@ -72,7 +72,6 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
-      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -92,11 +91,9 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
-      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/database/slurmdbd.conf:/home/config/slurmdbd.conf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - ${DATADIR}/slurm/state:/var/lib/slurm/d
     ports:
       - "6819:6819"
 
@@ -111,7 +108,6 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
-      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/worker/cgroup.conf:/home/config/cgroup.conf
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
       - /etc/timezone:/etc/timezone:ro
@@ -124,16 +120,15 @@ services:
     hostname: slurmrestd
     build:
       context: ./slurm/rest
-      args:
-        uid_u: ${UID_U}
-        gid_g: ${GID_G}
+    environment:
+      - SLURM_JWT=daemon
+      - SLURMRESTD_DEBUG=9
     depends_on:
       - slurmctld
     privileged: true
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
-      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
       - ./slurm/rest/slurmrestd.conf:/home/config/slurmrestd.conf
       - /etc/timezone:/etc/timezone:ro

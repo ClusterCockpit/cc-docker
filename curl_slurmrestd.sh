@@ -1,4 +1,3 @@
-JWT="eyJhbGciOiJSUzI1NiIsICJ0eXAiOiJKV1QifQ.eyJpc3MiOiJzbHVybSJ9.dzAHf1Ojoa149uRCCWY1eP3vDyCIZCOZ3h554R-KJJ8-OP0CJ0ymvSkFISLcYcyd9vVKmaYdSN3tWEF6bNZEmyX7G560i1MbkNFvhkhNVSPLKEKNPs38h5ra3ZlTlLlxAlDzXRAAn6UEEgKdm5vx4Jhec7ptaRL_zeSFpTS5fJPc0QE1Cm7e7nU39-9e8l4WU4KpRMxT6ANFm22_G4-mSA-AgCAvKQFzj2FInKsXDUTGlliNJuAgFxf-9LQxoeAknOQhEqcTXii_yBy9DNcT03pdNcAu5Ru4_qlX62vroInU_eh5mWQyiUdXN9Wj_OfMmfLoYFkJeUFYexBMZnSBgg"
-
-# curl -X 'GET' -v 'http://localhost:6820/slurm/v0.0.39/ping' -H "X-SLURM-USER-NAME:slurm" -H "X-SLURM-USER-TOKEN:$SLURM_JWT"
-curl -v --unix-socket data/slurm/tmp/slurmrestd.socket 'http://localhost:6820/slurm/v0.0.39/ping'
+SLURM_JWT=$(cat data/slurm/secret/jwt_token.txt)
+curl -X 'GET' -v 'http://localhost:6820/slurm/v0.0.39/ping' --location --silent --show-error -H "X-SLURM-USER-NAME: root" -H "X-SLURM-USER-TOKEN: $SLURM_JWT"
+# curl -v --unix-socket data/slurm/tmp/slurmrestd.socket 'http://localhost:6820/slurm/v0.0.39/ping'

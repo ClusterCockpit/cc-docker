@@ -74,14 +74,17 @@ _slurmdbd() {
   fi
 
   echo "checking for jwt.key"
-  while [ ! -f /.secret/jwt.key ]; do
+  while [ ! -f /.secret/jwt_hs256.key ]; do
     echo "."
     sleep 1
   done
 
-  cp /.secret/jwt.key /etc/config/jwt.key
-  chown slurm: /etc/config/jwt.key
-  chmod 0400 /etc/config/jwt.key
+  mkdir -p /var/spool/slurm/statesave
+  chown slurm:slurm /var/spool/slurm/statesave
+  chmod 0755 /var/spool/slurm/statesave
+  cp /.secret/jwt_hs256.key /var/spool/slurm/statesave/jwt_hs256.key
+  chown slurm: /var/spool/slurm/statesave/jwt_hs256.key
+  chmod 0600 /var/spool/slurm/statesave/jwt_hs256.key
 
   echo ""
 

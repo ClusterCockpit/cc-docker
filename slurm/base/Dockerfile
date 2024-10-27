@@ -9,10 +9,10 @@ RUN ARCH=$(uname -m) && yum install -y https://rpmfind.net/linux/almalinux/8.10/
 
 RUN groupadd -g 981 munge \
   && useradd  -m -c "MUNGE Uid 'N' Gid Emporium" -d /var/lib/munge -u 981 -g munge  -s /sbin/nologin munge \
-  && groupadd -g 982 slurm \
-  && useradd  -m -c "Slurm workload manager" -d /var/lib/slurm -u 982 -g slurm  -s /bin/bash slurm \
-  && groupadd -g 1000 worker \
-  && useradd  -m -c "Workflow user" -d /home/worker -u 1000 -g worker  -s /bin/bash worker
+  && groupadd -g 1000 slurm \
+  && useradd  -m -c "Slurm workload manager" -d /var/lib/slurm -u 1000 -g slurm  -s /bin/bash slurm \
+  && groupadd -g 982 worker \
+  && useradd  -m -c "Workflow user" -d /home/worker -u 982 -g worker  -s /bin/bash worker
 
 RUN yum install -y munge munge-libs rng-tools \
     python3 gcc openssl openssl-devel \

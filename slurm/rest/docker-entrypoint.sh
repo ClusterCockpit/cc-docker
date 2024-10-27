@@ -4,18 +4,8 @@ set -e
 # Determine the system architecture dynamically
 ARCH=$(uname -m)
 SLURM_VERSION="24.05.3"
-SLURMRESTD="/tmp/slurmrestd.socket"
-# SLURM_JWT=daemon
-
-uid_u="${1:-}"
-gid_g="${2:-}"
-
-echo Your container args are: "$@"
-
-# Change the uid
-# usermod -u "${uid_u}" slurm
-# Change the gid
-# groupmod -g "${gid_g}" slurm
+# SLURMRESTD="/tmp/slurmrestd.socket"
+SLURM_JWT=daemon
 
 # start sshd server
 _sshd_host() {
@@ -50,14 +40,6 @@ _munge_start_using_key() {
 
 _enable_slurmrestd() {
 
-    cd /tmp
-    mkdir statesave
-    dd if=/dev/random of=/tmp/statesave/jwt_hs256.key bs=32 count=1
-    chown slurm:slurm /tmp/statesave/jwt_hs256.key
-    chmod 0600 /tmp/statesave/jwt_hs256.key
-    chown slurm:slurm /tmp/statesave
-    chmod 0755 /tmp/statesave
-
     cat >/usr/lib/systemd/system/slurmrestd.service <<EOF
 [Unit]
 Description=Slurm REST daemon
@@ -78,8 +60,7 @@ Restart=always
 RestartSec=5
 # Group=
 # Default to listen on both socket and slurmrestd port
-ExecStart=/usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -a rest_auth/jwt $SLURMRESTD_OPTIONS -vvvvvv -s dbv0.0.39,v0.0.39 unix:$SLURMRESTD 0.0.0.0:6820
-# /usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -vvvvvv -a rest_auth/jwt -s dbv0.0.39,v0.0.39 -u slurm unix:$SLURMRESTD 0.0.0.0:6820
+ExecStart=/usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -a rest_auth/jwt $SLURMRESTD_OPTIONS -vvvvvv -s dbv0.0.39,v0.0.39 0.0.0.0:6820
 # Enable auth/jwt be default, comment out the line to disable it for slurmrestd
 Environment="SLURM_JWT=daemon"
 ExecReload=/bin/kill -HUP $MAINPID
@@ -113,8 +94,6 @@ _slurmrestd() {
 
     touch /var/log/slurmrestd.log
     chown slurm: /var/log/slurmrestd.log
-    chown worker: /tmp
-    chmod 770 /tmp
 
     if [[ ! -f /home/config/slurmrestd.conf ]]; then
         echo "### Missing slurm.conf ###"
@@ -126,7 +105,7 @@ _slurmrestd() {
     fi
 
     echo "checking for jwt.key"
-    while [ ! -f /.secret/jwt.key ]; do
+    while [ ! -f /.secret/jwt_hs256.key ]; do
         echo "."
         sleep 1
     done
@@ -137,9 +116,12 @@ _slurmrestd() {
     sudo yum install -y lsof
     sudo yum install -y socat
 
-    cp /.secret/jwt.key /etc/config/jwt.key
-    chown slurm: /etc/config/jwt.key
-    chmod 0400 /etc/config/jwt.key
+    mkdir -p /var/spool/slurm/statesave
+    chown slurm:slurm /var/spool/slurm/statesave
+    chmod 0755 /var/spool/slurm/statesave
+    cp /.secret/jwt_hs256.key /var/spool/slurm/statesave/jwt_hs256.key
+    chown slurm: /var/spool/slurm/statesave/jwt_hs256.key
+    chmod 0400 /var/spool/slurm/statesave/jwt_hs256.key
 
     echo ""
 
@@ -148,7 +130,7 @@ _slurmrestd() {
     # _enable_slurmrestd
     # sudo ln -s /usr/lib/systemd/system/slurmrestd.service /etc/systemd/system/multi-user.target.wants/slurmrestd.service
 
-    /usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -vvvvvv -s dbv0.0.39,v0.0.39 -u worker unix:$SLURMRESTD 0.0.0.0:6820
+    SLURMRESTD_SECURITY=disable_user_check SLURMRESTD_DEBUG=9 /usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -a rest_auth/jwt -s dbv0.0.39,v0.0.39 -u slurm 0.0.0.0:6820
     echo "Started slurmrestd"
 }
 
