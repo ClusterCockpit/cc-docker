@@ -70,11 +70,12 @@ _slurmdbd() {
     cp /home/config/slurmdbd.conf /etc/slurm/slurmdbd.conf
     chown slurm: /etc/slurm/slurmdbd.conf
     chmod 600 /etc/slurm/slurmdbd.conf
+    cp /etc/slurm/slurmdbd.conf /.secret/slurmdbd.conf
   fi
 
-  echo -n "checking for jwt.key"
+  echo "checking for jwt.key"
   while [ ! -f /.secret/jwt.key ]; do
-    echo -n "."
+    echo "."
     sleep 1
   done
 
@@ -87,8 +88,6 @@ _slurmdbd() {
   sudo yum install -y nc
   sudo yum install -y procps
   sudo yum install -y iputils
-  
-  cp /etc/slurm/slurmdbd.conf /.secret/slurmdbd.conf
 
   echo "Starting slurmdbd"
   /usr/sbin/slurmdbd -Dvv

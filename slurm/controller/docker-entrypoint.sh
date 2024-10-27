@@ -129,7 +129,7 @@ _slurmctld() {
         slurm-slurmctld-$SLURM_VERSION*.$ARCH.rpm
     echo "checking for slurmdbd.conf"
     while [ ! -f /.secret/slurmdbd.conf ]; do
-        echo -n "."
+        echo "."
         sleep 1
     done
     echo ""
@@ -170,7 +170,7 @@ _slurmctld() {
     else
         cp /.secret/jwt.key /etc/config/jwt.key
         chown slurm: /etc/config/jwt.key
-        chmod 0400 /etc/config/jwt.key
+        chmod 0600 /etc/config/jwt.key
     fi
 
     _generate_jwt_token
@@ -178,6 +178,7 @@ _slurmctld() {
     sudo yum install -y nc
     sudo yum install -y procps
     sudo yum install -y iputils
+    sudo yum install -y lsof
 
     while ! nc -z slurmdbd 6819; do
         echo "Waiting for slurmdbd to be ready..."

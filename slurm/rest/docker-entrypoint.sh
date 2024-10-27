@@ -113,8 +113,8 @@ _slurmrestd() {
 
     touch /var/log/slurmrestd.log
     chown slurm: /var/log/slurmrestd.log
-    chown slurm: /tmp
-    chmod 777 /tmp
+    chown worker: /tmp
+    chmod 770 /tmp
 
     if [[ ! -f /home/config/slurmrestd.conf ]]; then
         echo "### Missing slurm.conf ###"
@@ -125,15 +125,17 @@ _slurmrestd() {
         cp /home/config/slurm.conf /etc/config/slurm.conf
     fi
 
-    echo -n "checking for jwt.key"
+    echo "checking for jwt.key"
     while [ ! -f /.secret/jwt.key ]; do
-        echo -n "."
+        echo "."
         sleep 1
     done
 
     sudo yum install -y nc
     sudo yum install -y procps
     sudo yum install -y iputils
+    sudo yum install -y lsof
+    sudo yum install -y socat
 
     cp /.secret/jwt.key /etc/config/jwt.key
     chown slurm: /etc/config/jwt.key
@@ -146,7 +148,7 @@ _slurmrestd() {
     # _enable_slurmrestd
     # sudo ln -s /usr/lib/systemd/system/slurmrestd.service /etc/systemd/system/multi-user.target.wants/slurmrestd.service
 
-    /usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -vvvvvv -s dbv0.0.39,v0.0.39 -u slurm unix:$SLURMRESTD 0.0.0.0:6820
+    /usr/sbin/slurmrestd -f /etc/config/slurmrestd.conf -vvvvvv -s dbv0.0.39,v0.0.39 -u worker unix:$SLURMRESTD 0.0.0.0:6820
     echo "Started slurmrestd"
 }
 

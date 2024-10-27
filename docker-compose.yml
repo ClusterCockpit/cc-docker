@@ -72,6 +72,7 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ${DATADIR}/slurm/tmp:/tmp:rw
       - ./slurm/controller/slurm.conf:/home/config/slurm.conf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
