@@ -7,4 +7,5 @@ RUN rm -f /root/rpmbuild/RPMS/slurm-*.rpm \
   && rm -rf /var/cache/yum
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
+CMD ["/usr/sbin/init"]
 ENTRYPOINT ["/docker-entrypoint.sh"]

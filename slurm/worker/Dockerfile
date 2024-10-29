@@ -8,4 +8,5 @@ RUN rm -f /root/rpmbuild/RPMS/slurm-*.rpm \
 
 WORKDIR /home/worker
 COPY docker-entrypoint.sh /docker-entrypoint.sh
+CMD ["/usr/sbin/init"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
