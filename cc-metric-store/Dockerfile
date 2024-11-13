@@ -17,4 +17,5 @@ COPY config.json  /go/bin
 VOLUME /data
 
 WORKDIR /go/bin
+RUN mkdir -p ./var/checkpoints
 CMD ["./cc-metric-store"]
