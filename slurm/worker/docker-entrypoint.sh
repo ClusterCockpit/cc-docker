@@ -78,9 +78,9 @@ _slurmd() {
   fi
   echo "found slurm.conf"
 
-  sudo yum install -y nc
-  sudo yum install -y procps
-  sudo yum install -y iputils
+  # sudo yum install -y nc
+  # sudo yum install -y procps
+  # sudo yum install -y iputils
 
   mkdir -p /var/spool/slurm/d /etc/slurm /var/run/slurm/d /var/log/slurm
   chown slurm: /var/spool/slurm/d /var/run/slurm/d /var/log/slurm
@@ -98,6 +98,7 @@ _slurmd() {
   chown slurm: /var/run/slurm/d/slurmd.pid
 
   echo "Starting slurmd"
+  /usr/sbin/slurmstepd infinity &
   /usr/sbin/slurmd -Dvv
   echo "Started slurmd"
 }
