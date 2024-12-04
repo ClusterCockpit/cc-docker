@@ -167,12 +167,12 @@
     },
     "checkpoints": {
         "interval": "12h",
-        "directory": "./var/checkpoints",
+        "directory": "/data/checkpoints",
         "restore": "48h"
     },
     "archive": {
         "interval": "50h",
-        "directory": "./var/archive"
+        "directory": "/data/archive"
     },
     "http-api": {
         "address": "localhost:8082",

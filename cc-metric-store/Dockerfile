@@ -3,8 +3,9 @@ FROM golang:1.22.4
 RUN apt-get update
 RUN apt-get -y install git
 
+RUN rm -rf /cc-metric-store
+
 RUN git clone https://github.com/ClusterCockpit/cc-metric-store.git /cc-metric-store
-RUN ls
 RUN cd /cc-metric-store && go build ./cmd/cc-metric-store
 
 # Reactivate when latest commit is available
@@ -17,5 +18,4 @@ COPY config.json  /go/bin
 VOLUME /data
 
 WORKDIR /go/bin
-RUN mkdir -p ./var/checkpoints
 CMD ["./cc-metric-store"]
