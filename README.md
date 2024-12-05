@@ -18,6 +18,32 @@ It includes the following containers:
 
 The setup comes with fixture data for a Job archive, cc-metric-store checkpoints, InfluxDB, MariaDB, and a LDAP user directory.
 
+## Prerequisites
+
+For all the docker services to work correctly, you will need the following tools installed:
+
+1. `docker` and `docker-compose`
+2. `golang` (for compiling cc-metric-store)
+3. `perl` (for migrateTimestamp.pl) with Cpanel::JSON::XS, Data::Dumper, Time::Piece, Sort::Versions and File::Slurp perl modules.
+4. `npm` (for cc-backend)
+5. `make` (for building slurm base image)
+
+It is also recommended to add docker service to sudouser group since the setupDev.sh script assumes sudo permissions for docker and docker-compose services.
+
+You can use:
+
+```
+sudo groupadd docker
+sudo usermod -aG docker $USER 
+
+# restart after adding your docker with your user to sudo group
+sudo shutdown -r -t 0
+```
+
+Note: You can install all these dependencies via predefined installation steps in `prerequisite_installation_script.sh`.
+
+If you are using different linux flavors, you will have to adapt `prerequisite_installation_script.sh` as well as `setupDev.sh`.
+
 ## Configuration Templates
 
 Located in `./templates`
