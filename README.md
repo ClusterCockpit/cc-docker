@@ -44,13 +44,6 @@ Note: You can install all these dependencies via predefined installation steps i
 
 If you are using different linux flavors, you will have to adapt `prerequisite_installation_script.sh` as well as `setupDev.sh`.
 
-## Configuration Templates
-
-Located in `./templates`
-* `docker-compose.yml.default`: Docker-Compose file to setup cc-metric-store, InfluxDB, MariaDB, PhpMyadmin, and LDAP containers (Default). Used in `setupDev.sh`.
-* `env.default`: Environment variables for setup with cc-metric-store, InfluxDB, MariaDB, PhpMyadmin, and LDAP containers (Default). Used in `setupDev.sh`.
-* `env.mysql`: Additional environment variables required if MySQL is desired instead of MariaDB.
-
 ## Setup
 
 1. Clone `cc-backend` repository in chosen base folder: `$> git clone https://github.com/ClusterCockpit/cc-backend.git`
