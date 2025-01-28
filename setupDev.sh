@@ -73,6 +73,39 @@ fi
 # rm -r ./data/job-archive-source
 # rm -r ./data/cc-metric-store-source
 
+if [ ! -d data/mariadb ]; then
+    mkdir -p data/mariadb
+    cat > data/mariadb/01.databases.sql <<EOF
+CREATE DATABASE IF NOT EXISTS \`ccbackend\`;
+EOF
+else
+    echo "'data/mariadb' already exists!"
+fi
+
+if [ ! -d data/ldap ]; then
+    mkdir -p data/ldap
+    cat > data/ldap/add_users.ldif <<EOF
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+ou: users
+
+dn: uid=ldapuser,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Ldap User
+sn: User
+uid: ldapuser
+uidNumber: 1
+gidNumber: 1
+homeDirectory: /home/ldapuser
+userPassword: {SSHA}sQRqFQtuiupej7J/rbrQrTwYEHDduV+N
+EOF
+
+else
+    echo "'data/ldap' already exists!"
+fi
+
 # prepare folders for influxdb2
 if [ ! -d data/influxdb ]; then
     mkdir -p data/influxdb/data
@@ -99,6 +132,8 @@ cd ../..
 
 docker-compose build
 docker-compose up -d
+
+cp -f config.json cc-backend/config.json
 
 echo ""
 echo "|--------------------------------------------------------------------------------------|"

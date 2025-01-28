@@ -175,7 +175,7 @@
         "directory": "/data/archive"
     },
     "http-api": {
-        "address": "localhost:8082",
+        "address": "0.0.0.0:8084",
         "https-cert-file": null,
         "https-key-file": null
     },

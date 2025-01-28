@@ -1,0 +1,77 @@
+{
+  "addr": "127.0.0.1:8080",
+  "short-running-jobs-duration": 300,
+  "archive": {
+    "kind": "file",
+    "path": "./var/job-archive"
+  },
+  "jwts": {
+    "max-age": "2000h"
+  },
+  "db-driver": "mysql",
+  "db": "root:root@tcp(0.0.0.0:3306)/ccbackend",
+  "ldap": {
+    "url": "ldap://0.0.0.0",
+    "user_base": "ou=users,dc=example,dc=com",
+    "search_dn": "cn=admin,dc=example,dc=com",
+    "user_bind": "uid={username},ou=users,dc=example,dc=com",
+    "user_filter": "(&(objectclass=posixAccount))",
+    "syncUserOnLogin": true
+  },
+  "enable-resampling": {
+    "trigger": 30,
+    "resolutions": [
+      600,
+      300,
+      120,
+      60
+    ]
+  },
+  "emission-constant": 317,
+  "clusters": [
+    {
+      "name": "fritz",
+      "metricDataRepository": {
+        "kind": "cc-metric-store",
+        "url": "http://0.0.0.0:8084",
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9BTkFMWVNUIiwiUk9MRV9VU0VSIl19.d-3_3FZTsadPjDEdsWrrQ7nS0edMAR4zjl-eK7rJU3HziNBfI9PDHDIpJVHTNN5E5SlLGLFXctWyKAkwhXL-Dw"
+      },
+      "filterRanges": {
+        "numNodes": {
+          "from": 1,
+          "to": 64
+        },
+        "duration": {
+          "from": 0,
+          "to": 86400
+        },
+        "startTime": {
+          "from": "2022-01-01T00:00:00Z",
+          "to": null
+        }
+      }
+    },
+    {
+      "name": "alex",
+      "metricDataRepository": {
+        "kind": "cc-metric-store",
+        "url": "http://0.0.0.0:8084",
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9BTkFMWVNUIiwiUk9MRV9VU0VSIl19.d-3_3FZTsadPjDEdsWrrQ7nS0edMAR4zjl-eK7rJU3HziNBfI9PDHDIpJVHTNN5E5SlLGLFXctWyKAkwhXL-Dw"
+      },
+      "filterRanges": {
+        "numNodes": {
+          "from": 1,
+          "to": 64
+        },
+        "duration": {
+          "from": 0,
+          "to": 86400
+        },
+        "startTime": {
+          "from": "2022-01-01T00:00:00Z",
+          "to": null
+        }
+      }
+    }
+  ]
+}
