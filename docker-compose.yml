@@ -3,15 +3,19 @@ services:
     container_name: nats
     image: nats:alpine
     ports:
-      - "4222:4222"
-      - "8222:8222"
+      - "0.0.0.0:4222:4222"
+      - "0.0.0.0:8222:8222"
+      - "0.0.0.0:6222:6222"
+    volumes:
+      - ${DATADIR}/nats:/data
+    entrypoint: ["/bin/sh", "/data/docker-entrypoint.sh"]
 
   cc-metric-store:
     container_name: cc-metric-store
     build:
       context: ./cc-metric-store
     ports:
-      - "8084:8084"
+      - "0.0.0.0:8084:8084"
     volumes:
       - ${DATADIR}/cc-metric-store:/data
     depends_on:
@@ -30,7 +34,7 @@ services:
       DOCKER_INFLUXDB_INIT_RETENTION: 100w
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
     ports:
-      - "127.0.0.1:${INFLUXDB_PORT}:8086"
+      - "0.0.0.0:8086:8086"
     volumes:
       - ${DATADIR}/influxdb/data:/var/lib/influxdb2
       - ${DATADIR}/influxdb/config:/etc/influxdb2
@@ -62,7 +66,7 @@ services:
       MARIADB_USER: slurm
       MARIADB_PASSWORD: demo
     ports:
-      - "0.0.0.0:${MARIADB_PORT}:3306"
+      - "0.0.0.0:3306:3306"
     volumes:
       - ${DATADIR}/mariadb:/docker-entrypoint-initdb.d
     cap_add:

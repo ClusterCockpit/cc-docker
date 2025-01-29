@@ -180,6 +180,22 @@
         "https-key-file": null
     },
     "retention-in-memory": "48h",
-    "nats": null,
+    "nats": [
+        {
+            "address": "nats://nats:4222",
+            "username": "root",
+            "password": "root",
+            "subscriptions": [
+                {
+                    "subscribe-to": "hpc-nats",
+                    "cluster-tag": "fritz"
+                },
+                {
+                    "subscribe-to": "hpc-nats",
+                    "cluster-tag": "alex"
+                }
+            ]
+        }
+    ],
     "jwt-public-key": "kzfYrYy+TzpanWZHJ5qSdMj5uKUWgq74BWhQG6copP0="
 }
