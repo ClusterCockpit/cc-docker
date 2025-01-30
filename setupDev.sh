@@ -16,7 +16,7 @@ echo "| 'sudo' keyword.                                                         
 echo "|--------------------------------------------------------------------------------------|"
 echo ""
 
-# Check cc-backend, touch job.db if exists
+# Check cc-backend if exists
 if [ ! -d cc-backend ]; then
     echo "'cc-backend' not yet prepared! Please clone cc-backend repository before starting this script."
     echo -n "Stopped."
@@ -44,14 +44,20 @@ else
     fi
 fi
 
+# Creates data directory if it does not exists.
+# Contains all the mount points required by all the docker services
+# and their static files.
 if [ ! -d data ]; then
     mkdir -m777 data
 fi
 
+# Invokes the dataGenerationScript.sh, which then populates the required
+# static files by the docker services. These static files are required by docker services after startup.
 chmod u+x dataGenerationScript.sh
 ./dataGenerationScript.sh
 
-# Update timestamps
+# Update timestamps for all the checkpoints in data/cc-metric-store-source
+# and dumps new files in data/cc-metric-store.
 perl ./migrateTimestamps.pl
 
 # Create archive folder for rewritten ccms checkpoints
@@ -64,13 +70,18 @@ if [ -d data/cc-metric-store-source ]; then
     rm -r data/cc-metric-store-source
 fi
 
+# Just in case user forgot manually shutdown the docker services.
 docker-compose down
 docker-compose down --remove-orphans
 
+# This automatically builds the base docker image for slurm.
+# All the slurm docker service in docker-compose.yml refer to
+# the base image created from this directory.
 cd slurm/base/
 make
 cd ../..
 
+# Starts all the docker services from docker-compose.yml.
 docker-compose build
 docker-compose up -d
 

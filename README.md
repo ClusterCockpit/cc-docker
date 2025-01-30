@@ -12,7 +12,7 @@ It includes the following containers:
 |Slurm Worker|node01|6818|
 |MariaDB service|mariadb|3306|
 |InfluxDB serice|influxdb|8086|
-|NATS service|nats|4222|
+|NATS service|nats|4222, 6222, 8222|
 |cc-metric-store service|cc-metric-store|8084|
 |OpenLDAP|openldap|389, 636|
 
@@ -62,23 +62,23 @@ Credentials for the preconfigured demo user are:
 * User: `demo`
 * Password: `demo`
 
+Credentials for the preconfigured LDAP user are:
+* User: `ldapuser`
+* Password: `ldapuser`
+
 You can also login as regular user using any credential in the LDAP user directory at `./data/ldap/users.ldif`.
 
-## Post-Setup adjustment for using `cc-metric-store`
+## Preconfigured setup between docker services and ClusterCockpit components
 
-When using `influxdb` as a metric database, one must adjust the following files:
-* `cc-backend/var/job-archive/fritz/cluster.json`
-* `cc-backend/var/job-archive/alex/cluster.json`
+When you are done cloning the cc-backend repo and once you execute `setupDev.sh` file, it will copy a preconfigured `config.json` from `misc/config.json` and replace the `cc-backend/config.json`, which will be used by cc-backend, once you start the server. 
+The preconfigured config.json attaches to:
+#### 1. MariaDB docker service on port 3306 (database: ccbackend)
+#### 2. OpenLDAP docker service on port 389
+#### 3. cc-metric-store docker service on port 8084
 
-In the JSON (cc-backend/config.json), exchange the content of the `metricDataRepository`-Entry (By default configured for `cc-metric-store`) with:
-```
-"metricDataRepository": 
-{
-        "kind": "cc-metric-store",
-        "url": "http://localhost:8082",
-        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9BTkFMWVNUIiwiUk9MRV9VU0VSIl19.d-3_3FZTsadPjDEdsWrrQ7nS0edMAR4zjl-eK7rJU3HziNBfI9PDHDIpJVHTNN5E5SlLGLFXctWyKAkwhXL-Dw"      
-}
-```
+cc-metric-store also has a preconfigured `config.json` in `cc-metric-store/config.json` which attaches to NATS docker service on port 4222 and subscribes to topic 'hpc-nats'.
+
+Basically, all the ClusterCockpit components and the docker services attach to each other like lego pieces.
 
 ## Docker commands to access the services
 

@@ -6,6 +6,11 @@ echo "| Starting file required by docker services in data/                      
 echo "|--------------------------------------------------------------------------------------|"
 
 # Download unedited checkpoint files to ./data/cc-metric-store-source/checkpoints
+# After this, migrateTimestamp.pl will run from setupDev.sh. This will update the timestamps
+# for all the checkpoint files, which then can be read by cc-metric-store.
+# cc-metric-store reads only data upto certain time, like 48 hours of data.
+# These checkpoint files have timestamp older than 48 hours and needs to be updated with
+# migrateTimestamp.pl file, which will be automatically invoked from setupDev.sh.
 if [ ! -d data/cc-metric-store-source ]; then
     mkdir -p data/cc-metric-store-source/checkpoints
     cd data/cc-metric-store-source/checkpoints
@@ -17,6 +22,10 @@ else
     echo "'data/cc-metric-store-source' already exists!"
 fi
 
+# A simple configuration file for mariadb docker service.
+# Required because you can specify only one database per docker service.
+# This file mentions the database to be created for cc-backend.
+# This file automatically picked by mariadb after the docker service starts.
 if [ ! -d data/mariadb ]; then
     mkdir -p data/mariadb
     cat > data/mariadb/01.databases.sql <<EOF
@@ -26,6 +35,9 @@ else
     echo "'data/mariadb' already exists!"
 fi
 
+# A simple configuration file for openldap docker service.
+# Creates a simple user 'ldapuser' with password 'ldapuser'.
+# This file automatically picked by openldap after the docker service starts.
 if [ ! -d data/ldap ]; then
     mkdir -p data/ldap
     cat > data/ldap/add_users.ldif <<EOF
@@ -50,6 +62,11 @@ else
     echo "'data/ldap' already exists!"
 fi
 
+# A simple configuration file for nats docker service.
+# Required because we need to execute custom commands after nats docker service starts.
+# This file automatically executed when the nats docker service starts.
+# After docker service starts, there is an infinite while loop that publises data for 'fritz' and 'alex' cluster 
+# to subject 'hpc-nats' every 1 minute. Random data is generated only for node level metrics, not hardware level metrics.
 if [ ! -d data/nats ]; then
     mkdir -p data/nats
     cat > data/nats/docker-entrypoint.sh <<EOF
@@ -100,7 +117,7 @@ else
     echo "'data/nats' already exists!"
 fi
 
-# prepare folders for influxdb2
+# prepare folders for influxdb3
 if [ ! -d data/influxdb ]; then
     mkdir -p data/influxdb/data
     mkdir -p data/influxdb/config
