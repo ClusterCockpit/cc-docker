@@ -87,26 +87,34 @@ echo "NATS is up and running. Executing custom script..."
 apk add curl
 curl -sf https://binaries.nats.dev/nats-io/natscli/nats@latest | sh
 
-# Run your custom script
+# This is a dummy data generation loop, that inserts data for given nodes at 1 min interval
 while true; do
 
+    # Timestamp in seconds
     timestamp="\$(date '+%s')"
 
+    # Generate data for alex cluster. Push to sample_alex.txt
     for metric in cpu_irq cpu_load mem_cached net_bytes_in cpu_user cpu_idle nfs4_read mem_used nfs4_write nfs4_total ib_xmit ib_xmit_pkts net_bytes_out cpu_iowait ib_recv cpu_system ib_recv_pkts; do
         for hostname in a0603 a0903 a0832 a0329 a0702 a0122 a1624 a0731 a0224 a0704 a0631 a0225 a0222 a0427 a0603 a0429 a0833 a0705 a0901 a0601 a0227 a0804 a0322 a0226 a0126 a0129 a0605 a0801 a0934; do
-            echo "\$metric,cluster=alex,hostname=\$hostname,type=node value=$((1 + RANDOM % 100)).0 \$timestamp" >sample_alex.txt
+            echo "\$metric,cluster=alex,hostname=\$hostname,type=node value=\$((1 + RANDOM % 100)).0 \$timestamp" >>sample_alex.txt
         done
     done
 
+    # Nats client will publish the data from sample_alex.txt to 'hpc-nats' subject on this nats server
     ./nats pub hpc-nats "\$(cat sample_alex.txt)" -s nats://0.0.0.0:4222 --user root --password root
 
+    # Generate data for fritz cluster. Push to sample_fritz.txt
     for metric in cpu_irq cpu_load mem_cached net_bytes_in cpu_user cpu_idle nfs4_read mem_used nfs4_write nfs4_total ib_xmit ib_xmit_pkts net_bytes_out cpu_iowait ib_recv cpu_system ib_recv_pkts; do
         for hostname in f0201 f0202 f0203 f0204 f0205 f0206 f0207 f0208 f0209 f0210 f0211 f0212 f0213 f0214 f0215 f0217 f0218 f0219 f0220 f0221 f0222 f0223 f0224 f0225 f0226 f0227 f0228 f0229; do
-            echo "\$metric,cluster=fritz,hostname=\$hostname,type=node value=$((1 + RANDOM % 100)).0 \$timestamp" >sample_fritz.txt
+            echo "\$metric,cluster=fritz,hostname=\$hostname,type=node value=\$((1 + RANDOM % 100)).0 \$timestamp" >>sample_fritz.txt
         done
     done
 
+    # Nats client will publish the data from sample_fritz.txt to 'hpc-nats' subject on this nats server
     ./nats pub hpc-nats "\$(cat sample_fritz.txt)" -s nats://0.0.0.0:4222 --user root --password root
+
+    rm sample_alex.txt
+    rm sample_fritz.txt
 
     sleep 1m
 

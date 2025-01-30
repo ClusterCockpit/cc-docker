@@ -81,8 +81,6 @@ if [ ! -d var ]; then
 else
     cd ..
     echo "'cc-backend/var' exists. Cautiously exiting."
-    echo -n "Stopped."
-    exit
 fi
 
 echo ""
