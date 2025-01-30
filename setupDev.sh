@@ -12,7 +12,7 @@ echo "| > sudo usermod -aG docker $USER                                         
 echo "|                                                                                      |"
 echo "| This will add docker to the sudo usergroup and all the docker                        |"
 echo "| command will run as sudo by default without requiring                                |"
-echo "| 'sudo' keyword.                                                                      |"  
+echo "| 'sudo' keyword.                                                                      |"
 echo "|--------------------------------------------------------------------------------------|"
 echo ""
 
@@ -21,27 +21,6 @@ if [ ! -d cc-backend ]; then
     echo "'cc-backend' not yet prepared! Please clone cc-backend repository before starting this script."
     echo -n "Stopped."
     exit
-else
-    cd cc-backend
-    if [ ! -d var ]; then
-        wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
-        tar xf job-archive-demo.tar
-        rm ./job-archive-demo.tar
-
-        cp ./configs/env-template.txt .env
-        cp -f ../misc/config.json config.json
-
-        make
-
-        ./cc-backend -migrate-db
-        ./cc-backend --init-db --add-user demo:admin:demo
-        cd ..
-    else
-        cd ..
-        echo "'cc-backend/var' exists. Cautiously exiting."
-        echo -n "Stopped."
-        exit
-    fi
 fi
 
 # Creates data directory if it does not exists.
@@ -84,6 +63,27 @@ cd ../..
 # Starts all the docker services from docker-compose.yml.
 docker-compose build
 docker-compose up -d
+
+cd cc-backend
+if [ ! -d var ]; then
+    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
+    tar xf job-archive-demo.tar
+    rm ./job-archive-demo.tar
+
+    cp ./configs/env-template.txt .env
+    cp -f ../misc/config.json config.json
+
+    make
+
+    ./cc-backend -migrate-db
+    ./cc-backend --init-db --add-user demo:admin:demo
+    cd ..
+else
+    cd ..
+    echo "'cc-backend/var' exists. Cautiously exiting."
+    echo -n "Stopped."
+    exit
+fi
 
 echo ""
 echo "|--------------------------------------------------------------------------------------|"
