@@ -1,48 +1,42 @@
 #!/bin/bash
+echo ""
+echo "|--------------------------------------------------------------------------------------|"
+echo "| Welcome to cc-docker automatic deployment script.                                    |"
+echo "| Make sure you have sudo rights to run docker services                                |"
+echo "| This script assumes that docker command is added to sudo group                       |"
+echo "| This means that docker commands do not explicitly require                            |"
+echo "| 'sudo' keyword to run. You can use this following command:                           |"
+echo "|                                                                                      |"
+echo "| > sudo groupadd docker                                                               |"
+echo "| > sudo usermod -aG docker $USER                                                      |"
+echo "|                                                                                      |"
+echo "| This will add docker to the sudo usergroup and all the docker                        |"
+echo "| command will run as sudo by default without requiring                                |"
+echo "| 'sudo' keyword.                                                                      |"
+echo "|--------------------------------------------------------------------------------------|"
+echo ""
 
-# Check cc-backend, touch job.db if exists
+# Check cc-backend if exists
 if [ ! -d cc-backend ]; then
     echo "'cc-backend' not yet prepared! Please clone cc-backend repository before starting this script."
     echo -n "Stopped."
     exit
-else
-    cd cc-backend
-    if [ ! -d var ]; then
-        mkdir var
-        touch var/job.db
-    else
-        echo "'cc-backend/var' exists. Cautiously exiting."
-        echo -n "Stopped."
-        exit
-    fi
 fi
 
-
-# Download unedited job-archive to ./data/job-archive-source
-if [ ! -d data/job-archive-source ]; then
-    cd data
-    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
-    tar xf job-archive-demo.tar
-    mv ./job-archive ./job-archive-source
-    rm ./job-archive-demo.tar
-    cd ..
-else
-    echo "'data/job-archive-source' already exists!"
+# Creates data directory if it does not exists.
+# Contains all the mount points required by all the docker services
+# and their static files.
+if [ ! -d data ]; then
+    mkdir -m777 data
 fi
 
-# Download unedited checkpoint files to ./data/cc-metric-store-source/checkpoints
-if [ ! -d data/cc-metric-store-source ]; then
-  mkdir -p data/cc-metric-store-source/checkpoints
-  cd data/cc-metric-store-source/checkpoints
-  wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/cc-metric-store-checkpoints.tar.xz
-  tar xf cc-metric-store-checkpoints.tar.xz
-  rm cc-metric-store-checkpoints.tar.xz
-  cd ../../../
-else
-    echo "'data/cc-metric-store-source' already exists!"
-fi
+# Invokes the dataGenerationScript.sh, which then populates the required
+# static files by the docker services. These static files are required by docker services after startup.
+chmod u+x dataGenerationScript.sh
+./dataGenerationScript.sh
 
-# Update timestamps
+# Update timestamps for all the checkpoints in data/cc-metric-store-source
+# and dumps new files in data/cc-metric-store.
 perl ./migrateTimestamps.pl
 
 # Create archive folder for rewritten ccms checkpoints
@@ -51,32 +45,54 @@ if [ ! -d data/cc-metric-store/archive ]; then
 fi
 
 # cleanup sources
-# rm -r ./data/job-archive-source
-# rm -r ./data/cc-metric-store-source
-
-# prepare folders for influxdb2
-if [ ! -d data/influxdb ]; then
-    mkdir -p data/influxdb/data
-    mkdir -p data/influxdb/config/influx-configs
-else
-    echo "'data/influxdb' already exists!"
+if [ -d data/cc-metric-store-source ]; then
+    rm -r data/cc-metric-store-source
 fi
 
-# Check dotenv-file and docker-compose-yml, copy accordingly if not present and build docker services
-if [ ! -d .env ]; then
-    cp templates/env.default ./.env
-fi
+# Just in case user forgot manually shutdown the docker services.
+docker-compose down
+docker-compose down --remove-orphans
 
-if [ ! -d docker-compose.yml ]; then
-    cp templates/docker-compose.yml.default ./docker-compose.yml
-fi
+# This automatically builds the base docker image for slurm.
+# All the slurm docker service in docker-compose.yml refer to
+# the base image created from this directory.
+cd slurm/base/
+make
+cd ../..
 
+# Starts all the docker services from docker-compose.yml.
 docker-compose build
-./cc-backend/cc-backend --init-db --add-user demo:admin:AdminDev
 docker-compose up -d
 
+cd cc-backend
+if [ ! -d var ]; then
+    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
+    tar xf job-archive-demo.tar
+    rm ./job-archive-demo.tar
+
+    cp ./configs/env-template.txt .env
+    cp -f ../misc/config.json config.json
+
+    make
+
+    ./cc-backend -migrate-db
+    ./cc-backend --init-db --add-user demo:admin:demo
+    cd ..
+else
+    cd ..
+    echo "'cc-backend/var' exists. Cautiously exiting."
+fi
+
 echo ""
-echo "Setup complete, containers are up by default: Shut down with 'docker-compose down'."
-echo "Use './cc-backend/cc-backend' to start cc-backend."
-echo "Use scripts in /scripts to load data into influx or mariadb."
-# ./cc-backend/cc-backend
+echo "|--------------------------------------------------------------------------------------|"
+echo "| Check logs for each slurm service by using these commands:                           |"
+echo "| docker-compose logs slurmctld                                                        |"
+echo "| docker-compose logs slurmdbd                                                         |"
+echo "| docker-compose logs slurmrestd                                                       |"
+echo "| docker-compose logs node01                                                           |"
+echo "|======================================================================================|"
+echo "| Setup complete, containers are up by default: Shut down with 'docker-compose down'.  |"
+echo "| Use './cc-backend/cc-backend -server' to start cc-backend.                           |"
+echo "| Use scripts in /scripts to load data into influx or mariadb.                         |"
+echo "|--------------------------------------------------------------------------------------|"
+echo ""

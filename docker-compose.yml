@@ -3,15 +3,19 @@ services:
     container_name: nats
     image: nats:alpine
     ports:
-      - "4222:4222"
-      - "8222:8222"
+      - "0.0.0.0:4222:4222"
+      - "0.0.0.0:8222:8222"
+      - "0.0.0.0:6222:6222"
+    volumes:
+      - ${DATADIR}/nats:/data
+    entrypoint: ["/bin/sh", "/data/docker-entrypoint.sh"]
 
   cc-metric-store:
     container_name: cc-metric-store
     build:
       context: ./cc-metric-store
     ports:
-      - "8084:8084"
+      - "0.0.0.0:8084:8084"
     volumes:
       - ${DATADIR}/cc-metric-store:/data
     depends_on:
@@ -19,8 +23,8 @@ services:
 
   influxdb:
     container_name: influxdb
-    image: influxdb
-    command: ["--reporting-disabled"]
+    image: influxdb:latest
+    command: ["--reporting-disabled", "--log-level=debug"]
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
       DOCKER_INFLUXDB_INIT_USERNAME: devel
@@ -30,7 +34,7 @@ services:
       DOCKER_INFLUXDB_INIT_RETENTION: 100w
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
     ports:
-      - "127.0.0.1:${INFLUXDB_PORT}:8086"
+      - "0.0.0.0:8086:8086"
     volumes:
       - ${DATADIR}/influxdb/data:/var/lib/influxdb2
       - ${DATADIR}/influxdb/config:/etc/influxdb2
@@ -40,9 +44,15 @@ services:
     image: osixia/openldap:1.5.0
     command: --copy-service --loglevel debug
     environment:
-      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
-      - LDAP_ORGANISATION=${LDAP_ORGANISATION}
-      - LDAP_DOMAIN=${LDAP_DOMAIN}
+      - LDAP_ADMIN_PASSWORD=mashup
+      - LDAP_ORGANISATION=Example Organization
+      - LDAP_DOMAIN=example.com
+      - LDAP_LOGGING=true
+      - LDAP_CONNECTION=default
+      - LDAP_CONNECTIONS=default
+      - LDAP_DEFAULT_HOSTS=0.0.0.0
+    ports:
+      - "0.0.0.0:389:389"
     volumes:
       - ${DATADIR}/ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom
 
@@ -51,36 +61,18 @@ services:
     image: mariadb:latest
     command: ["--default-authentication-plugin=mysql_native_password"]
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: slurm_acct_db
       MARIADB_USER: slurm
       MARIADB_PASSWORD: demo
     ports:
-      - "127.0.0.1:${MARIADB_PORT}:3306"
+      - "0.0.0.0:3306:3306"
     volumes:
-      - ${DATADIR}/mariadb:/etc/mysql/conf.d
-      # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
+      - ${DATADIR}/mariadb:/docker-entrypoint-initdb.d
     cap_add:
       - SYS_NICE
 
-  # mysql:
-  #   container_name: mysql
-  #   image: mysql:8.0.22
-  #   command: ["--default-authentication-plugin=mysql_native_password"]
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
-  #     MYSQL_USER: ${MYSQL_USER}
-  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-  #   ports:
-  #     - "127.0.0.1:${MYSQL_PORT}:3306"
-  #   # volumes:
-  #     # - ${DATADIR}/sql-init:/docker-entrypoint-initdb.d
-  #     # - ${DATADIR}/sqldata:/var/lib/mysql
-  #   cap_add:
-  #     - SYS_NICE
-
-  slurm-controller:
+  slurmctld:
     container_name: slurmctld
     hostname: slurmctld
     build:
@@ -89,40 +81,66 @@ services:
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/controller/slurm.conf:/home/config/slurm.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ${DATADIR}/slurm/state:/var/lib/slurm/d
+    ports:
+      - "6817:6817"
 
-  slurm-database:
-    container_name: slurmdb
-    hostname: slurmdb
+  slurmdbd:
+    container_name: slurmdbd
+    hostname: slurmdbd
     build:
       context: ./slurm/database
     depends_on:
       - mariadb
-      - slurm-controller
+      - slurmctld
     privileged: true
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/database/slurmdbd.conf:/home/config/slurmdbd.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "6819:6819"
 
-  slurm-worker01:
+  node01:
     container_name: node01
     hostname: node01
     build:
       context: ./slurm/worker
     depends_on:
-      - slurm-controller
+      - slurmctld
     privileged: true
     volumes:
       - ${DATADIR}/slurm/home:/home
       - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/worker/cgroup.conf:/home/config/cgroup.conf
+      - ./slurm/controller/slurm.conf:/home/config/slurm.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "6818:6818"
 
-  # slurm-worker02:
-  #   container_name: node02
-    # hostname: node02
-  #   build:
-  #     context: ./slurm/worker
-  #   depends_on:
-  #     - slurm-controller
-  #   privileged: true
-  #   volumes:
-      # - ${DATADIR}/slurm/home:/home
-      # - ${DATADIR}/slurm/secret:/.secret
+  slurmrestd:
+    container_name: slurmrestd
+    hostname: slurmrestd
+    build:
+      context: ./slurm/rest
+    environment:
+      - SLURM_JWT=daemon
+      - SLURMRESTD_DEBUG=9
+    depends_on:
+      - slurmctld
+    privileged: true
+    volumes:
+      - ${DATADIR}/slurm/home:/home
+      - ${DATADIR}/slurm/secret:/.secret
+      - ./slurm/controller/slurm.conf:/home/config/slurm.conf
+      - ./slurm/rest/slurmrestd.conf:/home/config/slurmrestd.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "6820:6820"
