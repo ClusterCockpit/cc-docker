@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 echo ""
 echo "|--------------------------------------------------------------------------------------|"
 echo "| Welcome to cc-docker automatic deployment script.                                    |"
@@ -18,16 +19,27 @@ echo ""
 
 # Check cc-backend if exists
 if [ ! -d cc-backend ]; then
-    echo "'cc-backend' not yet prepared! Please clone cc-backend repository before starting this script."
-    echo -n "Stopped."
-    exit
+  echo "'cc-backend' not yet prepared! Please clone cc-backend repository before starting this script."
+  echo -n "Stopped."
+  exit
 fi
 
+# Check if required perl modules are installed
+if ./scripts/checkPerlModules.pl migrateTimestamps.pl | grep "couldn't load"; then
+  echo "Perl Modules missing!"
+  echo -n "Stopped."
+  exit
+else
+  echo "Perl Modules loaded."
+fi
+
+echo -n "GET HERE."
+exit
 # Creates data directory if it does not exists.
 # Contains all the mount points required by all the docker services
 # and their static files.
 if [ ! -d data ]; then
-    mkdir -m777 data
+  mkdir -m777 data
 fi
 
 # Invokes the dataGenerationScript.sh, which then populates the required
@@ -41,12 +53,12 @@ perl ./migrateTimestamps.pl
 
 # Create archive folder for rewritten ccms checkpoints
 if [ ! -d data/cc-metric-store/archive ]; then
-    mkdir -p data/cc-metric-store/archive
+  mkdir -p data/cc-metric-store/archive
 fi
 
 # cleanup sources
 if [ -d data/cc-metric-store-source ]; then
-    rm -r data/cc-metric-store-source
+  rm -r data/cc-metric-store-source
 fi
 
 # Just in case user forgot manually shutdown the docker services.
@@ -66,21 +78,21 @@ docker-compose up -d
 
 cd cc-backend
 if [ ! -d var ]; then
-    wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
-    tar xf job-archive-demo.tar
-    rm ./job-archive-demo.tar
+  wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
+  tar xf job-archive-demo.tar
+  rm ./job-archive-demo.tar
 
-    cp ./configs/env-template.txt .env
-    cp -f ../misc/config.json config.json
+  cp ./configs/env-template.txt .env
+  cp -f ../misc/config.json config.json
 
-    make
+  make
 
-    ./cc-backend -migrate-db
-    ./cc-backend --init-db --add-user demo:admin:demo
-    cd ..
+  ./cc-backend -migrate-db
+  ./cc-backend --init-db --add-user demo:admin:demo
+  cd ..
 else
-    cd ..
-    echo "'cc-backend/var' exists. Cautiously exiting."
+  cd ..
+  echo "'cc-backend/var' exists. Cautiously exiting."
 fi
 
 echo ""
