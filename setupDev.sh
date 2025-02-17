@@ -24,17 +24,9 @@ if [ ! -d cc-backend ]; then
   exit
 fi
 
-# Check if required perl modules are installed
-if ./scripts/checkPerlModules.pl migrateTimestamps.pl | grep "couldn't load"; then
-  echo "Perl Modules missing!"
-  echo -n "Stopped."
-  exit
-else
-  echo "Perl Modules loaded."
-fi
+chmod u+x scripts/checkModules.sh
+./scripts/checkModules.sh
 
-echo -n "GET HERE."
-exit
 # Creates data directory if it does not exists.
 # Contains all the mount points required by all the docker services
 # and their static files.
