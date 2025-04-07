@@ -38,6 +38,27 @@ services:
     volumes:
       - ${DATADIR}/ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom
 
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+
+  keycloak:
+    container_name: keycloak
+    build:
+      context: ./keycloak
+      args:
+        PG_KC_URL: postgres
+        PG_KC_USER: keycloak
+        PG_KC_PASS: password
+    ports:
+      - "0.0.0.0:8080:8080"
+    restart: always
+    command: --verbose start --optimized
+
   mariadb:
     container_name: mariadb
     image: mariadb:latest
@@ -126,21 +147,3 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "6820:6820"
-
-  # influxdb:
-  #   container_name: influxdb
-  #   image: influxdb:latest
-  #   command: ["--reporting-disabled", "--log-level=debug"]
-  #   environment:
-  #     DOCKER_INFLUXDB_INIT_MODE: setup
-  #     DOCKER_INFLUXDB_INIT_USERNAME: devel
-  #     DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
-  #     DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
-  #     DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
-  #     DOCKER_INFLUXDB_INIT_RETENTION: 100w
-  #     DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
-  #   ports:
-  #     - "0.0.0.0:8086:8086"
-  #   volumes:
-  #     - ${DATADIR}/influxdb/data:/var/lib/influxdb2
-  #     - ${DATADIR}/influxdb/config:/etc/influxdb2
