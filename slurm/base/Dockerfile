@@ -5,7 +5,7 @@ ENV SLURM_VERSION=24.05.3
 ENV HTTP_PARSER_VERSION=2.8.0
 
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN ARCH=$(uname -m) && yum install -y https://rpmfind.net/linux/almalinux/8.10/PowerTools/x86_64/os/Packages/http-parser-devel-2.8.0-9.el8.$ARCH.rpm
+RUN ARCH=$(uname -m) && yum install -y https://rpmfind.net/linux/almalinux/8.10/PowerTools/$ARCH/os/Packages/http-parser-devel-2.8.0-9.el8.$ARCH.rpm
 
 RUN groupadd -g 981 munge \
   && useradd  -m -c "MUNGE Uid 'N' Gid Emporium" -d /var/lib/munge -u 981 -g munge  -s /sbin/nologin munge \
@@ -15,25 +15,25 @@ RUN groupadd -g 981 munge \
   && useradd  -m -c "Workflow user" -d /home/worker -u 982 -g worker  -s /bin/bash worker
 
 RUN yum install -y munge munge-libs rng-tools \
-    python3 gcc openssl openssl-devel \
-    openssh-server openssh-clients dbus-devel \
-    pam-devel numactl numactl-devel hwloc sudo \
-    lua readline-devel ncurses-devel man2html \
-    autoconf automake json-c-devel libjwt-devel \
-    libibmad libibumad rpm-build perl-ExtUtils-MakeMaker.noarch rpm-build make wget
+  python3 gcc openssl openssl-devel \
+  openssh-server openssh-clients dbus-devel \
+  pam-devel numactl numactl-devel hwloc sudo \
+  lua readline-devel ncurses-devel man2html \
+  autoconf automake json-c-devel libjwt-devel \
+  libibmad libibumad rpm-build perl-ExtUtils-MakeMaker.noarch rpm-build make wget
 
 RUN dnf --enablerepo=powertools install -y munge-devel rrdtool-devel lua-devel hwloc-devel mariadb-server mariadb-devel
 
 RUN mkdir -p /usr/local/slurm-tmp \ 
-    && cd /usr/local/slurm-tmp \
-    && wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 \
-    && rpmbuild -ta --with slurmrestd --with jwt slurm-${SLURM_VERSION}.tar.bz2
+  && cd /usr/local/slurm-tmp \
+  && wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 \
+  && rpmbuild -ta --with slurmrestd --with jwt slurm-${SLURM_VERSION}.tar.bz2
 
 RUN ARCH=$(uname -m) \
-    && yum -y --nogpgcheck localinstall \
-        /root/rpmbuild/RPMS/$ARCH/slurm-${SLURM_VERSION}*.$ARCH.rpm \
-        /root/rpmbuild/RPMS/$ARCH/slurm-perlapi-${SLURM_VERSION}*.$ARCH.rpm \
-        /root/rpmbuild/RPMS/$ARCH/slurm-slurmctld-${SLURM_VERSION}*.$ARCH.rpm
+  && yum -y --nogpgcheck localinstall \
+  /root/rpmbuild/RPMS/$ARCH/slurm-${SLURM_VERSION}*.$ARCH.rpm \
+  /root/rpmbuild/RPMS/$ARCH/slurm-perlapi-${SLURM_VERSION}*.$ARCH.rpm \
+  /root/rpmbuild/RPMS/$ARCH/slurm-slurmctld-${SLURM_VERSION}*.$ARCH.rpm
 
 VOLUME ["/home", "/.secret"]
 #   22:         SSH

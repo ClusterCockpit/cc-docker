@@ -61,8 +61,13 @@ If you are using different linux flavors, you will have to adapt
    size of 338MB (mostly for the cc-metric-store data).
 
 3. The setup-script launches the supporting container stack in the background
-   automatically if everything went well. Run `$> ./cc-backend/cc-backend
--server -dev` to start `cc-backend`.
+   automatically if everything went well. Run
+
+``` bash
+./cc-backend/cc-backend -server -dev
+```
+
+to start `cc-backend`.
 
 4. By default, you can access `cc-backend` in your browser at
    `http://localhost:8080`. You can shut down the cc-backend server by pressing
@@ -153,7 +158,7 @@ cluster i.e. node01.
 In order to execute slurm commands, you may need to **`bash`** into the
 **`slurmctld`** docker service.
 
-```
+``` bash
 docker exec -it slurmctld bash
 ```
 
@@ -228,4 +233,3 @@ Roughly 2700 jobs from the first week of 2021 are loaded with data from InfluxDB
 Some views of ClusterCockpit (e.g. the Users view) show the last week or month.
 To show some data there you have to set the filter to time periods with jobs
 (August 2020 to January 2021).
-

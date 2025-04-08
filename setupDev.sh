@@ -27,6 +27,26 @@ fi
 chmod u+x scripts/checkModules.sh
 ./scripts/checkModules.sh
 
+# check if docker-compose is installed and available
+if ! docker-compose --version; then
+  echo "Docker-compose not installed!"
+else
+  echo "docker-compose available."
+  export DOCKER_COMPOSE="docker-compose"
+fi
+
+if ! docker compose version; then
+  echo "Docker-compose not installed!"
+else
+  echo "docker compose available."
+  export DOCKER_COMPOSE="docker compose"
+fi
+
+if [[ -z "${DOCKER_COMPOSE}" ]]; then
+  echo -n "Stopped."
+  exit
+fi
+
 # Creates data directory if it does not exists.
 # Contains all the mount points required by all the docker services
 # and their static files.
@@ -54,8 +74,8 @@ if [ -d data/cc-metric-store-source ]; then
 fi
 
 # Just in case user forgot manually shutdown the docker services.
-docker-compose down
-docker-compose down --remove-orphans
+$DOCKER_COMPOSE down
+$DOCKER_COMPOSE down --remove-orphans
 
 # This automatically builds the base docker image for slurm.
 # All the slurm docker service in docker-compose.yml refer to
@@ -65,8 +85,8 @@ make
 cd ../..
 
 # Starts all the docker services from docker-compose.yml.
-docker-compose build
-docker-compose up -d
+$DOCKER_COMPOSE build
+$DOCKER_COMPOSE up -d
 
 cd cc-backend
 if [ ! -d var ]; then

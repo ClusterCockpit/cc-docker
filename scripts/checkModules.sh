@@ -29,15 +29,6 @@ else
   echo "Docker installed."
 fi
 
-# check if docker-compose is installed and available
-if ! docker-compose --version; then
-  echo "Docker-compose not installed!"
-  echo -n "Stopped."
-  exit
-else
-  echo "Docker-compose installed."
-fi
-
 # check if npm is installed and available
 if ! npm --version; then
   echo "NPM not installed!"
