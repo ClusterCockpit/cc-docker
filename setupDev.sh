@@ -39,6 +39,33 @@ fi
 chmod u+x dataGenerationScript.sh
 ./dataGenerationScript.sh
 
+cd cc-backend
+
+rm -rf var
+
+if [ ! -d var ]; then
+  wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
+  tar xf job-archive-demo.tar
+  rm ./job-archive-demo.tar
+
+  cp ./configs/env-template.txt .env
+  cp ./configs/config-demo.json config.json
+
+  sed -i 's/"addr": *"127\.0\.0\.1:8080"/"addr": "0.0.0.0:8080"/' config.json
+
+  make
+
+  ./cc-backend -migrate-db
+  ./cc-backend --init-db --add-user demo:admin,api:demo
+
+  JWT=$(./cc-backend -jwt demo | awk -F': ' '/Successfully generated JWT/ {print $3}')
+  cd ..
+  sed -i "s/\"ccRestJwt\": \"\"/\"ccRestJwt\": \"$JWT\"/" data/slurm/home/worker/CCSA/config.json
+
+else
+  cd ..
+fi
+
 # Update timestamps for all the checkpoints in data/cc-metric-store-source
 # and dumps new files in data/cc-metric-store.
 perl ./migrateTimestamps.pl
@@ -68,24 +95,6 @@ cd ../..
 docker-compose build
 docker-compose up -d
 
-cd cc-backend
-if [ ! -d var ]; then
-  wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
-  tar xf job-archive-demo.tar
-  rm ./job-archive-demo.tar
-
-  cp ./configs/env-template.txt .env
-  cp -f ../misc/config.json config.json
-
-  make
-
-  ./cc-backend -migrate-db
-  ./cc-backend --init-db --add-user demo:admin:demo
-  cd ..
-else
-  cd ..
-  echo "'cc-backend/var' exists. Cautiously exiting."
-fi
 
 echo ""
 echo "|--------------------------------------------------------------------------------------|"

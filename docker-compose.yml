@@ -69,6 +69,8 @@ services:
       - ${DATADIR}/slurm/state:/var/lib/slurm/d
     ports:
       - "6817:6817"
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
 
   slurmdbd:
     container_name: slurmdbd
@@ -126,21 +128,3 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "6820:6820"
-
-  # influxdb:
-  #   container_name: influxdb
-  #   image: influxdb:latest
-  #   command: ["--reporting-disabled", "--log-level=debug"]
-  #   environment:
-  #     DOCKER_INFLUXDB_INIT_MODE: setup
-  #     DOCKER_INFLUXDB_INIT_USERNAME: devel
-  #     DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
-  #     DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
-  #     DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
-  #     DOCKER_INFLUXDB_INIT_RETENTION: 100w
-  #     DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
-  #   ports:
-  #     - "0.0.0.0:8086:8086"
-  #   volumes:
-  #     - ${DATADIR}/influxdb/data:/var/lib/influxdb2
-  #     - ${DATADIR}/influxdb/config:/etc/influxdb2

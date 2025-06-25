@@ -35,8 +35,8 @@ _sshd_host() {
 _ssh_worker() {
     if [[ ! -d /home/worker ]]; then
         mkdir -p /home/worker
-        chown -R worker:worker /home/worker
     fi
+    chown -R worker:worker /home/worker
     cat >/home/worker/setup-worker-ssh.sh <<EOF2
 mkdir -p ~/.ssh
 chmod 0700 ~/.ssh
@@ -187,6 +187,8 @@ _slurmctld() {
     sudo yum install -y iputils
     sudo yum install -y lsof
     sudo yum install -y jq
+    sudo yum install -y git
+    sudo yum install -y go
 
     _openssl_jwt_key
 
@@ -210,8 +212,36 @@ _slurmctld() {
     sleep 2s
     echo "Starting slurmctld"
     cp -f /etc/slurm/slurm.conf /.secret/
-    /usr/sbin/slurmctld -Dvv
+    /usr/sbin/slurmctld -Dvv &
     echo "Started slurmctld"
+
+    echo "Cloning cc-slurm-adapter"
+    git clone https://github.com/ClusterCockpit/cc-slurm-adapter.git
+    echo "Cloned cc-slurm-adapter"
+
+    cd cc-slurm-adapter
+
+    echo "Building cc-slurm-adapter"
+    go build
+    echo "Completed building cc-slurm-adapter"
+
+    mkdir /run/cc-slurm-adapter/
+    chmod 777 /run/cc-slurm-adapter/
+
+    cp -f /home/worker/CCSA/config.json .
+    JWT=$(cat config.json | grep "ccRestJwt" | awk -F': ' '/"ccRestJwt"/ {print $2}' | tr -d '"')
+
+    while true; do
+        if curl -X 'GET' 'http://host.docker.internal:8080/api/clusters/' -H 'accept: application/json' --head -H "X-Auth-Token: $JWT" | grep -q "200 OK"; then
+            echo "Service is UP at $(date)"
+            break
+        else
+            echo "Service is still DOWN at $(date)"
+        fi
+        sleep 2
+    done
+
+    ./cc-slurm-adapter -daemon -config config.json -debug 1 &
 }
 
 ### main ###

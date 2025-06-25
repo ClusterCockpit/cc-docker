@@ -28,7 +28,7 @@ fi
 # This file automatically picked by mariadb after the docker service starts.
 if [ ! -d data/mariadb ]; then
     mkdir -p data/mariadb
-    cat > data/mariadb/01.databases.sql <<EOF
+    cat >data/mariadb/01.databases.sql <<EOF
 CREATE DATABASE IF NOT EXISTS \`ccbackend\`;
 EOF
 else
@@ -40,7 +40,7 @@ fi
 # This file automatically picked by openldap after the docker service starts.
 if [ ! -d data/ldap ]; then
     mkdir -p data/ldap
-    cat > data/ldap/add_users.ldif <<EOF
+    cat >data/ldap/add_users.ldif <<EOF
 dn: ou=users,dc=example,dc=com
 objectClass: organizationalUnit
 ou: users
@@ -65,11 +65,11 @@ fi
 # A simple configuration file for nats docker service.
 # Required because we need to execute custom commands after nats docker service starts.
 # This file automatically executed when the nats docker service starts.
-# After docker service starts, there is an infinite while loop that publises data for 'fritz' and 'alex' cluster 
+# After docker service starts, there is an infinite while loop that publises data for 'fritz' and 'alex' cluster
 # to subject 'hpc-nats' every 1 minute. Random data is generated only for node level metrics, not hardware level metrics.
 if [ ! -d data/nats ]; then
     mkdir -p data/nats
-    cat > data/nats/docker-entrypoint.sh <<EOF
+    cat >data/nats/docker-entrypoint.sh <<EOF
 #!/bin/sh
 set -e
 
@@ -125,12 +125,24 @@ else
     echo "'data/nats' already exists!"
 fi
 
-# prepare folders for influxdb3
-if [ ! -d data/influxdb ]; then
-    mkdir -p data/influxdb/data
-    mkdir -p data/influxdb/config
+if [ ! -d data/slurm/home/worker/CCSA ]; then
+    mkdir -p data/slurm/home/worker/CCSA
+
+    cat >data/slurm/home/worker/CCSA/config.json <<EOF
+{
+    "pidFilePath": "/home/worker/CCSA/daemon.pid",
+    "ipcSockPath": "/home/worker/CCSA/daemon.sock",
+    "lastRunPath": "/home/worker/CCSA/last_run",
+    "slurmPollInterval": 10,
+    "ccRestUrl": "http://host.docker.internal:8080",
+    "ccRestJwt": ""
+}
+EOF
+
+chmod 777 data/slurm/home/worker/CCSA/config.json
+
 else
-    echo "'data/influxdb' already exists!"
+    echo "'data/slurm/worker' already exists!"
 fi
 
 echo ""
