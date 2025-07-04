@@ -8,8 +8,9 @@
   "jwts": {
     "max-age": "2000h"
   },
-  "db-driver": "mysql",
-  "db": "root:root@tcp(0.0.0.0:3306)/ccbackend",
+  "apiAllowedIPs": [
+    "*"
+  ],
   "ldap": {
     "url": "ldap://0.0.0.0",
     "user_base": "ou=users,dc=example,dc=com",

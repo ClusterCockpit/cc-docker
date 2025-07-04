@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 cd scripts
 
 # Check if required perl modules are installed

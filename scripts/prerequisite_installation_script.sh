@@ -1,5 +1,7 @@
 #!/bin/bash -l
 
+set -euo pipefail
+
 sudo apt-get update
 sudo apt-get upgrade -f -y
 
@@ -33,7 +35,7 @@ sudo cpan Time::Piece
 sudo cpan Sort::Versions
 
 sudo groupadd docker
-sudo usermod -aG docker ubuntu
+sudo usermod -aG docker $USER
 
 sudo shutdown -r -t 0
 

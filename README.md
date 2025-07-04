@@ -10,13 +10,11 @@ It includes the following containers:
 |Slurm Database service|slurmdbd|6817|
 |Slurm Rest service with JWT authentication|slurmrestd|6820|
 |Slurm Worker|node01|6818|
-|MariaDB service|mariadb|3306|
-|InfluxDB serice|influxdb|8086|
 |NATS service|nats|4222, 6222, 8222|
 |cc-metric-store service|cc-metric-store|8084|
 |OpenLDAP|openldap|389, 636|
 
-The setup comes with fixture data for a Job archive, cc-metric-store checkpoints, InfluxDB, MariaDB, and a LDAP user directory.
+The setup comes with fixture data for a Job archive, cc-metric-store checkpoints, and a LDAP user directory.
 
 ## Prerequisites
 
@@ -44,11 +42,11 @@ Note: You can install all these dependencies via predefined installation steps i
 
 If you are using different linux flavors, you will have to adapt `prerequisite_installation_script.sh` as well as `setupDev.sh`.
 
-## Setup
+## Setup Procedure
 
 1. Clone `cc-backend` repository in chosen base folder: `$> git clone https://github.com/ClusterCockpit/cc-backend.git`
 
-2. Run `$ ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the cc-metric-store data).
+2. Run the setup bash file: `$> ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the cc-metric-store data).
 
 3. The setup-script launches the supporting container stack in the background automatically if everything went well. Run `$> ./cc-backend/cc-backend -server -dev` to start `cc-backend`.
 
@@ -72,9 +70,9 @@ You can also login as regular user using any credential in the LDAP user directo
 
 When you are done cloning the cc-backend repo and once you execute `setupDev.sh` file, it will copy a preconfigured `config.json` from `misc/config.json` and replace the `cc-backend/config.json`, which will be used by cc-backend, once you start the server. 
 The preconfigured config.json attaches to:
-#### 1. MariaDB docker service on port 3306 (database: ccbackend)
-#### 2. OpenLDAP docker service on port 389
-#### 3. cc-metric-store docker service on port 8084
+#### 1. OpenLDAP docker service on port 389
+#### 2. cc-metric-store docker service on port 8084
+#### 3. cc-slurm-adapter is running on slurmctld docker service.
 
 cc-metric-store also has a preconfigured `config.json` in `cc-metric-store/config.json` which attaches to NATS docker service on port 4222 and subscribes to topic 'hpc-nats'.
 
@@ -94,7 +92,7 @@ Now that you can see the docker services, and if you want to manually access the
 
 > **`Example`**: You want to run slurm commands like `sinfo` or `squeue` or `scontrol` on slurm controller, you cannot directly access it.
 
-You need to **`bash`** into the running service by using the following command:
+You need to open a **`bash`** session in the running service by using the following command:
 
 ```
 $ docker exec -it <docker service name> bash
@@ -103,7 +101,7 @@ $ docker exec -it <docker service name> bash
 $ docker exec -it slurmctld bash
 
 #or
-$ docker exec -it mariadb bash
+$ docker exec -it cc-metric-store bash
 ```
 
 Once you start a **`bash`** on any docker service, then you may execute any service related commands in that **`bash`**.
@@ -147,7 +145,7 @@ You may also use the never expiring token directly from the file for any of your
 ## Known Issues
 
 * `docker-compose` installed on Ubuntu (18.04, 20.04) via `apt-get` can not correctly parse `docker-compose.yml` due to version differences. Install latest version of `docker-compose` from https://docs.docker.com/compose/install/ instead.
-* You need to ensure that no other web server is running on ports 8080 (cc-backend), 8082 (cc-metric-store), 8086 (InfluxDB), 4222 and 8222 (Nats), or 3306 (MariaDB). If one or more ports are already in use, you have to adapt the related config accordingly.
+* You need to ensure that no other web server is running on ports 8080 (cc-backend), 8084 (cc-metric-store), 4222 and 8222 (Nats). If one or more ports are already in use, you have to adapt the related config accordingly.
 * Existing VPN connections sometimes cause problems with docker. If `docker-compose` does not start up correctly, try disabling any active VPN connection. Refer to https://stackoverflow.com/questions/45692255/how-make-openvpn-work-with-docker for further information.
 
 ## Docker services and restarting the services

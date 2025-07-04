@@ -91,8 +91,8 @@ services:
       - "6819:6819"
 
   node01:
-    container_name: node01
-    hostname: node01
+    container_name: f0101
+    hostname: f0101
     build:
       context: ./slurm/worker
     depends_on:

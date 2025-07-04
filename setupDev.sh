@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 echo ""
 echo "|--------------------------------------------------------------------------------------|"
 echo "| Welcome to cc-docker automatic deployment script.                                    |"
@@ -41,15 +41,13 @@ chmod u+x dataGenerationScript.sh
 
 cd cc-backend
 
-rm -rf var
-
 if [ ! -d var ]; then
   wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
   tar xf job-archive-demo.tar
   rm ./job-archive-demo.tar
 
   cp ./configs/env-template.txt .env
-  cp ./configs/config-demo.json config.json
+  cp ../misc/config.json config.json
 
   sed -i 's/"addr": *"127\.0\.0\.1:8080"/"addr": "0.0.0.0:8080"/' config.json
 

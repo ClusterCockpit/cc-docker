@@ -208,7 +208,7 @@ _slurmctld() {
         sleep 2
     done
 
-    sacctmgr -i add cluster name=linux
+    sacctmgr -i add cluster name=fritz
     sleep 2s
     echo "Starting slurmctld"
     cp -f /etc/slurm/slurm.conf /.secret/

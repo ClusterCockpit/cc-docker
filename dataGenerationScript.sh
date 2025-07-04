@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+
 echo ""
 echo "|--------------------------------------------------------------------------------------|"
 echo "| This is Data generation script for docker services                                   |"
