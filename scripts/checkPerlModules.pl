@@ -16,15 +16,22 @@ while (<IN>) {
   }
 }
 close IN;
+my $fail = 0;
+
 for my $code (@modules) {
   my ( undef, $library ) = split( / /, $code );    # get the module name
   $library =~ s/;//;                               # clean up the name
   eval $code;
   if ($@) {
     warn "couldn't load $library: $@", "\n";
-  } else {
-    print "$library looks ok\n";
+    $fail = 1;
   }
+}
+
+if ($fail) {
+  exit 0;
+} else {
+  exit 1;
 }
 
 sub help
