@@ -7,19 +7,19 @@ InfluxDB, LDAP, SLURM), or easily added by manual configuration (MariaDB).
 
 It includes the following containers:
 
-|Service full name|docker service name|port|
-| --- | --- | --- |
-|Slurm Controller service|slurmctld|6818|
-|Slurm Database service|slurmdbd|6817|
-|Slurm Rest service with JWT authentication|slurmrestd|6820|
-|Slurm Worker|node01|6818|
-|NATS service|nats|4222, 6222, 8222|
-|cc-metric-store service|cc-metric-store|8084|
-|OpenLDAP|openldap|389, 636|
+| Service full name | docker service name | port             |
+| ----------------- | ------------------- | ---------------- |
+| Slurm Controller  | slurmctld           | 6818             |
+| Slurm Database    | slurmdbd            | 6817             |
+| Slurm Rest (JWT)  | slurmrestd          | 6820             |
+| Slurm Worker      | node01              | 6818             |
+| NATS service      | nats                | 4222, 6222, 8222 |
+| cc-metric-store   | cc-metric-store     | 8084             |
+| KeyCloak          | keycloak            | 8080             |
+| OpenLDAP          | openldap            | 389, 636         |
 
-dev
-The setup comes with fixture data for a Job archive, cc-metric-store checkpoints, and a LDAP user directory.
-
+The setup comes with fixture data for a Job archive, cc-metric-store
+checkpoints, and a LDAP user directory.
 
 ## Prerequisites
 
@@ -40,7 +40,7 @@ You can use:
 
 ```
 sudo groupadd docker
-sudo usermod -aG docker $USER 
+sudo usermod -aG docker $USER
 
 # restart after adding your docker with your user to sudo group
 sudo shutdown -r -t 0
@@ -49,55 +49,58 @@ sudo shutdown -r -t 0
 Note: You can install all these dependencies via predefined installation steps
 in `prerequisite_installation_script.sh`.
 
-If you are using different linux flavors, you will have to adapt
+If you are using different Linux flavors, you will have to adapt
 `prerequisite_installation_script.sh` as well as `setupDev.sh`.
 
 ## Setup Procedure
 
 1. Clone `cc-backend` repository in chosen base folder: `$> git clone https://github.com/ClusterCockpit/cc-backend.git`
 
-2. Run the setup bash file: `$> ./setupDev.sh`:  **NOTICE** The script will download files of a total size of 338MB (mostly for the cc-metric-store data).
+2. Run the setup bash file: `$> ./setupDev.sh`: **NOTICE** The script will
+   download files of a total size of 338MB (mostly for the cc-metric-store
+   data).
 
 3. The setup-script launches the supporting container stack in the background
    automatically if everything went well. Run
 
-
-``` bash
+```bash
 ./cc-backend/cc-backend -server -dev
 ```
 
 to start `cc-backend`.
 
-4. By default, you can access `cc-backend` in your browser at
+1. By default, you can access `cc-backend` in your browser at
    `http://localhost:8080`. You can shut down the cc-backend server by pressing
-`CTRL-C`, remember to also shut down all containers via `$> docker-compose down`
-afterwards.
+   `CTRL-C`, remember to also shut down all containers via `$> docker-compose down`
+   afterwards.
 
-5. You can restart the containers with: `$> docker-compose up -d`.
+2. You can restart the containers with: `$> docker-compose up -d`.
 
 ## Credentials for logging into clustercockpit
 
 Credentials for the preconfigured demo user are:
 
-* User: `demo`
-* Password: `demo`
+- User: `demo`
+- Password: `demo`
 
 Credentials for the preconfigured LDAP user are:
 
-* User: `ldapuser`
-* Password: `ldapuser`
+- User: `ldapuser`
+- Password: `ldapuser`
 
 You can also login as regular user using any credential in the LDAP user
 directory at `./data/ldap/users.ldif`.
 
 ## Preconfigured setup between docker services and ClusterCockpit components
 
-When you are done cloning the cc-backend repo and once you execute `setupDev.sh` file, it will copy a preconfigured `config.json` from `misc/config.json` and replace the `cc-backend/config.json`, which will be used by cc-backend, once you start the server. 
+When you are done cloning the cc-backend repo and once you execute `setupDev.sh` file, it will copy a preconfigured `config.json` from `misc/config.json` and replace the `cc-backend/config.json`, which will be used by cc-backend, once you start the server.
 The preconfigured config.json attaches to:
-#### 1. OpenLDAP docker service on port 389
-#### 2. cc-metric-store docker service on port 8084
-#### 3. cc-slurm-adapter is running on slurmctld docker service.
 
+#### 1. OpenLDAP docker service on port 389
+
+#### 2. cc-metric-store docker service on port 8084
+
+#### 3. cc-slurm-adapter is running on slurmctld docker service
 
 cc-metric-store also has a preconfigured `config.json` in
 `cc-metric-store/config.json` which attaches to NATS docker service on port 4222
@@ -153,26 +156,26 @@ cluster i.e. node01.
 In order to execute slurm commands, you may need to **`bash`** into the
 **`slurmctld`** docker service.
 
-``` bash
+```bash
 docker exec -it slurmctld bash
 ```
 
 Then you may be able to run slurm controller commands. A few examples without
 output are:
 
-``` bash
+```bash
 sinfo
 ```
 
 or
 
-``` bash
+```bash
 squeue
 ```
 
 or
 
-``` bash
+```bash
 scontrol show nodes
 ```
 
@@ -190,10 +193,9 @@ custom CURL commands.
 
 ## Known Issues
 
-* `docker-compose` installed on Ubuntu (18.04, 20.04) via `apt-get` can not correctly parse `docker-compose.yml` due to version differences. Install latest version of `docker-compose` from https://docs.docker.com/compose/install/ instead.
-* You need to ensure that no other web server is running on ports 8080 (cc-backend), 8084 (cc-metric-store), 4222 and 8222 (Nats). If one or more ports are already in use, you have to adapt the related config accordingly.
-* Existing VPN connections sometimes cause problems with docker. If `docker-compose` does not start up correctly, try disabling any active VPN connection. Refer to https://stackoverflow.com/questions/45692255/how-make-openvpn-work-with-docker for further information.
-
+- `docker-compose` installed on Ubuntu (18.04, 20.04) via `apt-get` can not correctly parse `docker-compose.yml` due to version differences. Install latest version of `docker-compose` from <https://docs.docker.com/compose/install/> instead.
+- You need to ensure that no other web server is running on ports 8080 (cc-backend), 8084 (cc-metric-store), 4222 and 8222 (Nats). If one or more ports are already in use, you have to adapt the related config accordingly.
+- Existing VPN connections sometimes cause problems with docker. If `docker-compose` does not start up correctly, try disabling any active VPN connection. Refer to <https://stackoverflow.com/questions/45692255/how-make-openvpn-work-with-docker> for further information.
 
 ## Docker services and restarting the services
 
@@ -202,14 +204,14 @@ modify it.
 
 Whenever you modify it, please use
 
-``` bash
+```bash
 docker compose down
 ```
 
 in order to shut down all the services in all the VM’s (maininstance,
 nodeinstance, nodeinstance2) and then start all the services by using
 
-``` bash
+```bash
 docker compose up
 ```
 
