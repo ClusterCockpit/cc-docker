@@ -59,22 +59,6 @@ services:
     restart: always
     command: --verbose start --optimized
 
-  mariadb:
-    container_name: mariadb
-    image: mariadb:latest
-    command: ["--default-authentication-plugin=mysql_native_password"]
-    environment:
-      MARIADB_ROOT_PASSWORD: root
-      MARIADB_DATABASE: slurm_acct_db
-      MARIADB_USER: slurm
-      MARIADB_PASSWORD: demo
-    ports:
-      - "0.0.0.0:3306:3306"
-    volumes:
-      - ${DATADIR}/mariadb:/docker-entrypoint-initdb.d
-    cap_add:
-      - SYS_NICE
-
   slurmctld:
     container_name: slurmctld
     hostname: slurmctld
@@ -91,7 +75,7 @@ services:
     ports:
       - "6817:6817"
     extra_hosts:
-    - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway"
 
   slurmdbd:
     container_name: slurmdbd
@@ -128,25 +112,3 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "6818:6818"
-
-  slurmrestd:
-    container_name: slurmrestd
-    hostname: slurmrestd
-    build:
-      context: ./slurm/rest
-    environment:
-      - SLURM_JWT=daemon
-      - SLURMRESTD_DEBUG=9
-    depends_on:
-      - slurmctld
-    privileged: true
-    volumes:
-      - ${DATADIR}/slurm/home:/home
-      - ${DATADIR}/slurm/secret:/.secret
-      - ./slurm/controller/slurm.conf:/home/config/slurm.conf
-      - ./slurm/rest/slurmrestd.conf:/home/config/slurmrestd.conf
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - "6820:6820"
-
