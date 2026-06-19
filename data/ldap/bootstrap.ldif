@@ -1,0 +1,239 @@
+# ClusterCockpit Bootstrap LDAP Directory
+# =========================================
+# Domain: dc=example,dc=com  (LDAP_DOMAIN=example.com in docker-compose.yml)
+# Admin DN: cn=admin,dc=example,dc=com  (set via LDAP_ADMIN_PASSWORD env)
+#
+# All test user passwords: "password"
+#   {SHA} hash verification: slappasswd -h {SHA} -s password
+#
+# Suggested cc-backend ldap config (config.json):
+#   "url":         "ldap://ldap:389"
+#   "user-base":   "ou=people,dc=example,dc=com"
+#   "search-dn":   "uid=ccbinduser,ou=people,dc=example,dc=com"
+#   "user-bind":   "uid={username},ou=people,dc=example,dc=com"
+#   "user-filter": "(&(objectclass=posixAccount)(!(uid=ccbinduser)))"
+#   "username-attr": "gecos"
+#   "uid-attr":    "uid"
+#   "sync-password": "password"
+#
+# ClusterCockpit roles (from cc-lib/schema/user.go):
+#   anonymous < api < user < manager < support < admin
+# =========================================
+
+# ---------------------------------------------------------------------------
+# Organizational Units
+# ---------------------------------------------------------------------------
+
+dn: ou=people,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+description: HPC user accounts
+
+dn: ou=groups,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+description: HPC project groups and ClusterCockpit role groups
+
+# ---------------------------------------------------------------------------
+# Service account used by cc-backend for LDAP search binding
+# ---------------------------------------------------------------------------
+
+dn: uid=ccbinduser,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: CC Bind User
+sn: BindUser
+uid: ccbinduser
+uidNumber: 500
+gidNumber: 500
+homeDirectory: /home/ccbinduser
+description: Service account for cc-backend LDAP search
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# ---------------------------------------------------------------------------
+# Test users
+# Role membership is tracked via cc-role-* groups below.
+# ---------------------------------------------------------------------------
+
+# admin01 — ClusterCockpit admin
+dn: uid=admin01,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Admin User
+sn: User
+uid: admin01
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/admin01
+gecos: Admin User
+mail: admin01@example.com
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# support01 — ClusterCockpit support staff
+dn: uid=support01,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Support User
+sn: User
+uid: support01
+uidNumber: 1002
+gidNumber: 1001
+homeDirectory: /home/support01
+gecos: Support User
+mail: support01@example.com
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# manager01 — ClusterCockpit project manager
+dn: uid=manager01,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Manager User
+sn: User
+uid: manager01
+uidNumber: 1003
+gidNumber: 1001
+homeDirectory: /home/manager01
+gecos: Manager User
+mail: manager01@example.com
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# user01 — regular HPC user
+dn: uid=user01,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Regular User 01
+sn: User
+uid: user01
+uidNumber: 1010
+gidNumber: 1001
+homeDirectory: /home/user01
+gecos: Regular User 01
+mail: user01@example.com
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# user02 — regular HPC user (also member of a project group)
+dn: uid=user02,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Regular User 02
+sn: User
+uid: user02
+uidNumber: 1011
+gidNumber: 1001
+homeDirectory: /home/user02
+gecos: Regular User 02
+mail: user02@example.com
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# user03 — regular HPC user (also member of a project group)
+dn: uid=user03,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Regular User 03
+sn: User
+uid: user03
+uidNumber: 1012
+gidNumber: 1001
+homeDirectory: /home/user03
+gecos: Regular User 03
+mail: user03@example.com
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# apiuser01 — programmatic/service API access
+dn: uid=apiuser01,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: API User 01
+sn: User
+uid: apiuser01
+uidNumber: 1020
+gidNumber: 1001
+homeDirectory: /home/apiuser01
+gecos: API User 01
+mail: apiuser01@example.com
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+# ---------------------------------------------------------------------------
+# ClusterCockpit role groups
+# These map to cc-lib Role constants:  admin, support, manager, user, api
+# cc-backend can use these for group-based user filtering or future role sync.
+# Example user-filter to restrict login to group members:
+#   (&(objectclass=posixAccount)(memberOf=cn=cc-users,ou=groups,dc=example,dc=com))
+# Note: memberOf requires the memberof overlay; use memberUid for posixGroup.
+# ---------------------------------------------------------------------------
+
+dn: cn=cc-admins,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: cc-admins
+gidNumber: 2000
+description: ClusterCockpit administrators (role: admin)
+memberUid: admin01
+
+dn: cn=cc-support,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: cc-support
+gidNumber: 2001
+description: ClusterCockpit support staff (role: support)
+memberUid: support01
+
+dn: cn=cc-managers,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: cc-managers
+gidNumber: 2002
+description: ClusterCockpit project managers (role: manager)
+memberUid: manager01
+
+dn: cn=cc-users,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: cc-users
+gidNumber: 2003
+description: ClusterCockpit regular users (role: user)
+memberUid: user01
+memberUid: user02
+memberUid: user03
+
+dn: cn=cc-api,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: cc-api
+gidNumber: 2004
+description: ClusterCockpit API/service accounts (role: api)
+memberUid: apiuser01
+
+# ---------------------------------------------------------------------------
+# HPC project groups (for testing manager project-scoping)
+# A manager assigned to project hpc_proj_alpha can view all jobs in that project.
+# ---------------------------------------------------------------------------
+
+dn: cn=hpc_proj_alpha,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: hpc_proj_alpha
+gidNumber: 3001
+description: HPC project alpha
+memberUid: manager01
+memberUid: user01
+memberUid: user02
+
+dn: cn=hpc_proj_beta,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: hpc_proj_beta
+gidNumber: 3002
+description: HPC project beta
+memberUid: manager01
+memberUid: user03
