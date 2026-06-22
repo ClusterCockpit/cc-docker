@@ -5,10 +5,10 @@ set -euo pipefail
 cd scripts
 
 # Check if required perl modules are installed
-if ./checkPerlModules.pl ../migrateTimestamps.pl | grep "couldn't load"; then
+if ! ./checkPerlModules.pl ../migrateTimestamps.pl; then
   echo "Perl Modules missing!"
   echo -n "Stopped."
-  exit
+  exit 1
 else
   echo "Perl Modules loaded."
 fi
@@ -17,7 +17,7 @@ fi
 if ! go version; then
   echo "Golang not installed!"
   echo -n "Stopped."
-  exit
+  exit 1
 else
   echo "Golang installed."
 fi
@@ -26,7 +26,7 @@ fi
 if ! docker --version; then
   echo "Docker not installed!"
   echo -n "Stopped."
-  exit
+  exit 1
 else
   echo "Docker installed."
 fi
@@ -35,7 +35,7 @@ fi
 if ! npm --version; then
   echo "NPM not installed!"
   echo -n "Stopped."
-  exit
+  exit 1
 else
   echo "NPM installed."
 fi
@@ -44,7 +44,7 @@ fi
 if ! make --version; then
   echo "Make not installed!"
   echo -n "Stopped."
-  exit
+  exit 1
 else
   echo "Make installed."
 fi
@@ -53,7 +53,7 @@ fi
 if ! gcc --version; then
   echo "GCC not installed!"
   echo -n "Stopped."
-  exit
+  exit 1
 else
   echo "GCC installed."
 fi

@@ -29,9 +29,9 @@ for my $code (@modules) {
 }
 
 if ($fail) {
-  exit 0;
-} else {
   exit 1;
+} else {
+  exit 0;
 }
 
 sub help

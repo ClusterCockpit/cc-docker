@@ -6,3 +6,4 @@ data/cc-metric-store-source
 data/slurm
 cc-backend/**
 .vscode
+cc-backend
