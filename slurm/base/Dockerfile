@@ -1,11 +1,9 @@
-FROM rockylinux:8
+FROM almalinux:9
 LABEL org.opencontainers.image.authors="jan.eitzinger@fau.de"
 
 ENV SLURM_VERSION=24.05.3
-ENV HTTP_PARSER_VERSION=2.8.0
 
-RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN ARCH=$(uname -m) && yum install -y https://rpmfind.net/linux/almalinux/8.10/PowerTools/$ARCH/os/Packages/http-parser-devel-2.8.0-9.el8.$ARCH.rpm
+RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 
 RUN groupadd -g 981 munge \
   && useradd  -m -c "MUNGE Uid 'N' Gid Emporium" -d /var/lib/munge -u 981 -g munge  -s /sbin/nologin munge \
@@ -18,11 +16,11 @@ RUN yum install -y munge munge-libs rng-tools \
   python3 gcc openssl openssl-devel \
   openssh-server openssh-clients dbus-devel \
   pam-devel numactl numactl-devel hwloc sudo \
-  lua readline-devel ncurses-devel man2html \
-  autoconf automake json-c-devel libjwt-devel \
+  lua readline-devel ncurses-devel \
+  autoconf automake libjwt-devel \
   libibmad libibumad rpm-build perl-ExtUtils-MakeMaker.noarch rpm-build make wget
 
-RUN dnf --enablerepo=powertools install -y munge-devel rrdtool-devel lua-devel hwloc-devel mariadb-server mariadb-devel
+RUN dnf --enablerepo=crb install -y munge-devel rrdtool-devel lua-devel hwloc-devel mariadb-server mariadb-devel http-parser-devel json-c-devel
 
 RUN mkdir -p /usr/local/slurm-tmp \ 
   && cd /usr/local/slurm-tmp \

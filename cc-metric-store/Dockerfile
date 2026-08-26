@@ -1,4 +1,4 @@
-FROM golang:1.22.4
+FROM golang:1.26.4
 
 RUN apt-get update
 RUN apt-get -y install git

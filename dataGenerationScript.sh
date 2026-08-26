@@ -37,15 +37,43 @@ else
     echo "'data/mariadb' already exists!"
 fi
 
-# A simple configuration file for openldap docker service.
-# Creates a simple user 'ldapuser' with password 'ldapuser'.
-# This file automatically picked by openldap after the docker service starts.
+# Configuration file for the openldap docker service.
+# Creates the dev users (password == uid) and the cc-* role groups used by
+# auth.ldap.role-filters in config.json.
+# This file is automatically picked up by openldap on first start.
 if [ ! -d data/ldap ]; then
     mkdir -p data/ldap
-    cat >data/ldap/add_users.ldif <<EOF
+    cat >data/ldap/add_users.ldif <<'LDIF'
+# ClusterCockpit dev LDAP directory
+# =================================
+# Applied by the osixia/openldap container on first init via
+# /container/service/slapd/assets/config/bootstrap/ldif/custom.
+#
+# Every account's password equals its uid (e.g. ccadmin / ccadmin).
+# Hashes are {SSHA}; regenerate with `slappasswd -h {SSHA} -s <password>`.
+#
+# Role sync (auth.ldap.role-filters in config.json) matches on the memberOf
+# attribute of the *user* entry. The memberof overlay of this image maintains
+# memberOf for groupOfUniqueNames/uniqueMember, so the group entries below must
+# come after the user entries they reference.
+
+# ---------------------------------------------------------------------------
+# Organizational units
+# ---------------------------------------------------------------------------
+
 dn: ou=users,dc=example,dc=com
 objectClass: organizationalUnit
+objectClass: top
 ou: users
+
+dn: ou=groups,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+# ---------------------------------------------------------------------------
+# Users
+# ---------------------------------------------------------------------------
 
 dn: uid=ldapuser,ou=users,dc=example,dc=com
 objectClass: inetOrgPerson
@@ -55,10 +83,104 @@ cn: Ldap User
 sn: User
 uid: ldapuser
 uidNumber: 1
-gidNumber: 1
+gidNumber: 100
 homeDirectory: /home/ldapuser
-userPassword: {SSHA}sQRqFQtuiupej7J/rbrQrTwYEHDduV+N
-EOF
+userPassword: {SSHA}0OhsiEb+IXanz71bd7jyFhvy0xhPJ34e
+
+dn: uid=ccadmin,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: CC Admin
+sn: Admin
+uid: ccadmin
+uidNumber: 2000
+gidNumber: 100
+homeDirectory: /home/ccadmin
+userPassword: {SSHA}HfIVI9GeNot9ea5bSXgKNcF6kP0MUyfv
+
+dn: uid=ccsupport,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: CC Support
+sn: Support
+uid: ccsupport
+uidNumber: 2001
+gidNumber: 100
+homeDirectory: /home/ccsupport
+userPassword: {SSHA}7zCZNDYQZPZl8jcBSkU+UnmxCR8lD9sm
+
+dn: uid=ccmanager,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: CC Manager
+sn: Manager
+uid: ccmanager
+uidNumber: 2002
+gidNumber: 100
+homeDirectory: /home/ccmanager
+userPassword: {SSHA}DKcUb2h8DWbDtTjXtIvwDi4Bf29vzhKK
+
+dn: uid=ccapi,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: CC Api
+sn: Api
+uid: ccapi
+uidNumber: 2003
+gidNumber: 100
+homeDirectory: /home/ccapi
+userPassword: {SSHA}dhcxIxs883hX2CTpkQp7cNgc0+puJ23z
+
+dn: uid=ccuser,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: CC User
+sn: User
+uid: ccuser
+uidNumber: 2004
+gidNumber: 100
+homeDirectory: /home/ccuser
+userPassword: {SSHA}UKYfiDmhT/H01R20rtYYOBj7t/w7yLyW
+
+# ---------------------------------------------------------------------------
+# Role groups
+# The memberof overlay of this image is configured for groupOfUniqueNames /
+# uniqueMember, so these classes are required for memberOf to be maintained.
+# ---------------------------------------------------------------------------
+
+dn: cn=cc-admin,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: cc-admin
+description: Grants the ClusterCockpit admin role
+uniqueMember: uid=ccadmin,ou=users,dc=example,dc=com
+
+dn: cn=cc-support,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: cc-support
+description: Grants the ClusterCockpit support role
+uniqueMember: uid=ccsupport,ou=users,dc=example,dc=com
+
+dn: cn=cc-manager,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: cc-manager
+description: Grants the ClusterCockpit manager role
+uniqueMember: uid=ccmanager,ou=users,dc=example,dc=com
+
+dn: cn=cc-api,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: cc-api
+description: Grants the ClusterCockpit api role
+uniqueMember: uid=ccapi,ou=users,dc=example,dc=com
+LDIF
 
 else
     echo "'data/ldap' already exists!"

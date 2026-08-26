@@ -65,11 +65,7 @@ if [ ! -d var ]; then
   wget https://hpc-mover.rrze.uni-erlangen.de/HPC-Data/0x7b58aefb/eig7ahyo6fo2bais0ephuf2aitohv1ai/job-archive-demo.tar
   tar xf job-archive-demo.tar
   rm ./job-archive-demo.tar
-
-  cp ./configs/env-template.txt .env
   cp ../misc/config.json config.json
-
-  sed -i 's/"addr": *"127\.0\.0\.1:8080"/"addr": "0.0.0.0:8080"/' config.json
 
   make
 
@@ -112,7 +108,6 @@ cd ../..
 # Starts all the docker services from docker-compose.yml.
 $DOCKER_COMPOSE build
 $DOCKER_COMPOSE up -d
-
 
 echo ""
 echo "|--------------------------------------------------------------------------------------|"

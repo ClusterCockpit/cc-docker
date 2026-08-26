@@ -57,7 +57,11 @@ services:
     ports:
       - "0.0.0.0:8080:8080"
     restart: always
-    command: --verbose start --optimized
+    depends_on:
+      - postgres
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import:ro
+    command: --verbose start --optimized --import-realm
 
   mariadb:
     container_name: mariadb

@@ -70,7 +70,8 @@ If you are using different Linux flavors, you will have to adapt
 to start `cc-backend`.
 
 1. By default, you can access `cc-backend` in your browser at
-   `http://localhost:8080`. You can shut down the cc-backend server by pressing
+   `http://localhost:8088` (port 8080 is taken by the KeyCloak container). You
+   can shut down the cc-backend server by pressing
    `CTRL-C`, remember to also shut down all containers via `$> docker-compose down`
    afterwards.
 
@@ -83,24 +84,127 @@ Credentials for the preconfigured demo user are:
 - User: `demo`
 - Password: `demo`
 
-Credentials for the preconfigured LDAP user are:
+The LDAP user directory is defined in `./data/ldap/add_users.ldif`. Every
+account's password equals its user name:
 
-- User: `ldapuser`
-- Password: `ldapuser`
+| User        | Group        | Role in ClusterCockpit |
+| ----------- | ------------ | ---------------------- |
+| `ldapuser`  | –            | `user`                 |
+| `ccuser`    | –            | `user`                 |
+| `ccadmin`   | `cc-admin`   | `user`, `admin`        |
+| `ccsupport` | `cc-support` | `user`                 |
+| `ccmanager` | `cc-manager` | `user`                 |
+| `ccapi`     | `cc-api`     | `user`                 |
 
-You can also login as regular user using any credential in the LDAP user
-directory at `./data/ldap/users.ldif`.
+### LDAP role sync
+
+cc-backend can derive elevated roles from LDAP group membership via
+`auth.ldap.role-filters` in `config.json`. Each entry maps a role to an LDAP
+filter that is evaluated against the *user* entry; the preconfigured setup maps
+the `cc-admin` group to the `admin` role:
+
+```json
+"role-filters": {
+  "admin": "(memberOf=cn=cc-admin,ou=groups,dc=example,dc=com)"
+}
+```
+
+The `memberOf` attribute is maintained automatically by the `memberof` overlay
+of the openldap image, which is configured for `groupOfUniqueNames` /
+`uniqueMember` — the group entries in the ldif use those classes accordingly.
+
+LDAP is authoritative for every role listed in `role-filters`: a role is granted
+when the filter matches and revoked when it no longer does. Roles that are not
+listed are never touched. To exercise the other groups, add them as well:
+
+```json
+"role-filters": {
+  "admin": "(memberOf=cn=cc-admin,ou=groups,dc=example,dc=com)",
+  "support": "(memberOf=cn=cc-support,ou=groups,dc=example,dc=com)",
+  "manager": "(memberOf=cn=cc-manager,ou=groups,dc=example,dc=com)",
+  "api": "(memberOf=cn=cc-api,ou=groups,dc=example,dc=com)"
+}
+```
+
+Roles are applied when the account is first synced (`sync-user-on-login`) and
+refreshed on every subsequent login (`update-user-on-login`), as well as by the
+periodic sync task (`sync-interval`).
+
+> Note: The ldif is only applied when the openldap container initialises its
+> database. After changing it, recreate the container and its volumes with
+> `docker compose rm -sfv openldap`, or load the changes into the running
+> directory manually with `ldapadd`.
+
+### OIDC login via KeyCloak
+
+The KeyCloak container imports the realm `clustercockpit` from
+`./keycloak/import/clustercockpit-realm.json` on first start. It defines the
+confidential client `cc-backend`, the realm roles `cc-admin`, `cc-support`,
+`cc-manager` and `cc-api`, and these accounts (password equals user name):
+
+| User        | Realm role   | Role in ClusterCockpit |
+| ----------- | ------------ | ---------------------- |
+| `kcuser`    | –            | `user`                 |
+| `kcadmin`   | `cc-admin`   | `admin`                |
+| `kcsupport` | `cc-support` | `user`                 |
+| `kcmanager` | `cc-manager` | `user`                 |
+| `kcapi`     | `cc-api`     | `user`                 |
+
+The KeyCloak admin console is at `http://localhost:8080` (`admin` / `admin`).
+
+The `auth.oidc.role-mapping` section of `config.json` translates realm roles
+into ClusterCockpit roles. The preconfigured setup maps `cc-admin` to `admin`:
+
+```json
+"oidc": {
+  "provider": "http://localhost:8080/realms/clustercockpit",
+  "client-id": "cc-backend",
+  "client-secret": "cc-backend-dev-secret",
+  "sync-user-on-login": true,
+  "update-user-on-login": true,
+  "role-mapping": {
+    "cc-admin": "admin"
+  }
+}
+```
+
+Unlike the LDAP role filters, `role-mapping` is the *sole* source of roles for
+OIDC logins: a role in the token grants a ClusterCockpit role only if it is
+listed here, and unmapped roles are ignored — literal role names such as `admin`
+would also have to be mapped explicitly. Accounts without a mapped role get
+`user`. Add the remaining groups to exercise them:
+
+```json
+"role-mapping": {
+  "cc-admin": "admin",
+  "cc-support": "support",
+  "cc-manager": "manager",
+  "cc-api": "api"
+}
+```
+
+Roles are read from the `realm_access.roles` claim of the **ID token**. The
+built-in KeyCloak `roles` client scope only adds that claim to the *access*
+token, so the imported client carries its own `realm roles in id token`
+protocol mapper with `id.token.claim` enabled. Keep that mapper when editing
+the realm, otherwise every OIDC login falls back to the plain `user` role.
+
+> Note: `cc-backend` resolves the OIDC provider at startup and aborts if it is
+> unreachable, so the KeyCloak container has to be up before starting the
+> server. The realm is only imported while the KeyCloak database is empty —
+> to re-import after editing the realm file, recreate KeyCloak *and* its
+> database with `docker compose rm -sf keycloak postgres`.
 
 ## Preconfigured setup between docker services and ClusterCockpit components
 
 When you are done cloning the cc-backend repo and once you execute `setupDev.sh` file, it will copy a preconfigured `config.json` from `misc/config.json` and replace the `cc-backend/config.json`, which will be used by cc-backend, once you start the server.
 The preconfigured config.json attaches to:
 
-#### 1. OpenLDAP docker service on port 389
+### 1. OpenLDAP docker service on port 389
 
-#### 2. cc-metric-store docker service on port 8084
+### 2. cc-metric-store docker service on port 8084
 
-#### 3. cc-slurm-adapter is running on slurmctld docker service
+### 3. cc-slurm-adapter is running on slurmctld docker service
 
 cc-metric-store also has a preconfigured `config.json` in
 `cc-metric-store/config.json` which attaches to NATS docker service on port 4222
@@ -194,7 +298,7 @@ custom CURL commands.
 ## Known Issues
 
 - `docker-compose` installed on Ubuntu (18.04, 20.04) via `apt-get` can not correctly parse `docker-compose.yml` due to version differences. Install latest version of `docker-compose` from <https://docs.docker.com/compose/install/> instead.
-- You need to ensure that no other web server is running on ports 8080 (cc-backend), 8084 (cc-metric-store), 4222 and 8222 (Nats). If one or more ports are already in use, you have to adapt the related config accordingly.
+- You need to ensure that no other web server is running on ports 8088 (cc-backend), 8080 (KeyCloak), 8084 (cc-metric-store), 4222 and 8222 (Nats). If one or more ports are already in use, you have to adapt the related config accordingly.
 - Existing VPN connections sometimes cause problems with docker. If `docker-compose` does not start up correctly, try disabling any active VPN connection. Refer to <https://stackoverflow.com/questions/45692255/how-make-openvpn-work-with-docker> for further information.
 
 ## Docker services and restarting the services

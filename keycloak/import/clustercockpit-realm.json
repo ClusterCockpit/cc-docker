@@ -1,0 +1,111 @@
+{
+  "realm": "clustercockpit",
+  "displayName": "ClusterCockpit",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      { "name": "cc-admin", "description": "Grants the ClusterCockpit admin role" },
+      { "name": "cc-support", "description": "Grants the ClusterCockpit support role" },
+      { "name": "cc-manager", "description": "Grants the ClusterCockpit manager role" },
+      { "name": "cc-api", "description": "Grants the ClusterCockpit api role" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "cc-backend",
+      "name": "ClusterCockpit Backend",
+      "description": "Confidential OIDC client used by cc-backend",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "cc-backend-dev-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8088/oidc-callback",
+        "http://127.0.0.1:8088/oidc-callback"
+      ],
+      "webOrigins": [
+        "http://localhost:8088",
+        "http://127.0.0.1:8088"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:8088/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm roles in id token",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "kcadmin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "KC",
+      "lastName": "Admin",
+      "email": "kcadmin@example.com",
+      "credentials": [{ "type": "password", "value": "kcadmin", "temporary": false }],
+      "realmRoles": ["default-roles-clustercockpit", "cc-admin"]
+    },
+    {
+      "username": "kcsupport",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "KC",
+      "lastName": "Support",
+      "email": "kcsupport@example.com",
+      "credentials": [{ "type": "password", "value": "kcsupport", "temporary": false }],
+      "realmRoles": ["default-roles-clustercockpit", "cc-support"]
+    },
+    {
+      "username": "kcmanager",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "KC",
+      "lastName": "Manager",
+      "email": "kcmanager@example.com",
+      "credentials": [{ "type": "password", "value": "kcmanager", "temporary": false }],
+      "realmRoles": ["default-roles-clustercockpit", "cc-manager"]
+    },
+    {
+      "username": "kcapi",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "KC",
+      "lastName": "Api",
+      "email": "kcapi@example.com",
+      "credentials": [{ "type": "password", "value": "kcapi", "temporary": false }],
+      "realmRoles": ["default-roles-clustercockpit", "cc-api"]
+    },
+    {
+      "username": "kcuser",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "KC",
+      "lastName": "User",
+      "email": "kcuser@example.com",
+      "credentials": [{ "type": "password", "value": "kcuser", "temporary": false }],
+      "realmRoles": ["default-roles-clustercockpit"]
+    }
+  ]
+}

@@ -4,15 +4,11 @@
 
 Use [Docker](https://www.docker.com/) to explore the various components of [Slurm](https://www.schedmd.com/index.php)
 
-This work represents a small exploratory Slurm cluster using CentOS 7 based Docker images. The intent was to learn the basics of Slurm prior to extending the concept to a more distributed environment.
+This work represents a small exploratory Slurm cluster using AlmaLinux 9 based Docker images.
 
 Images include:
 
-- [Slurm 19.05.1](https://slurm.schedmd.com) - installed from [rpm packages](packages)
-- [OpenMPI 3.0.1](https://www.open-mpi.org/doc/current/) - installed from [rpm packages](packages)
-- [Lmod 7.7](http://lmod.readthedocs.io/en/latest/index.html) - installed from [distribution files](https://sourceforge.net/projects/lmod/files/)
-  - [Lmod module packages for CentOS 7](https://github.com/scidas/lmod-modules-centos) - Organized for Slurm-in-Docker use
-  - [Using Lmod with Slurm-in-Docker](using-lmod-with-slurm-in-docker.md) documentation
+- [Slurm 24.05.3](https://slurm.schedmd.com) - built from source RPMs inside the container
 
 ## Contents
 
@@ -63,33 +59,24 @@ TODO: Have software check validity of custom configuration files.
 
 ## Build
 
-Build the slurm RPM files by following the instructions in the [packages](packages) directory.
-
 **Create the base Slurm image**:
-
-Copy the `packages/centos-7/rpms` directory to the `base` directory
 
 ```
 cd base/
-cp -r ../packages/centos-7/rpms .
+make
 ```
 
-Build the base image
-
-```
-docker build -t scidas/slurm.base:19.05.1 .
-```
+This builds `clustercockpit/slurm.base:24.05.3` from AlmaLinux 9, compiling Slurm RPMs from source with JWT and slurmrestd support.
 
 Verify image build
 
 ```console
 $ docker images
-REPOSITORY             TAG                 IMAGE ID            CREATED                  SIZE
-scidas/slurm.base   19.05.1             1600621cb483        Less than a second ago   819MB
-...
+REPOSITORY                     TAG       IMAGE ID       CREATED         SIZE
+clustercockpit/slurm.base      24.05.3   ...
 ```
 
-All images defined in `docker-compose.yml` will be built from the `scidas/slurm.base:19.05.1` base image
+All images defined in `docker-compose.yml` are built from the `clustercockpit/slurm.base:24.05.3` base image
 
 ## Usage
 
